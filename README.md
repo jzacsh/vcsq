@@ -1,5 +1,16 @@
 # vcst: VCSrusT
 
+Tries to answer generic questions about a VCS repo, without making you think
+about the particular flavor of VCS at play.
+
+This repo lives at https://gitlab.com/jzacsh/vcsrs
+
+## Development
+
+```sh
+cargo watch -x test
+```
+
 ## Design Goals
 
 **Goal**: answer 101 introspective questions about a repo/directory.
@@ -16,7 +27,7 @@ Questions I frequently[^freq] want to answer;
 1. dirty filepaths
 1. HEAD's touched files
    - "touched" means "since last commit"
-.1 union of the last two
+1. union of the last two
 1. HEAD's touched as opposed to "last bookmark"
 
 The goal is to have coverage popular VCS I personally encounter regulalry, like
