@@ -3,7 +3,7 @@
 Tries to answer generic questions about a VCS repo, without making you think
 about the particular flavor of VCS at play.
 
-This repo lives at https://gitlab.com/jzacsh/vcsrs
+This repo lives at https://gitlab.com/jzacsh/vcst
 
 ## Development
 
