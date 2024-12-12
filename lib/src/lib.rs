@@ -1,4 +1,4 @@
-// TODO finish converting readme bulletted list to proper API surfaces/docs below (then update the
+// TODO finish convert from readme list to proper API surfaces/docs below (then update the
 // readme to point here as the canonical reference).
 pub mod repo;
 

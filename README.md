@@ -7,8 +7,10 @@ This repo lives at https://gitlab.com/jzacsh/vcst
 
 ## Development
 
+In `lib/` just unit tests right now:
+
 ```sh
-cargo watch -x test
+$ cargo watch -x test
 ```
 
 ## Design Goals
@@ -45,10 +47,10 @@ my root directory, for example).
 
 
 [^freq]:
-    See another three predecessory mini-library just like this one, which I
-    wrote at at https://gitlab.com/jzacsh/dotfiles and at
+    See the three predecessors/mini-libs that inspired this one, at:
+    https://gitlab.com/jzacsh/dotfiles and at
     https://gitlab.com/jzacsh/yabashlib and
-    https://gitlab.com/jzacsh/jzach.gitlab.cio
+    https://gitlab.com/jzacsh/jzach.gitlab.io
 
 ## License
 
