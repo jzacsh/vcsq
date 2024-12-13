@@ -1,14 +1,9 @@
-/// The particular brands of VCS this library supports.
-pub enum VcsBrand {
-    Git,
-    Mercurial,
-    Jujutsu,
-}
-
 // TODO needed? helpful?
 pub type DirPath = str;
 
 /// Operations any VCS should be able to answer about a repo.
+// TODO finish convert from readme list to proper API surfaces/docs below (then update the
+// readme to point here as the canonical reference).
 pub trait Repo {
     /// Whether dir is a VCS of this particular branch, or an error if anything went wrong
     /// trying to find out.
