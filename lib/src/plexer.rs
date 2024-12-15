@@ -8,18 +8,24 @@ enum VcsBrand {
     // TODO: Jujutsu,
 }
 
-pub struct RepoPlexer {}
+pub struct RepoPlexer<'a> {
+    brand: VcsBrand,
+    dir: &'a repo::DirPath,
+}
 
-impl repo::Repo for RepoPlexer {
-    fn is_vcs(dir: &repo::DirPath) -> Result<bool, &str> {
-        todo!(); // DO NOT SUBMIT: just shell out
+impl RepoPlexer<'_> {
+    /// is dir `foo/` a VCS repo?
+    /// if so, of which type?
+    fn from(dir: &repo::DirPath) -> Result<RepoPlexer<'_>, &str> {
+        todo!();
     }
 }
 
-/// is dir `foo/` a VCS repo?
-/// if so, of which type?
-pub fn vcs_type(dir: &repo::DirPath) -> Result<VcsBrand, &str> {
-    todo!();
+impl repo::Repo for RepoPlexer<'_> {
+    /// Redundant: no point in calling this if you have an instance of RepoPlexer constructed
+    fn is_vcs(dir: &repo::DirPath) -> Result<bool, &str> {
+        todo!(); // DO NOT SUBMIT: just shell out
+    }
 }
 
 #[cfg(test)]

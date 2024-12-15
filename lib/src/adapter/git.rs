@@ -4,6 +4,7 @@ pub struct RepoGit {}
 
 impl repo::Repo for RepoGit {
     fn is_vcs(dir: &repo::DirPath) -> Result<bool, &str> {
+        // DO NOT SUBMIT use https://doc.rust-lang.org/std/process/struct.Command.html
         todo!(); // DO NOT SUBMIT: just shell out
     }
 }
