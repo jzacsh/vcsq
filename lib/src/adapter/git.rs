@@ -1,5 +1,6 @@
 use crate::repo;
 
+#[derive(Debug)]
 pub struct RepoGit {}
 
 impl repo::Repo for RepoGit {

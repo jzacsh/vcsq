@@ -1,17 +1,33 @@
 use clap::Parser;
+use libvcst::plexer::RepoPlexer;
+use libvcst::repo::DirPath;
+use std::boxed::Box;
+use std::path::PathBuf;
+use std::error::Error;
 
-/// Version Control System (VCS) inspection tool.
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
+/// Version Control System (VCS) inspection tool.
 struct VcstArgs {
     /// Directory for which you'd like to ask VCS questions.
-    // TODO: can swithc to std::path::Path instead?
+    // TODO: can switch to std::path::Path instead?
     #[arg(short, long)]
     dir: String,
 }
 
-fn main() {
-    println!("zomg write some calls for $PWD already!\n\t{:?}", VcstArgs::parse());
+// TODO(rust) error infra from the start?
+fn fromCli() -> Result<Box<RepoPlexer>, &'static str> {
+    let dir: String = VcstArgs::parse().dir;
+    let dir: DirPath = PathBuf::from(dir);
+    let plexer = RepoPlexer::from(dir)?;
+    Ok(Box::from(plexer))
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let plexer = fromCli()?;
+    println!("zomg write some calls for $PWD already!\n\t{:?}", plexer);
     println!("\tDO NOT SUBMIT setup cargo CLI crate (clippy?)!");
     println!("\tin the meantime, here's whether you're in a VCS repo:");
+
+    Ok(())
 }

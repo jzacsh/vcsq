@@ -1,29 +1,33 @@
 use crate::adapter::git::RepoGit;
-use crate::repo;
+use crate::repo::{DirPath, Repo};
 
 /// The particular brands of VCS this library supports.
+#[derive(Debug)]
 enum VcsBrand {
     Git,
     // TODO: Mercurial,
     // TODO: Jujutsu,
 }
 
-pub struct RepoPlexer<'a> {
+#[derive(Debug)]
+pub struct RepoPlexer {
     brand: VcsBrand,
-    dir: &'a repo::DirPath,
+    dir: DirPath,
 }
 
-impl RepoPlexer<'_> {
+/// Multiplexes all available VCS adapters into one interface so you don't have to figure out which
+/// VCS you're interacting with in order to start asking repo::Repo questions.
+impl RepoPlexer {
     /// is dir `foo/` a VCS repo?
     /// if so, of which type?
-    fn from(dir: &repo::DirPath) -> Result<RepoPlexer<'_>, &str> {
+    pub fn from(dir: DirPath) -> Result<RepoPlexer, &'static str> {
         todo!();
     }
 }
 
-impl repo::Repo for RepoPlexer<'_> {
+impl Repo for RepoPlexer {
     /// Redundant: no point in calling this if you have an instance of RepoPlexer constructed
-    fn is_vcs(dir: &repo::DirPath) -> Result<bool, &str> {
+    fn is_vcs(dir: &DirPath) -> Result<bool, &str> {
         todo!(); // DO NOT SUBMIT: just shell out
     }
 }

@@ -1,5 +1,5 @@
 // TODO needed? helpful?
-pub type DirPath = str;
+pub type DirPath = std::path::PathBuf;
 
 /// Operations any VCS should be able to answer about a repo.
 // TODO finish convert from readme list to proper API surfaces/docs below (then update the
