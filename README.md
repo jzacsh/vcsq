@@ -10,7 +10,15 @@ This repo lives at https://gitlab.com/jzacsh/vcst
 In `lib/` just unit tests right now:
 
 ```sh
-$ cargo watch -x test
+$ cd lib && cargo watch -x test
+# ...
+```
+
+In `vcst/` just runt he binary:
+
+```sh
+$ cd vcst && cargo watch -x run
+# ...
 ```
 
 ## Design Goals
