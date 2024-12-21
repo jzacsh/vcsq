@@ -3,7 +3,7 @@
 Tries to answer generic questions about a VCS repo, without making you think
 about the particular flavor of VCS at play.
 
-This repo lives at https://gitlab.com/jzacsh/vcst
+This repo lives at <https://gitlab.com/jzacsh/vcst>
 
 ## Development
 
@@ -43,7 +43,6 @@ Questions I frequently[^freq] want to answer;
 The goal is to have coverage popular VCS I personally encounter regulalry, like
 `git`, `hg`, `jj`.
 
-
 ## Tests
 
 e2e tests are going to be the easiest to maintain and leverage, and I imagine
@@ -53,12 +52,11 @@ TODO figure out how to get root-less container setup easily so we can contain
 some tests (because I don't want a unit-test's buggy teardown() func to delete
 my root directory, for example).
 
-
 [^freq]:
     See the three predecessors/mini-libs that inspired this one, at:
-    https://gitlab.com/jzacsh/dotfiles and at
-    https://gitlab.com/jzacsh/yabashlib and
-    https://gitlab.com/jzacsh/jzach.gitlab.io
+    <https://gitlab.com/jzacsh/dotfiles> and at
+    <https://gitlab.com/jzacsh/yabashlib> and
+    <https://gitlab.com/jzacsh/jzach.gitlab.io>
 
 ## License
 
