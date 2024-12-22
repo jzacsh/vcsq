@@ -1,13 +1,23 @@
-use crate::repo;
+use crate::repo::{DirPath,Repo};
 
 #[derive(Debug)]
 pub struct RepoGit {}
 
-impl repo::Repo for RepoGit {
-    fn is_vcs(dir: &repo::DirPath) -> Result<bool, &str> {
+impl RepoGit {
+    /// Whether `dir` is a git repo (if so: wraps it in an object you can call for more
+    /// questions.
+    ///
+    /// Basically checks the following shell command returns 0:
+    /// ```sh
+    /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
+    /// ```
+    pub fn is_vcs(dir: DirPath) -> Result<Option<Self>, &'static str> {
+        todo!()
         // DO NOT SUBMIT use https://doc.rust-lang.org/std/process/struct.Command.html
-        todo!(); // DO NOT SUBMIT: just shell out
     }
+}
+
+impl Repo for RepoGit {
 }
 
 #[cfg(test)]
