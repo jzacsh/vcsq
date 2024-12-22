@@ -1,7 +1,6 @@
 use clap::Parser;
 use libvcst::plexer::RepoPlexer;
 use libvcst::repo::DirPath;
-use std::boxed::Box;
 use std::path::PathBuf;
 use std::error::Error;
 
@@ -16,11 +15,11 @@ struct VcstArgs {
 }
 
 // TODO(rust) error infra from the start?
-fn fromCli() -> Result<Box<RepoPlexer>, &'static str> {
+fn fromCli() -> Result<RepoPlexer, &'static str> {
     let dir: String = VcstArgs::parse().dir;
     let dir: DirPath = PathBuf::from(dir);
     let plexer = RepoPlexer::from(dir)?;
-    Ok(Box::from(plexer))
+    Ok(plexer)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
