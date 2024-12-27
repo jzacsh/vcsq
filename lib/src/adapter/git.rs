@@ -1,7 +1,10 @@
 use crate::repo::{DirPath,Repo};
+use std::process::{Command,Stdio};
 
 #[derive(Debug)]
-pub struct RepoGit {}
+pub struct RepoGit {
+    dir: DirPath,
+}
 
 impl RepoGit {
     /// Whether `dir` is a git repo (if so: wraps it in an object you can call for more
@@ -12,8 +15,22 @@ impl RepoGit {
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
     pub fn is_vcs(dir: DirPath) -> Result<Option<Self>, &'static str> {
-        todo!()
-        // DO NOT SUBMIT use https://doc.rust-lang.org/std/process/struct.Command.html
+        if Command::new("git")
+            .arg("rev-parse")
+            .arg("--show-toplevel")
+            // TODO map stderr to Err() values
+            .stderr(Stdio::null())
+            // TODO check 'output.stdout' is a non-empty substr of 'dir'
+            .stdout(Stdio::null())
+            .current_dir(dir.clone())
+            .output()
+            .expect("failed executing git locally")
+            .status
+            .success() {
+            Ok(Some(RepoGit {dir}))
+        } else {
+            Ok(None)
+        }
     }
 }
 
