@@ -27,7 +27,13 @@ pub struct RepoPlexer {
 //    impl Repo for RepoPlexer<...> {}
 impl RepoPlexer {
     /// Redundant: no point in calling this if you have an instance of RepoPlexer constructed
-    fn is_vcs(dir: DirPath) -> Result<Option<RepoPlexer>, &'static str> {
+    pub fn is_vcs(dir: DirPath) -> Result<Option<RepoPlexer>, &'static str> {
+        // TODO generically handle "vcs" being not in $PATH, out here in our plexer; if
+        // _none_ of our adapter's underlying CLIs are in our plexer, _then_ trnaslate that
+        // to an error.
+        //    if let NotFound = e.kind() { ... }
+        //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
+
         if let Some(adapter) = RepoGit::is_vcs(dir.clone()).expect("error inspecting dir") {
             Ok(Some(Self {
                 dir,

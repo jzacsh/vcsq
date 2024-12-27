@@ -18,15 +18,18 @@ struct VcstArgs {
 fn fromCli() -> Result<Option<RepoPlexer>, &'static str> {
     let dir: String = VcstArgs::parse().dir;
     let dir: DirPath = PathBuf::from(dir);
-    RepoPlexer::is_vcs(dir)?
+    Ok(RepoPlexer::is_vcs(dir)?)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let plexer = fromCli().expect("could not even construct a plexer");
-    println!("zomg write some calls for $PWD already!\n\t{:?}", plexer);
-    println!("\tDO NOT SUBMIT setup cargo CLI crate (clippy?)!");
-    println!("\tin the meantime, here's whether you're in a VCS repo:");
-    println!("plexer#is_vcs: {:?}", plexer.is_vcs().expect("able to ask if dir '{:?}' is a vcs"))
-
+    match fromCli().expect("could not even construct a plexer") {
+        Some(plexer) => {
+            println!("appears you have a repo: {:?}", plexer);
+        },
+        None => {
+            eprintln!("dir appears not to be a VCS repo");
+        }
+    }
     Ok(())
+    // TODO setup cargo CLI crate (clippy?)!
 }
