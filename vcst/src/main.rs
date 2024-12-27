@@ -15,14 +15,14 @@ struct VcstArgs {
 }
 
 // TODO(rust) error infra from the start?
-fn fromCli() -> Result<Option<RepoPlexer>, &'static str> {
+fn from_cli() -> Result<Option<RepoPlexer>, &'static str> {
     let dir: String = VcstArgs::parse().dir;
     let dir: DirPath = PathBuf::from(dir);
     Ok(RepoPlexer::is_vcs(dir)?)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    match fromCli().expect("could not even construct a plexer") {
+    match from_cli().expect("could not even construct a plexer") {
         Some(plexer) => {
             println!("appears you have a repo: {:?}", plexer);
         },
