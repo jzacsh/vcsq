@@ -12,6 +12,10 @@ struct VcstArgs {
     // TODO: can switch to std::path::Path instead?
     #[arg(short, long)]
     dir: String,
+
+    // TODO next: implement every question in my readme as a flag here, nad match each one to a
+    // todo!() macros call in main(). This way we have a nice panic-path to implementing all of
+    // Repo trait.
 }
 
 // TODO(rust) error infra from the start?
