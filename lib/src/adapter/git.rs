@@ -43,6 +43,9 @@ impl RepoGit {
 }
 
 impl Repo for RepoGit {
+    fn root(&self) -> Result<DirPath, RepoLoadError> {
+        todo!(); // call git_show_top_level and gets its output
+    }
 }
 
 #[cfg(test)]

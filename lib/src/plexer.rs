@@ -53,6 +53,12 @@ impl RepoPlexer {
     }
 }
 
+impl Repo for RepoPlexer {
+    fn root(&self) -> Result<DirPath, RepoLoadError> {
+        self.adapter.root()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

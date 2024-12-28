@@ -1,8 +1,9 @@
 use std::convert::From;
 use std::fmt;
+use std::path::PathBuf;
 
 // TODO needed? helpful?
-pub type DirPath = std::path::PathBuf;
+pub type DirPath = PathBuf;
 
 #[derive(Debug)]
 pub enum RepoLoadError {
@@ -46,5 +47,6 @@ impl fmt::Display for RepoLoadError {
 pub trait Repo
     where Self: std::fmt::Debug,
 {
-
+    /// Prints the root dir of the repo.
+    fn root(&self) -> Result<DirPath, RepoLoadError>;
 }
