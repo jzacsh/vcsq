@@ -50,7 +50,7 @@ impl Repo for RepoGit {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
 
     #[test]
     fn it_works() {
