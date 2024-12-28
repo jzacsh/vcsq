@@ -14,7 +14,7 @@ impl RepoGit {
     /// ```sh
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
-    pub fn is_vcs(dir: DirPath) -> Result<Option<Self>, &'static str> {
+    pub fn new(dir: DirPath) -> Result<Option<Self>, &'static str> {
         if Command::new("git")
             .arg("rev-parse")
             .arg("--show-toplevel")

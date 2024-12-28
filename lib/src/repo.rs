@@ -1,10 +1,8 @@
 // TODO needed? helpful?
 pub type DirPath = std::path::PathBuf;
 
-// TODO(rust) I want is_vcs() to be a function of trait 'Repo' below, but it was causing some
-// really strange-loops with the compiler making me deal with https://doc.rust-lang.org/reference/items/traits.html#object-safety
-/// Whether dir is a VCS of this particular branch, or an error if anything went wrong
-/// trying to find out.
+// TODO(rust) common error types here that we want all Repo's to return in their constructions
+
 // TODO is returning boolean right here? how can we handle the case that JJ repo is a JJ
 // rpeo, or maybe a JJ-colocated-git repo, or JJ-colocated-p4 repo, or JJ-wrapping-git
 // repo? Just true for all of those? Or some generic type we can define that would let JJ

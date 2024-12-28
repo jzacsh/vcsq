@@ -125,7 +125,7 @@ fn from_cli() -> Result<PlexerQuery, String> {
     let vcst_args = VcstArgs::init()?;
     let dir: String = vcst_args.dir.clone().unwrap();
     let dir: DirPath = PathBuf::from(dir);
-    let plexer = RepoPlexer::is_vcs(dir)?;
+    let plexer = RepoPlexer::new(dir)?;
     Ok(PlexerQuery{
       plexer,
       cli: vcst_args,

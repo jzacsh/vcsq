@@ -26,8 +26,9 @@ pub struct RepoPlexer {
 // to instead being this (which we're doing by hand right now w/o compiler help):
 //    impl Repo for RepoPlexer<...> {}
 impl RepoPlexer {
-    /// Redundant: no point in calling this if you have an instance of RepoPlexer constructed
-    pub fn is_vcs(dir: DirPath) -> Result<Option<RepoPlexer>, String> {
+    /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
+    /// returns a Repo object that can answer further questions about said repo.
+    pub fn new(dir: DirPath) -> Result<Option<RepoPlexer>, String> {
         // TODO generically handle "vcs" being not in $PATH, out here in our plexer; if
         // _none_ of our adapter's underlying CLIs are in our plexer, _then_ trnaslate that
         // to an error.
@@ -37,7 +38,7 @@ impl RepoPlexer {
         let mut attempts = Vec::with_capacity(5);
 
         attempts.push(VcsBrand::Git);
-        if let Some(git) = RepoGit::is_vcs(dir.clone()).expect("error inspecting dir") {
+        if let Some(git) = RepoGit::new(dir.clone()).expect("error inspecting dir") {
             Ok(Some(Self {
                 dir,
                 brand: VcsBrand::Git,
