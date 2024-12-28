@@ -1,6 +1,6 @@
 use clap::{Parser,Subcommand};
 use libvcst::plexer::RepoPlexer;
-use libvcst::repo::DirPath;
+use libvcst::repo::{DirPath,RepoLoadError};
 use std::path::PathBuf;
 use std::error::Error;
 use std::process::exit;
@@ -33,7 +33,7 @@ struct VcstArgs {
 
 impl VcstArgs {
     /// Alternative to clap's parse, just so we can handle defaults
-    pub fn init() -> Result<VcstArgs, &'static str> {
+    pub fn init() -> Result<VcstArgs, RepoLoadError> {
         let mut args = VcstArgs::parse();
         // TODO(rust) delete all this clunky method if Clap has a way to express defaults directly
         // with its derive macros. 
@@ -49,7 +49,7 @@ impl VcstArgs {
 
             // TODO(rust) is this really the clap way? some "usage error" type that lets clap
             // do other nice things?
-            Err("usage: dir is required")
+            Err("usage: dir is required".to_string().into())
         }
     }
 }
@@ -121,7 +121,7 @@ struct PlexerQuery {
 }
 
 // TODO(rust) error infra from the start?
-fn from_cli() -> Result<PlexerQuery, String> {
+fn from_cli() -> Result<PlexerQuery, RepoLoadError> {
     let vcst_args = VcstArgs::init()?;
     let dir: String = vcst_args.dir.clone().unwrap();
     let dir: DirPath = PathBuf::from(dir);
@@ -154,6 +154,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         VcstQuery::Brand{dir} => {
             println!("{:?}", plexer.brand);
         },
+
+
         VcstQuery::Root{dir} => todo!(),
         VcstQuery::IsClean{dir} => todo!(),
         VcstQuery::CurrentId{dir, dirtyOk} => todo!(),

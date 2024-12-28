@@ -1,5 +1,5 @@
 use crate::adapter::git::RepoGit;
-use crate::repo::{DirPath, Repo};
+use crate::repo::{DirPath, Repo, RepoLoadError};
 
 /// The particular brands of VCS this library supports.
 #[derive(Debug)]
@@ -28,7 +28,7 @@ pub struct RepoPlexer {
 impl RepoPlexer {
     /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
     /// returns a Repo object that can answer further questions about said repo.
-    pub fn new(dir: DirPath) -> Result<Option<RepoPlexer>, String> {
+    pub fn new(dir: DirPath) -> Result<Option<RepoPlexer>, RepoLoadError> {
         // TODO generically handle "vcs" being not in $PATH, out here in our plexer; if
         // _none_ of our adapter's underlying CLIs are in our plexer, _then_ trnaslate that
         // to an error.
@@ -48,7 +48,7 @@ impl RepoPlexer {
             Err(format!(
                 "if dir is a VCS, it's of an unknown brand (tried {:?}: {:?})",
                 attempts.len(),
-                attempts))
+                attempts).into())
         }
     }
 }

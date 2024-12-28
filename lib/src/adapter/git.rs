@@ -1,4 +1,4 @@
-use crate::repo::{DirPath,Repo};
+use crate::repo::{DirPath,Repo,RepoLoadError};
 use std::process::{Command,Stdio};
 
 #[derive(Debug)]
@@ -14,7 +14,7 @@ impl RepoGit {
     /// ```sh
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
-    pub fn new(dir: DirPath) -> Result<Option<Self>, &'static str> {
+    pub fn new(dir: DirPath) -> Result<Option<Self>, RepoLoadError> {
         if Command::new("git")
             .arg("rev-parse")
             .arg("--show-toplevel")
