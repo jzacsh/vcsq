@@ -3,7 +3,7 @@ use crate::repo::{DirPath, Repo};
 
 /// The particular brands of VCS this library supports.
 #[derive(Debug)]
-enum VcsBrand {
+pub enum VcsBrand {
     Git,
     // TODO: Mercurial,
     // TODO: Jujutsu,
@@ -13,7 +13,7 @@ enum VcsBrand {
 /// VCS you're interacting with in order to start asking repo::Repo questions.
 #[derive(Debug)]
 pub struct RepoPlexer {
-    brand: VcsBrand,
+    pub brand: VcsBrand,
     adapter: Box<dyn Repo>,
     dir: DirPath,
 }
@@ -27,21 +27,27 @@ pub struct RepoPlexer {
 //    impl Repo for RepoPlexer<...> {}
 impl RepoPlexer {
     /// Redundant: no point in calling this if you have an instance of RepoPlexer constructed
-    pub fn is_vcs(dir: DirPath) -> Result<Option<RepoPlexer>, &'static str> {
+    pub fn is_vcs(dir: DirPath) -> Result<Option<RepoPlexer>, String> {
         // TODO generically handle "vcs" being not in $PATH, out here in our plexer; if
         // _none_ of our adapter's underlying CLIs are in our plexer, _then_ trnaslate that
         // to an error.
         //    if let NotFound = e.kind() { ... }
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
-        if let Some(adapter) = RepoGit::is_vcs(dir.clone()).expect("error inspecting dir") {
+        let mut attempts = Vec::with_capacity(5);
+
+        attempts.push(VcsBrand::Git);
+        if let Some(git) = RepoGit::is_vcs(dir.clone()).expect("error inspecting dir") {
             Ok(Some(Self {
                 dir,
                 brand: VcsBrand::Git,
-                adapter: Box::from(adapter),
+                adapter: Box::from(git),
             }))
         } else {
-            Err("if dir is a VCS, it's of an unknown brand")
+            Err(format!(
+                "if dir is a VCS, it's of an unknown brand (tried {:?}: {:?})",
+                attempts.len(),
+                attempts))
         }
     }
 }

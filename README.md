@@ -25,20 +25,8 @@ $ cd vcst && cargo watch -x run
 
 **Goal**: answer 101 introspective questions about a repo/directory.
 
-Questions I frequently[^freq] want to answer;
-
-1. is dir `foo/` a VCS repo?
-   - if so, of which type?
-1. given dir `foo/` a where is this repo's root?
-1. is this repo dirty?
-1. what unique ID (commit/rev) can you give me to refer to the repo's current
-   state?
-1. what unique bookmark (branch, tag) can you give me to refer to the repo's current?
-1. dirty filepaths
-1. HEAD's touched files
-   - "touched" means "since last commit"
-1. union of the last two
-1. HEAD's touched as opposed to "last bookmark"
+Questions I frequently[^freq] want to answered are now outlined as `VcstQuery`
+enum of in the namesaked reference binary (at `./vcst/src/main.rs`).
 
 The goal is to have coverage popular VCS I personally encounter regulalry, like
 `git`, `hg`, `jj`.
