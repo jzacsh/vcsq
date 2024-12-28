@@ -15,22 +15,30 @@ impl RepoGit {
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
     pub fn new(dir: DirPath) -> Result<Option<Self>, RepoLoadError> {
-        if Command::new("git")
-            .arg("rev-parse")
-            .arg("--show-toplevel")
-            // TODO map stderr to Err() values
-            .stderr(Stdio::null())
+        let repo_git = RepoGit {dir};
+        let is_ok = repo_git.git_show_top_level()
             // TODO check 'output.stdout' is a non-empty substr of 'dir'
             .stdout(Stdio::null())
-            .current_dir(dir.clone())
+            // TODO map stderr to Err() values
+            .stderr(Stdio::null())
             .output()
             .expect("failed executing git locally")
             .status
-            .success() {
-            Ok(Some(RepoGit {dir}))
+            .success();
+        if is_ok {
+            Ok(Some(repo_git))
         } else {
             Ok(None)
         }
+    }
+
+    fn git_show_top_level(&self) -> Command {
+        let mut cmd = Command::new("git");
+        cmd
+            .arg("rev-parse")
+            .arg("--show-toplevel")
+            .current_dir(self.dir.clone());
+        cmd
     }
 }
 
