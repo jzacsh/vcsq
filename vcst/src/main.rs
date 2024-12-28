@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
-use libvcst::repo::{DirPath, RepoLoadError};
+use libvcst::repo::{DirPath, Repo, RepoLoadError};
 use std::error::Error;
 use std::path::PathBuf;
 use std::process::exit;
@@ -36,23 +36,35 @@ impl VcstArgs {
         // TODO(rust) delete all this clunky method if Clap has a way to express defaults directly
         // with its derive macros.
         if let Some(ref dir) = args.dir {
-            if args.query.is_none() {
+            if let Some(ref query) = args.query {
+                // TODO(feature,clap) fix this clunkiness: somehow allow lone positional arg of a
+                // directory for the case that no subcommand is passed. IDK how to do that in clap.
+
+                let dir_positional = query.dir();
+                assert!(dir.to_string() == dir_positional.clone(), "clunky ux: you passed --dir different than DIR; you only need one; got: --dir={:?} and DIR={:?}", dir.clone(), dir_positional);
+            } else {
                 args.query = Some(VcstQuery::Brand { dir: dir.clone() });
             }
-            Ok(args)
-        } else {
-            // TODO(feature) impl a subcommand that lets you know which $PATH dependencies are
-            // found.
+        }
+        Ok(args)
+    }
 
-            // TODO(rust) is this really the clap way? some "usage error" type that lets clap
-            // do other nice things?
-            Err("usage: dir is required".to_string().into())
+    pub fn dir(&self) -> String {
+        if let Some(ref dir) = self.dir {
+            return dir.clone();
+        }
+        if let Some(ref query) = self.query {
+            return query.dir().clone();
+        } else {
+            panic!("require either subcmd with a query or direct --dir");
         }
     }
 }
 
 // TODO(clap, rust) figure out how to shorten the names of these subcommands so they rust-lang
 // naming doesn't turn into annoyingly-long (and hyphenated) names.
+//
+// TODO(feature) impl a subcommand that lets you know which $PATH dependencies are found.
 #[derive(Debug, Subcommand, Clone)]
 enum VcstQuery {
     /// Prints the brand of the VCS repo, or exits non-zero if it's not a known VCS repo.
@@ -110,6 +122,22 @@ enum VcstQuery {
     },
 }
 
+impl VcstQuery {
+    // TODO(rust) way to ask clap to make a global positional arg for all these subcommands, so we
+    // can rely on its presence?
+    fn dir(&self) -> &String {
+        match self {
+            VcstQuery::Brand { dir } => dir,
+            VcstQuery::Root { dir } => dir,
+            VcstQuery::IsClean { dir } => dir,
+            VcstQuery::CurrentId { dir, dirtyOk } => dir,
+            VcstQuery::CurrentName { dir, dirtyOk } => dir,
+            VcstQuery::DirtyFiles { dir } => dir,
+            VcstQuery::CurrentFiles { dir, dirtyOk } => dir,
+        }
+    }
+}
+
 struct PlexerQuery {
     plexer: Option<RepoPlexer>,
     cli: VcstArgs,
@@ -118,7 +146,7 @@ struct PlexerQuery {
 // TODO(rust) error infra from the start?
 fn from_cli() -> Result<PlexerQuery, RepoLoadError> {
     let vcst_args = VcstArgs::init()?;
-    let dir: String = vcst_args.dir.clone().unwrap();
+    let dir: String = vcst_args.dir();
     let dir: DirPath = PathBuf::from(dir);
     let plexer = RepoPlexer::new(dir)?;
     Ok(PlexerQuery {
@@ -153,8 +181,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         VcstQuery::Brand { dir } => {
             println!("{:?}", plexer.brand);
         }
-
-        VcstQuery::Root { dir } => todo!(),
+        VcstQuery::Root { dir } => match plexer.root() {
+            Ok(root_path) => println!("{:?}", root_path),
+            Err(e) => {
+                eprintln!("root dir: {:?}", e);
+                exit(1);
+            }
+        },
         VcstQuery::IsClean { dir } => todo!(),
         VcstQuery::CurrentId { dir, dirtyOk } => todo!(),
         VcstQuery::CurrentName { dir, dirtyOk } => todo!(),
