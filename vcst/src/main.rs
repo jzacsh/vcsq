@@ -1,8 +1,8 @@
-use clap::{Parser,Subcommand};
+use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
-use libvcst::repo::{DirPath,RepoLoadError};
-use std::path::PathBuf;
+use libvcst::repo::{DirPath, RepoLoadError};
 use std::error::Error;
+use std::path::PathBuf;
 use std::process::exit;
 
 #[derive(Parser, Debug)]
@@ -20,15 +20,13 @@ struct VcstArgs {
 
     #[command(subcommand)]
     query: Option<VcstQuery>,
-
     // TODO next: implement every question in my readme as a flag here, nad match each one to a
     // todo!() macros call in main(). This way we have a nice panic-path to implementing all of
     // Repo trait.
-//  1. HEAD's touched files
-//     - "touched" means "since last commit"
-//  1. union of the last two
-//  1. HEAD's touched as opposed to "last bookmark"
-
+    //  1. HEAD's touched files
+    //     - "touched" means "since last commit"
+    //  1. union of the last two
+    //  1. HEAD's touched as opposed to "last bookmark"
 }
 
 impl VcstArgs {
@@ -36,16 +34,15 @@ impl VcstArgs {
     pub fn init() -> Result<VcstArgs, RepoLoadError> {
         let mut args = VcstArgs::parse();
         // TODO(rust) delete all this clunky method if Clap has a way to express defaults directly
-        // with its derive macros. 
+        // with its derive macros.
         if let Some(ref dir) = args.dir {
             if args.query.is_none() {
-                args.query = Some(VcstQuery::Brand{dir: dir.clone()});
+                args.query = Some(VcstQuery::Brand { dir: dir.clone() });
             }
             Ok(args)
         } else {
             // TODO(feature) impl a subcommand that lets you know which $PATH dependencies are
             // found.
-
 
             // TODO(rust) is this really the clap way? some "usage error" type that lets clap
             // do other nice things?
@@ -70,7 +67,7 @@ enum VcstQuery {
     #[command(arg_required_else_help = true)]
     IsClean {
         // TODO(feature) implement subcommand here, eg: enum {diffstat, diff, files}
-        dir: String // TODO: can switch to std::path::Path or DirPath instead?
+        dir: String, // TODO: can switch to std::path::Path or DirPath instead?
     },
 
     /// Print the VCS repo's current revision ID (eg: rev in Mercurial, ref in git, etc).
@@ -105,15 +102,13 @@ enum VcstQuery {
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
         dirtyOk: bool,
-
         // TODO(feature) allow an optional Id or Name  (ref or bookmark) of which to compare
         // (instead of just the default which is "parent commit").
 
         // TODO(feature) implement subcommand here, eg: enum {diffstat, diff, files} (unified with
         // IsClean)
-    }
+    },
 }
-
 
 struct PlexerQuery {
     plexer: Option<RepoPlexer>,
@@ -126,9 +121,9 @@ fn from_cli() -> Result<PlexerQuery, RepoLoadError> {
     let dir: String = vcst_args.dir.clone().unwrap();
     let dir: DirPath = PathBuf::from(dir);
     let plexer = RepoPlexer::new(dir)?;
-    Ok(PlexerQuery{
-      plexer,
-      cli: vcst_args,
+    Ok(PlexerQuery {
+        plexer,
+        cli: vcst_args,
     })
 }
 
@@ -140,28 +135,31 @@ fn main() -> Result<(), Box<dyn Error>> {
         Err(e) => {
             eprintln!("{}", e);
             exit(1);
-        },
+        }
         Ok(vcst) => vcst,
     };
     let plexer = match vcst_query.plexer {
         None => {
             eprintln!("dir appears not to be a VCS repo");
             exit(1);
-        },
+        }
         Some(plexer) => plexer,
     };
-    match vcst_query.cli.query.expect("bug: init() should have guaranteed a query") {
-        VcstQuery::Brand{dir} => {
+    match vcst_query
+        .cli
+        .query
+        .expect("bug: init() should have guaranteed a query")
+    {
+        VcstQuery::Brand { dir } => {
             println!("{:?}", plexer.brand);
-        },
+        }
 
-
-        VcstQuery::Root{dir} => todo!(),
-        VcstQuery::IsClean{dir} => todo!(),
-        VcstQuery::CurrentId{dir, dirtyOk} => todo!(),
-        VcstQuery::CurrentName{dir, dirtyOk} => todo!(),
-        VcstQuery::DirtyFiles{dir} => todo!(),
-        VcstQuery::CurrentFiles{dir, dirtyOk} => todo!(),
+        VcstQuery::Root { dir } => todo!(),
+        VcstQuery::IsClean { dir } => todo!(),
+        VcstQuery::CurrentId { dir, dirtyOk } => todo!(),
+        VcstQuery::CurrentName { dir, dirtyOk } => todo!(),
+        VcstQuery::DirtyFiles { dir } => todo!(),
+        VcstQuery::CurrentFiles { dir, dirtyOk } => todo!(),
     }
     Ok(())
 }

@@ -40,12 +40,12 @@ impl fmt::Display for RepoLoadError {
 // no, this isn't a Self repo.
 //fn is_vcs(dir: DirPath) -> Result<Option<Self>, &'static str>;
 
-
 /// Operations any VCS should be able to answer about a repo.
 // TODO finish convert from readme list to proper API surfaces/docs below (then update the
 // readme to point here as the canonical reference).
 pub trait Repo
-    where Self: std::fmt::Debug,
+where
+    Self: std::fmt::Debug,
 {
     /// Prints the root dir of the repo.
     fn root(&self) -> Result<DirPath, RepoLoadError>;

@@ -1,5 +1,5 @@
-use crate::repo::{DirPath,Repo,RepoLoadError};
-use std::process::{Command,Stdio};
+use crate::repo::{DirPath, Repo, RepoLoadError};
+use std::process::{Command, Stdio};
 
 #[derive(Debug)]
 pub struct RepoGit {
@@ -15,8 +15,9 @@ impl RepoGit {
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
     pub fn new(dir: DirPath) -> Result<Option<Self>, RepoLoadError> {
-        let repo_git = RepoGit {dir};
-        let is_ok = repo_git.git_show_top_level()
+        let repo_git = RepoGit { dir };
+        let is_ok = repo_git
+            .git_show_top_level()
             // TODO check 'output.stdout' is a non-empty substr of 'dir'
             .stdout(Stdio::null())
             // TODO map stderr to Err() values
@@ -34,8 +35,7 @@ impl RepoGit {
 
     fn git_show_top_level(&self) -> Command {
         let mut cmd = Command::new("git");
-        cmd
-            .arg("rev-parse")
+        cmd.arg("rev-parse")
             .arg("--show-toplevel")
             .current_dir(self.dir.clone());
         cmd
@@ -50,7 +50,6 @@ impl Repo for RepoGit {
 
 #[cfg(test)]
 mod tests {
-    
 
     #[test]
     fn it_works() {

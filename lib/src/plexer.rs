@@ -48,7 +48,9 @@ impl RepoPlexer {
             Err(format!(
                 "if dir is a VCS, it's of an unknown brand (tried {:?}: {:?})",
                 attempts.len(),
-                attempts).into())
+                attempts
+            )
+            .into())
         }
     }
 }
@@ -61,7 +63,6 @@ impl Repo for RepoPlexer {
 
 #[cfg(test)]
 mod tests {
-    
 
     #[test]
     fn it_works() {
