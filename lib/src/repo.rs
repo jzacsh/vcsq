@@ -18,21 +18,5 @@ pub type DirPath = std::path::PathBuf;
 pub trait Repo
     where Self: std::fmt::Debug,
 {
-    // given dir `foo/` a where is this repo's root?
-    //
-    // is this repo dirty?
-    //
-    // what unique ID (commit/rev) can you give me to refer to the repo's current
-    // state?
-    //
-    // what unique bookmark (branch, tag) can you give me to refer to the repo's current?
-    //
-    // dirty filepaths
-    //
-    // HEAD's touched files
-    // - "touched" means "since last commit"
-    //
-    // union of the last two
-    //
-    // HEAD's touched as opposed to "last bookmark"
+
 }
