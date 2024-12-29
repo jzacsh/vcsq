@@ -130,10 +130,10 @@ impl VcstQuery {
             VcstQuery::Brand { dir } => dir,
             VcstQuery::Root { dir } => dir,
             VcstQuery::IsClean { dir } => dir,
-            VcstQuery::CurrentId { dir, dirtyOk } => dir,
-            VcstQuery::CurrentName { dir, dirtyOk } => dir,
+            VcstQuery::CurrentId { dir, dirtyOk: _ } => dir,
+            VcstQuery::CurrentName { dir, dirtyOk: _ } => dir,
             VcstQuery::DirtyFiles { dir } => dir,
-            VcstQuery::CurrentFiles { dir, dirtyOk } => dir,
+            VcstQuery::CurrentFiles { dir, dirtyOk: _ } => dir,
         }
     }
 }
@@ -178,7 +178,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .query
         .expect("bug: init() should have guaranteed a query")
     {
-        VcstQuery::Brand { dir } => {
+        VcstQuery::Brand { dir: _ } => {
             println!("{:?}", plexer.brand);
         }
         VcstQuery::Root { dir } => match plexer.root() {

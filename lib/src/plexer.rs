@@ -16,7 +16,6 @@ pub enum VcsBrand {
 pub struct RepoPlexer {
     pub brand: VcsBrand,
     adapter: Box<dyn Repo>,
-    dir: DirPath,
 }
 
 // TODO the strange internal 'adapter: dyn Repo' causes a weird generic here, which then means that
@@ -42,7 +41,6 @@ impl RepoPlexer {
         attempts.push(VcsBrand::Git);
         if let Some(git) = RepoGit::new(dir.clone()).expect("git error inspecting dir") {
             return Ok(Some(Self {
-                dir,
                 brand: VcsBrand::Git,
                 adapter: Box::from(git),
             }));
@@ -51,7 +49,6 @@ impl RepoPlexer {
         attempts.push(VcsBrand::Mercurial);
         if let Some(hg) = RepoHg::new(dir.clone()).expect("hg error inspecting dir") {
             return Ok(Some(Self {
-                dir,
                 brand: VcsBrand::Mercurial,
                 adapter: Box::from(hg),
             }));
