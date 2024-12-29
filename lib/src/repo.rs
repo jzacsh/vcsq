@@ -5,6 +5,8 @@ use std::path::PathBuf;
 // TODO needed? helpful?
 pub type DirPath = PathBuf;
 
+// TODO(rust) setup with https://docs.rs/thiserror/latest/thiserror and/or at least
+// std::error::Error compliance, and trickle that change throughout the codebase.
 #[derive(Debug)]
 pub enum RepoLoadError {
     /// A system-level error, not necessarily related to any VCS, eg: the directory doesn't exist,
