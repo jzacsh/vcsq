@@ -19,9 +19,9 @@ impl RepoGit {
         let repo_git = RepoGit { dir };
         let is_ok = repo_git
             .git_show_top_level()
-            // TODO check 'output.stdout' is a non-empty substr of 'dir'
+            // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
             .stdout(Stdio::null())
-            // TODO map stderr to Err() values
+            // TODO: map stderr to Err() values
             .stderr(Stdio::null())
             .output()
             .expect("failed executing git locally")
@@ -59,7 +59,6 @@ mod tests {
 
     #[test]
     fn it_works() {
-        // TODO implement some "CmdRunner" interface so we can abstract out shelled-out commands.
         assert_eq!("git.rs -42", "git.rs 42");
     }
 }

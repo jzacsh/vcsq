@@ -7,7 +7,7 @@ use crate::repo::{DirPath, Repo, RepoLoadError};
 pub enum VcsBrand {
     Git,
     Mercurial,
-    // TODO: Jujutsu,
+    // TODO::(feature) Jujutsu,
 }
 
 /// Multiplexes all available VCS adapters into one interface so you don't have to figure out which
@@ -18,27 +18,20 @@ pub struct RepoPlexer {
     adapter: Box<dyn Repo>,
 }
 
-// TODO the strange internal 'adapter: dyn Repo' causes a weird generic here, which then means that
-// *telling rust* that RepoPlexer is _actually itself_ a Repo (which is what I want to do) would
-// make for some really confsuing code. TODO here is to figure out how to sanely change this impl
-// line from being
-//    impl RepoPlexer<...> {}
-// to instead being this (which we're doing by hand right now w/o compiler help):
-//    impl Repo for RepoPlexer<...> {}
 impl RepoPlexer {
     /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
     /// returns a Repo object that can answer further questions about said repo.
     pub fn new(dir: DirPath) -> Result<Option<RepoPlexer>, RepoLoadError> {
-        // TODO generically handle "vcs" being not in $PATH, out here in our plexer; if
-        // _none_ of our adapter's underlying CLIs are in our plexer, _then_ trnaslate that
-        // to an error.
+        let mut attempts = Vec::with_capacity(5);
+
+        // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
+        // _none_ of our adapter's underlying CLIs are in our plexer, _then_ translate that to an
+        // error.
         //    if let NotFound = e.kind() { ... }
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
-        // TODO(rust) stop panicking on every attempt, just handle the error appropriatley
-        let mut attempts = Vec::with_capacity(5);
-
         attempts.push(VcsBrand::Git);
+        // TODO: (rust) stop panicking on every attempt, just handle the error appropriatley
         if let Some(git) = RepoGit::new(dir.clone()).expect("git error inspecting dir") {
             return Ok(Some(Self {
                 brand: VcsBrand::Git,
@@ -47,6 +40,7 @@ impl RepoPlexer {
         }
 
         attempts.push(VcsBrand::Mercurial);
+        // TODO: (rust) stop panicking on every attempt, just handle the error appropriatley
         if let Some(hg) = RepoHg::new(dir.clone()).expect("hg error inspecting dir") {
             return Ok(Some(Self {
                 brand: VcsBrand::Mercurial,
@@ -74,7 +68,8 @@ mod tests {
 
     #[test]
     fn it_works() {
-        // TODO implement some "CmdRunner" interface so we can abstract out shelled-out commands.
+        // TODO: (rust) decide on unit testing strategy here (how to dependency-inject filesystem
+        // interactions? don't bother, just straight to e2e tests?)
         assert_eq!("plexer -42", "plexer.rs 42");
     }
 }

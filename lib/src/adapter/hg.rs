@@ -13,9 +13,9 @@ impl RepoHg {
 
         let is_ok = repo
             .hg_root()
-            // TODO check 'output.stdout' is a non-empty substr of 'dir'
+            // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
             .stdout(Stdio::null())
-            // TODO map stderr to Err() values
+            // TODO: (rust) map stderr to Err() values
             .stderr(Stdio::null())
             .output()
             .expect("failed executing hg locally")

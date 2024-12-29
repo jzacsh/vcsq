@@ -20,24 +20,17 @@ struct VcstArgs {
 
     #[command(subcommand)]
     query: Option<VcstQuery>,
-    // TODO next: implement every question in my readme as a flag here, nad match each one to a
-    // todo!() macros call in main(). This way we have a nice panic-path to implementing all of
-    // Repo trait.
-    //  1. HEAD's touched files
-    //     - "touched" means "since last commit"
-    //  1. union of the last two
-    //  1. HEAD's touched as opposed to "last bookmark"
 }
 
 impl VcstArgs {
     /// Alternative to clap's parse, just so we can handle defaults
     pub fn init() -> Result<VcstArgs, RepoLoadError> {
         let mut args = VcstArgs::parse();
-        // TODO(rust) delete all this clunky method if Clap has a way to express defaults directly
+        // TODO: (rust) delete all this clunky method if Clap has a way to express defaults directly
         // with its derive macros.
         if let Some(ref dir) = args.dir {
             if let Some(ref query) = args.query {
-                // TODO(feature,clap) fix this clunkiness: somehow allow lone positional arg of a
+                // TODO: (feature,clap) fix this clunkiness: somehow allow lone positional arg of a
                 // directory for the case that no subcommand is passed. IDK how to do that in clap.
 
                 let dir_positional = query.dir().to_string();
@@ -65,10 +58,10 @@ impl VcstArgs {
     }
 }
 
-// TODO(clap, rust) figure out how to shorten the names of these subcommands so they rust-lang
+// TODO: (clap, rust) figure out how to shorten the names of these subcommands so they rust-lang
 // naming doesn't turn into annoyingly-long (and hyphenated) names.
 //
-// TODO(feature) impl a subcommand that lets you know which $PATH dependencies are found.
+// TODO: (feature) impl a subcommand that lets you know which $PATH dependencies are found.
 #[derive(Debug, Subcommand, Clone)]
 enum VcstQuery {
     /// Prints the brand of the VCS repo, or exits non-zero if it's not a known VCS repo.
@@ -82,7 +75,7 @@ enum VcstQuery {
     /// Whether VCS repo is in a clean state, or has uncommitted work.
     #[command(arg_required_else_help = true)]
     IsClean {
-        // TODO(feature) implement subcommand here, eg: enum {diffstat, diff, files}
+        // TODO: (feature) implement subcommand here, eg: enum {diffstat, diff, files}
         dir: DirPath,
     },
 
@@ -116,11 +109,11 @@ enum VcstQuery {
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
         dirty_ok: bool,
-        // TODO(feature) allow an optional Id or Name  (ref or bookmark) of which to compare
+        // TODO: (feature) allow an optional Id or Name  (ref or bookmark) of which to compare
         // (instead of just the default which is "parent commit").
 
-        // TODO(feature) implement subcommand here, eg: enum {diffstat, diff, files} (unified with
-        // IsClean)
+        // TODO: (feature) implement subcommand here, eg: enum {diffstat, diff, files} (unified
+        // with IsClean)
     },
 }
 
@@ -129,8 +122,8 @@ impl VcstQuery {
         dir_clone_string(self.dir_path())
     }
 
-    // TODO(rust) way to ask clap to make a global positional arg for all these subcommands, so we
-    // can rely on its presence?
+    // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
+    // we can rely on its presence?
     fn dir_path(&self) -> &DirPath {
         match self {
             VcstQuery::Brand { dir } => dir,
@@ -149,7 +142,6 @@ struct PlexerQuery {
     cli: VcstArgs,
 }
 
-// TODO(rust) error infra from the start?
 fn from_cli() -> Result<PlexerQuery, RepoLoadError> {
     let vcst_args = VcstArgs::init()?;
     let dir: String = vcst_args.dir();
@@ -161,9 +153,9 @@ fn from_cli() -> Result<PlexerQuery, RepoLoadError> {
     })
 }
 
-// TODO(rust/clap): what happens with all errors we unwrap? should we just do
+// TODO: (rust/clap): what happens with all errors we unwrap? should we just do
 // https://doc.rust-lang.org/1.61.0/std/process/struct.ExitCode.html#examples instead?
-// TODO(rust) setup clippy somehow?
+// TODO: (rust) setup clippy somehow?
 fn main() -> Result<(), Box<dyn Error>> {
     let vcst_query = match from_cli() {
         Err(e) => {
@@ -189,7 +181,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
         VcstQuery::Root { dir: _ } => match plexer.root() {
             Ok(root_path) => {
-                // TODO(rust) stop panicking here, and instead setup an idiomatic error handling
+                // TODO: (rust) stop panicking here, and instead setup an idiomatic error handling
                 // library; without such a library it seemms we have to go thruogh enormous hoops
                 // to get the logical equivalent of ?-chaining _and_ the benefit of our custom
                 // error's From trait to be utilized.

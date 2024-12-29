@@ -2,10 +2,9 @@ use std::convert::From;
 use std::path::PathBuf;
 use thiserror::Error;
 
-// TODO needed? helpful?
 pub type DirPath = PathBuf;
 
-// TODO maybe this a vote for just not type-aliasing PathBuf?
+// TODO: (rust) maybe this a vote for just not type-aliasing PathBuf?
 pub fn dir_clone_string(dir: &DirPath) -> String {
     return dir
         .to_str()
@@ -13,8 +12,6 @@ pub fn dir_clone_string(dir: &DirPath) -> String {
         .to_string();
 }
 
-// TODO(rust) setup with https://docs.rs/thiserror/latest/thiserror and/or at least
-// std::error::Error compliance, and trickle that change throughout the codebase.
 #[derive(Error, Debug)]
 pub enum RepoLoadError {
     /// A system-level error, not necessarily related to any VCS, eg: the directory doesn't exist,
@@ -53,7 +50,7 @@ impl From<std::io::Error> for RepoLoadError {
     }
 }
 
-// TODO is returning boolean right here? how can we handle the case that JJ repo is a JJ
+// TODO: is returning boolean right here? how can we handle the case that JJ repo is a JJ
 // rpeo, or maybe a JJ-colocated-git repo, or JJ-colocated-p4 repo, or JJ-wrapping-git
 // repo? Just true for all of those? Or some generic type we can define that would let JJ
 // pack the answer here?
@@ -62,8 +59,6 @@ impl From<std::io::Error> for RepoLoadError {
 //fn is_vcs(dir: DirPath) -> Result<Option<Self>, &'static str>;
 
 /// Operations any VCS should be able to answer about a repo.
-// TODO finish convert from readme list to proper API surfaces/docs below (then update the
-// readme to point here as the canonical reference).
 pub trait Repo
 where
     Self: std::fmt::Debug,
