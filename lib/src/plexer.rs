@@ -1,11 +1,12 @@
 use crate::adapter::git::RepoGit;
+use crate::adapter::hg::RepoHg;
 use crate::repo::{DirPath, Repo, RepoLoadError};
 
 /// The particular brands of VCS this library supports.
 #[derive(Debug)]
 pub enum VcsBrand {
     Git,
-    // TODO: Mercurial,
+    Mercurial,
     // TODO: Jujutsu,
 }
 
@@ -35,23 +36,33 @@ impl RepoPlexer {
         //    if let NotFound = e.kind() { ... }
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
+        // TODO(rust) stop panicking on every attempt, just handle the error appropriatley
         let mut attempts = Vec::with_capacity(5);
 
         attempts.push(VcsBrand::Git);
-        if let Some(git) = RepoGit::new(dir.clone()).expect("error inspecting dir") {
-            Ok(Some(Self {
+        if let Some(git) = RepoGit::new(dir.clone()).expect("git error inspecting dir") {
+            return Ok(Some(Self {
                 dir,
                 brand: VcsBrand::Git,
                 adapter: Box::from(git),
-            }))
-        } else {
-            Err(format!(
-                "if dir is a VCS, it's of an unknown brand (tried {:?}: {:?})",
-                attempts.len(),
-                attempts
-            )
-            .into())
+            }));
         }
+
+        attempts.push(VcsBrand::Mercurial);
+        if let Some(hg) = RepoHg::new(dir.clone()).expect("hg error inspecting dir") {
+            return Ok(Some(Self {
+                dir,
+                brand: VcsBrand::Mercurial,
+                adapter: Box::from(hg),
+            }));
+        }
+
+        Err(format!(
+            "if dir is a VCS, it's of an unknown brand (tried {:?}: {:?})",
+            attempts.len(),
+            attempts
+        )
+        .into())
     }
 }
 

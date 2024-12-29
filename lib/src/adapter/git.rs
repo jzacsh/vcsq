@@ -1,5 +1,4 @@
 use crate::repo::{DirPath, Repo, RepoLoadError};
-use std::fmt::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
