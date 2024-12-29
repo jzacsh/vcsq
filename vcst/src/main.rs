@@ -187,7 +187,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         VcstQuery::Brand { dir: _ } => {
             println!("{:?}", plexer.brand);
         }
-        VcstQuery::Root { dir } => match plexer.root() {
+        VcstQuery::Root { dir: _ } => match plexer.root() {
             Ok(root_path) => {
                 // TODO(rust) stop panicking here, and instead setup an idiomatic error handling
                 // library; without such a library it seemms we have to go thruogh enormous hoops
@@ -201,11 +201,20 @@ fn main() -> Result<(), Box<dyn Error>> {
                 exit(1);
             }
         },
-        VcstQuery::IsClean { dir } => todo!(),
-        VcstQuery::CurrentId { dir, dirty_ok } => todo!(),
-        VcstQuery::CurrentName { dir, dirty_ok } => todo!(),
-        VcstQuery::DirtyFiles { dir } => todo!(),
-        VcstQuery::CurrentFiles { dir, dirty_ok } => todo!(),
+        VcstQuery::IsClean { dir: _ } => todo!(),
+        VcstQuery::CurrentId {
+            dir: _,
+            dirty_ok: _,
+        } => todo!(),
+        VcstQuery::CurrentName {
+            dir: _,
+            dirty_ok: _,
+        } => todo!(),
+        VcstQuery::DirtyFiles { dir: _ } => todo!(),
+        VcstQuery::CurrentFiles {
+            dir: _,
+            dirty_ok: _,
+        } => todo!(),
     }
     Ok(())
 }
