@@ -182,7 +182,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("{:?}", plexer.brand);
         }
         VcstQuery::Root { dir } => match plexer.root() {
-            Ok(root_path) => println!("{:?}", root_path),
+            Ok(root_path) => {
+                // TODO(rust) stop panicking here, and instead setup an idiomatic error handling
+                // library; without such a library it seemms we have to go thruogh enormous hoops
+                // to get the logical equivalent of ?-chaining _and_ the benefit of our custom
+                // error's From trait to be utilized.
+                let dir_path = root_path.as_path().to_str().unwrap();
+                println!("{}", dir_path);
+            }
             Err(e) => {
                 eprintln!("root dir: {:?}", e);
                 exit(1);

@@ -1,4 +1,6 @@
 use crate::repo::{DirPath, Repo, RepoLoadError};
+use std::fmt::Write;
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 #[derive(Debug)]
@@ -44,7 +46,18 @@ impl RepoGit {
 
 impl Repo for RepoGit {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
-        todo!(); // call git_show_top_level and gets its output
+        let output = self
+            .git_show_top_level()
+            .output()
+            .map_err(|e| RepoLoadError::from(e.to_string()))?;
+        if !output.status.success() {
+            return Err("bug? silent error from git".to_string().into());
+        }
+        let stdout = String::from_utf8(output.stdout)
+            .map_err(|e| RepoLoadError::from(e.to_string()))?
+            .trim()
+            .to_string();
+        Ok(PathBuf::from(stdout))
     }
 }
 
