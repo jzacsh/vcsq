@@ -5,6 +5,14 @@ use thiserror::Error;
 // TODO needed? helpful?
 pub type DirPath = PathBuf;
 
+// TODO maybe this a vote for just not type-aliasing PathBuf?
+pub fn dir_clone_string(dir: &DirPath) -> String {
+    return dir
+        .to_str()
+        .expect("bug? pathbuf failed to to_str()")
+        .to_string();
+}
+
 // TODO(rust) setup with https://docs.rs/thiserror/latest/thiserror and/or at least
 // std::error::Error compliance, and trickle that change throughout the codebase.
 #[derive(Error, Debug)]

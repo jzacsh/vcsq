@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
-use libvcst::repo::{DirPath, Repo, RepoLoadError};
+use libvcst::repo::{dir_clone_string, DirPath, Repo, RepoLoadError};
 use std::error::Error;
 use std::path::PathBuf;
 use std::process::exit;
@@ -16,7 +16,7 @@ needing to know each VCS's proprietary incantations."
 struct VcstArgs {
     /// Directory for which you'd like to ask VCS questions.
     #[arg(short, long)]
-    dir: Option<String>, // TODO: can switch to std::path::Path or DirPath instead?
+    dir: Option<DirPath>,
 
     #[command(subcommand)]
     query: Option<VcstQuery>,
@@ -40,8 +40,12 @@ impl VcstArgs {
                 // TODO(feature,clap) fix this clunkiness: somehow allow lone positional arg of a
                 // directory for the case that no subcommand is passed. IDK how to do that in clap.
 
-                let dir_positional = query.dir();
-                assert!(dir.to_string() == dir_positional.clone(), "clunky ux: you passed --dir different than DIR; you only need one; got: --dir={:?} and DIR={:?}", dir.clone(), dir_positional);
+                let dir_positional = query.dir().to_string();
+                assert!(
+                    dir_clone_string(dir) == dir_positional,
+                    "clunky ux: you passed --dir different than DIR; you only need one; got: --dir={:?} and DIR={:?}",
+                    dir_clone_string(dir),
+                    dir_positional);
             } else {
                 args.query = Some(VcstQuery::Brand { dir: dir.clone() });
             }
@@ -51,7 +55,7 @@ impl VcstArgs {
 
     pub fn dir(&self) -> String {
         if let Some(ref dir) = self.dir {
-            return dir.clone();
+            return dir_clone_string(dir);
         }
         if let Some(ref query) = self.query {
             return query.dir().clone();
@@ -69,23 +73,23 @@ impl VcstArgs {
 enum VcstQuery {
     /// Prints the brand of the VCS repo, or exits non-zero if it's not a known VCS repo.
     #[command(arg_required_else_help = true)]
-    Brand { dir: String }, // TODO: can switch to std::path::Path or DirPath instead?
+    Brand { dir: DirPath },
 
     /// Prints the root dir of the repo
     #[command(arg_required_else_help = true)]
-    Root { dir: String }, // TODO: can switch to std::path::Path or DirPath instead?
+    Root { dir: DirPath },
 
     /// Whether VCS repo is in a clean state, or has uncommitted work.
     #[command(arg_required_else_help = true)]
     IsClean {
         // TODO(feature) implement subcommand here, eg: enum {diffstat, diff, files}
-        dir: String, // TODO: can switch to std::path::Path or DirPath instead?
+        dir: DirPath,
     },
 
     /// Print the VCS repo's current revision ID (eg: rev in Mercurial, ref in git, etc).
     #[command(arg_required_else_help = true)]
     CurrentId {
-        dir: String, // TODO: can switch to std::path::Path or DirPath instead?
+        dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
         dirtyOk: bool,
@@ -95,7 +99,7 @@ enum VcstQuery {
     /// jj)
     #[command(arg_required_else_help = true)]
     CurrentName {
-        dir: String, // TODO: can switch to std::path::Path or DirPath instead?
+        dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
         dirtyOk: bool,
@@ -104,13 +108,11 @@ enum VcstQuery {
     /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output is
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
     #[command(arg_required_else_help = true)]
-    DirtyFiles {
-        dir: String, // TODO: can switch to std::path::Path or DirPath instead?
-    },
+    DirtyFiles { dir: DirPath },
 
     /// Prints what files were touched by the CurrentId
     CurrentFiles {
-        dir: String, // TODO: can switch to std::path::Path or DirPath instead?
+        dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
         dirtyOk: bool,
@@ -123,9 +125,13 @@ enum VcstQuery {
 }
 
 impl VcstQuery {
+    fn dir(&self) -> String {
+        dir_clone_string(self.dir_path())
+    }
+
     // TODO(rust) way to ask clap to make a global positional arg for all these subcommands, so we
     // can rely on its presence?
-    fn dir(&self) -> &String {
+    fn dir_path(&self) -> &DirPath {
         match self {
             VcstQuery::Brand { dir } => dir,
             VcstQuery::Root { dir } => dir,
