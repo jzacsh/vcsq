@@ -39,17 +39,11 @@ impl RepoHg {
 
 impl Repo for RepoHg {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
-        let output = self
-            .hg_root()
-            .output()
-            .map_err(|e| RepoLoadError::from(e.to_string()))?;
+        let output = self.hg_root().output()?;
         if !output.status.success() {
             return Err("bug? silent error from hg".to_string().into());
         }
-        let stdout = String::from_utf8(output.stdout)
-            .map_err(|e| RepoLoadError::from(e.to_string()))?
-            .trim()
-            .to_string();
+        let stdout = String::from_utf8(output.stdout)?.trim().to_string();
         Ok(PathBuf::from(stdout))
     }
 }

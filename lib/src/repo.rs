@@ -1,19 +1,32 @@
 use std::convert::From;
-use std::fmt;
 use std::path::PathBuf;
+use thiserror::Error;
 
 // TODO needed? helpful?
 pub type DirPath = PathBuf;
 
 // TODO(rust) setup with https://docs.rs/thiserror/latest/thiserror and/or at least
 // std::error::Error compliance, and trickle that change throughout the codebase.
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum RepoLoadError {
     /// A system-level error, not necessarily related to any VCS, eg: the directory doesn't exist,
     /// or we don't have access to it, etc.
+    #[error("directory access issue: {0}")]
     Directory(String),
 
-    /// An unknown error ocurred trying to inspect the repo.
+    /// An error ocurred trying to call out to the VCS binary
+    #[error("vcs call failed: {:?}", .context)]
+    Command {
+        context: Option<&'static str>,
+        source: std::io::Error,
+    },
+
+    /// An error ocurred reading the directory name
+    #[error("vcs returned a problematic root name")]
+    RootName(#[from] std::string::FromUtf8Error),
+
+    /// An unknown error ocurred
+    #[error("unknown error: {0}")]
     Unknown(String),
 }
 
@@ -23,14 +36,12 @@ impl From<String> for RepoLoadError {
     }
 }
 
-// TODO(rust) is this necessary? can this be derived by something for me?
-impl fmt::Display for RepoLoadError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        match self {
-            RepoLoadError::Unknown(msg) => write!(f, "{}", msg)?,
-            RepoLoadError::Directory(msg) => write!(f, "{}", msg)?,
+impl From<std::io::Error> for RepoLoadError {
+    fn from(source: std::io::Error) -> Self {
+        RepoLoadError::Command {
+            context: None,
+            source,
         }
-        Ok(())
     }
 }
 
