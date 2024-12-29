@@ -58,7 +58,7 @@ impl VcstArgs {
             return dir_clone_string(dir);
         }
         if let Some(ref query) = self.query {
-            return query.dir().clone();
+            query.dir().clone()
         } else {
             panic!("require either subcmd with a query or direct --dir");
         }
