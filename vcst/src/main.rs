@@ -92,7 +92,7 @@ enum VcstQuery {
         dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
-        dirtyOk: bool,
+        dirty_ok: bool,
     },
 
     /// Print the VCS repo's current human-readable revision (eg: branch or tag in git, bookmark in
@@ -102,7 +102,7 @@ enum VcstQuery {
         dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
-        dirtyOk: bool,
+        dirty_ok: bool,
     },
 
     /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output is
@@ -115,7 +115,7 @@ enum VcstQuery {
         dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event IsClean is false.
-        dirtyOk: bool,
+        dirty_ok: bool,
         // TODO(feature) allow an optional Id or Name  (ref or bookmark) of which to compare
         // (instead of just the default which is "parent commit").
 
@@ -136,10 +136,10 @@ impl VcstQuery {
             VcstQuery::Brand { dir } => dir,
             VcstQuery::Root { dir } => dir,
             VcstQuery::IsClean { dir } => dir,
-            VcstQuery::CurrentId { dir, dirtyOk: _ } => dir,
-            VcstQuery::CurrentName { dir, dirtyOk: _ } => dir,
+            VcstQuery::CurrentId { dir, dirty_ok: _ } => dir,
+            VcstQuery::CurrentName { dir, dirty_ok: _ } => dir,
             VcstQuery::DirtyFiles { dir } => dir,
-            VcstQuery::CurrentFiles { dir, dirtyOk: _ } => dir,
+            VcstQuery::CurrentFiles { dir, dirty_ok: _ } => dir,
         }
     }
 }
@@ -202,10 +202,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         },
         VcstQuery::IsClean { dir } => todo!(),
-        VcstQuery::CurrentId { dir, dirtyOk } => todo!(),
-        VcstQuery::CurrentName { dir, dirtyOk } => todo!(),
+        VcstQuery::CurrentId { dir, dirty_ok } => todo!(),
+        VcstQuery::CurrentName { dir, dirty_ok } => todo!(),
         VcstQuery::DirtyFiles { dir } => todo!(),
-        VcstQuery::CurrentFiles { dir, dirtyOk } => todo!(),
+        VcstQuery::CurrentFiles { dir, dirty_ok } => todo!(),
     }
     Ok(())
 }
