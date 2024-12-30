@@ -124,34 +124,21 @@ mod root {
 
 /// TODO: (feature,cleap) fix CLI-clunkiness and make a global dir arg
 mod cli_edges {
-    use vcst::{vcst_query, VcstArgs};
+    use assert_cmd::Command;
+    use predicates::prelude::*;
 
     #[test]
     fn no_args() {
-        //
-        // Arrange
-        //
-        let mut fake_stdout = Vec::new();
-        let mut fake_stderr = Vec::new();
-        let vcst_args = VcstArgs {
-            dir: None,
-            query: None,
-        };
-
-        //
-        // Act: with no args
-        //
-        let actual_exit = vcst_query(vcst_args, &mut fake_stdout, &mut fake_stderr);
-
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
         //
         // Assert
         //
-        assert_ne!(actual_exit, 0);
-        assert!(fake_stdout.is_empty());
-        assert_eq!(
-            String::from_utf8(fake_stderr).expect("stderr"),
-            "usage error: require either subcmd with a query or a direct --dir"
-        );
+        cmd.assert()
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::eq(
+                "usage error: require either subcmd with a query or a direct --dir",
+            ));
     }
 
     #[test]
