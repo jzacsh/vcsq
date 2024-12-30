@@ -113,18 +113,35 @@ mod brand {
 }
 
 mod root {
-    use vcst::{vcst_query, VcstArgs};
+    use assert_cmd::Command;
+    use predicates::prelude::*;
 
     #[test]
     fn git() {
         let test_dir = crate::setup_tests().git_repo;
-        assert_eq!(42, 42); // TODO: write real test
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let expected_root = test_dir.to_str().expect("git repo path utf8");
+
+        let assert = cmd.arg("root").arg(&test_dir).assert();
+        assert
+            .success()
+            .stderr(predicate::str::is_empty())
+            .stdout(predicate::eq(expected_root));
     }
 
     #[test]
     fn hg() {
         let test_dir = crate::setup_tests().hg_repo;
-        assert_eq!(42, 42); // TODO: write real test
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let expected_root = test_dir.to_str().expect("hg repo path utf8");
+
+        let assert = cmd.arg("root").arg(&test_dir).assert();
+        assert
+            .success()
+            .stderr(predicate::str::is_empty())
+            .stdout(predicate::eq(expected_root));
     }
 
     #[test]
