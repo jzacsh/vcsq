@@ -15,10 +15,8 @@ impl RepoHg {
             .hg_root()
             // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
             .stdout(Stdio::null())
-            // TODO: (rust) map stderr to Err() values
             .stderr(Stdio::null())
-            .output()
-            .expect("failed executing hg locally")
+            .output()?
             .status
             .success();
         if is_ok {

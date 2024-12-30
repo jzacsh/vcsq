@@ -27,7 +27,7 @@ enum VcstError {
     #[error("usage error: {0}")]
     Usage(String),
 
-    #[error("vcs error")]
+    #[error("vcs error: {0}")]
     Plexing(#[from] RepoLoadError),
 }
 

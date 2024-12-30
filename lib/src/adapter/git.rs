@@ -23,8 +23,7 @@ impl RepoGit {
             .stdout(Stdio::null())
             // TODO: map stderr to Err() values
             .stderr(Stdio::null())
-            .output()
-            .expect("failed executing git locally")
+            .output()?
             .status
             .success();
         if is_ok {

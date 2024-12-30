@@ -23,7 +23,7 @@ pub enum RepoLoadError {
     RootName(#[from] std::string::FromUtf8Error),
 
     /// An unknown error ocurred
-    #[error("unknown error: {0}")]
+    #[error("{0}")]
     Unknown(String),
 }
 
