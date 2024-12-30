@@ -29,6 +29,9 @@ enum VcstError {
 
     #[error("vcs error: {0}")]
     Plexing(#[from] RepoLoadError),
+
+    #[error("{0}")]
+    Unknown(String),
 }
 
 impl VcstArgs {
@@ -179,11 +182,9 @@ fn main() -> Result<(), VcstError> {
         }
         VcstQuery::Root { dir: _ } => match plexer.root() {
             Ok(root_path) => {
-                // TODO: (rust) stop panicking here, and instead setup an idiomatic error handling
-                // library; without such a library it seemms we have to go thruogh enormous hoops
-                // to get the logical equivalent of ?-chaining _and_ the benefit of our custom
-                // error's From trait to be utilized.
-                let dir_path = root_path.as_path().to_str().unwrap();
+                let dir_path = root_path.as_path().to_str().ok_or_else(|| {
+                    VcstError::Unknown(format!("vcs generated invalid unicode: {:?}", root_path))
+                })?;
                 println!("{}", dir_path);
             }
             Err(e) => {
