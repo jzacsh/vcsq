@@ -103,11 +103,15 @@ impl TestDirs {
     pub fn non_extant(&self) -> PathBuf {
         use uuid::Uuid;
         let mut path = self.root_dir.clone();
+        assert!(
+            self.root_dir.clone().exists(),
+            "test-harness bug: root dir should exist"
+        );
         let uuidv4 = Uuid::new_v4();
         path.push(uuidv4.simple().to_string());
         assert!(
             !path.exists(),
-            "tried to gen rando flie, but got real one: {:?}",
+            "test-harness bug: tried to gen rando flie, but got real one: {:?}",
             path
         );
         path

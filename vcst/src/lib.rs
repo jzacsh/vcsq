@@ -161,6 +161,11 @@ impl PlexerQuery<'_> {
         let query = args.reduce()?;
         let dir: String = query.dir()?;
         let dir: DirPath = PathBuf::from(dir);
+        if !dir.is_dir() {
+            return Err(VcstError::Usage(
+                "dir must be a readable directory".to_string(),
+            ));
+        }
         let plexer = RepoPlexer::new(dir)?;
         Ok(PlexerQuery {
             plexer,
