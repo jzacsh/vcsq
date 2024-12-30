@@ -16,10 +16,10 @@ needing to know each VCS's proprietary incantations."
 pub struct VcstArgs {
     /// Directory for which you'd like to ask VCS questions.
     #[arg(short, long)]
-    dir: Option<DirPath>,
+    pub dir: Option<DirPath>,
 
     #[command(subcommand)]
-    query: Option<VcstQuery>,
+    pub query: Option<VcstQuery>,
 }
 
 #[derive(Error, Debug)]
@@ -64,7 +64,7 @@ impl VcstArgs {
 //
 // TODO: (feature) impl a subcommand that lets you know which $PATH dependencies are found.
 #[derive(Debug, Subcommand, Clone)]
-enum VcstQuery {
+pub enum VcstQuery {
     /// Prints the brand of the VCS repo, or exits non-zero if it's not a known VCS repo.
     #[command(arg_required_else_help = true)]
     Brand { dir: DirPath },

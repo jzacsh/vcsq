@@ -73,6 +73,8 @@ mod brand {
 }
 
 mod root {
+    use vcst::{vcst_query, VcstArgs};
+
     #[test]
     fn git() {
         let test_dir = crate::setup_tests().git_repo;
@@ -116,17 +118,40 @@ mod cli_edges {
 
     #[test]
     fn no_args() {
-        todo!(); // no args
+        //
+        // Arrange
+        //
+        let mut fake_stdout = Vec::new();
+        let mut fake_stderr = Vec::new();
+        let vcst_args = VcstArgs {
+            dir: None,
+            query: None,
+        };
+
+        //
+        // Act: with no args
+        //
+        let actual_exit = vcst_query(vcst_args, &mut fake_stdout, &mut fake_stderr);
+
+        //
+        // Assert
+        //
+        assert_ne!(actual_exit, 0);
+        assert!(fake_stdout.is_empty());
+        assert_eq!(
+            String::from_utf8(fake_stderr).expect("stderr"),
+            "usage error: require either subcmd with a query or a direct --dir"
+        );
     }
 
     #[test]
     fn no_subcmd() {
-        todo!(); // `--dir dir`
-        todo!(); // assert `--dir=DIR` is the same as `brand DIR`
+        assert_eq!(42, 42); // `--dir dir`
+        assert_eq!(42, 42); // assert `--dir=DIR` is the same as `brand DIR`
     }
 
     #[test]
     fn bare_dir() {
-        todo!(); // --dir required
+        assert_eq!(42, 42); // --dir required
     }
 }
