@@ -113,3 +113,24 @@ mod root {
         assert_eq!(42, 42);
     }
 }
+
+/// TODO: (feature,cleap) fix CLI-clunkiness and make a global dir arg
+mod cli_edges {
+    use vcst::{vcst_query, VcstArgs};
+
+    #[test]
+    fn no_args() {
+        todo!(); // no args
+    }
+
+    #[test]
+    fn no_subcmd() {
+        todo!(); // `--dir dir`
+        todo!(); // assert `--dir=DIR` is the same as `brand DIR`
+    }
+
+    #[test]
+    fn bare_dir() {
+        todo!(); // --dir required
+    }
+}
