@@ -41,7 +41,10 @@ impl VcstArgs {
     // directory for the case that no subcommand is passed. IDK how to do that in clap.
     pub fn reduce(&self) -> Result<VcstQuery, VcstError> {
         match &self.query {
-            Some(q) => Ok(q.clone()), // TODO: (rust) can we args.query.unwrap_or_else() but that can accept errors?
+            // TODO: (rust) is there an "Option, else default" pattern that lets errors bubble out
+            // of the closure? eg: can we self.query.unwrap_or_else() but that can accept errors
+            // (as in the error-cases in the None match-arm below)?
+            Some(q) => Ok(q.clone()),
             None => {
                 let dir = self
                     .dir
