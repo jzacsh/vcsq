@@ -198,9 +198,6 @@ impl PlexerQuery {
     }
 }
 
-// TODO: (rust/clap): what happens with all errors we unwrap? should we just do
-// https://doc.rust-lang.org/1.61.0/std/process/struct.ExitCode.html#examples instead?
-// TODO: (rust) setup clippy somehow?
 fn main() {
     let plexerq = match PlexerQuery::new(VcstArgs::parse()) {
         Ok(pq) => pq,
