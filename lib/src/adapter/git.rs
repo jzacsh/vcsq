@@ -23,7 +23,11 @@ impl RepoGit {
             .stdout(Stdio::null())
             // TODO: map stderr to Err() values
             .stderr(Stdio::null())
-            .output()?
+            .output()
+            .map_err(|e| RepoLoadError::Command {
+                context: Some("git cli"),
+                source: e,
+            })?
             .status
             .success();
         if is_ok {

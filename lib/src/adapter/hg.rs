@@ -16,7 +16,11 @@ impl RepoHg {
             // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
             .stdout(Stdio::null())
             .stderr(Stdio::null())
-            .output()?
+            .output()
+            .map_err(|e| RepoLoadError::Command {
+                context: Some("hg cli"),
+                source: e,
+            })?
             .status
             .success();
         if is_ok {

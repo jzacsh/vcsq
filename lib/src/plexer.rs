@@ -31,8 +31,7 @@ impl RepoPlexer {
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
         attempts.push(VcsBrand::Git);
-        // TODO: (rust) stop panicking on every attempt, just handle the error appropriatley
-        if let Some(git) = RepoGit::new(dir.clone()).expect("git error inspecting dir") {
+        if let Some(git) = RepoGit::new(dir.clone())? {
             return Ok(Some(Self {
                 brand: VcsBrand::Git,
                 adapter: Box::from(git),
@@ -40,8 +39,7 @@ impl RepoPlexer {
         }
 
         attempts.push(VcsBrand::Mercurial);
-        // TODO: (rust) stop panicking on every attempt, just handle the error appropriatley
-        if let Some(hg) = RepoHg::new(dir.clone()).expect("hg error inspecting dir") {
+        if let Some(hg) = RepoHg::new(dir.clone())? {
             return Ok(Some(Self {
                 brand: VcsBrand::Mercurial,
                 adapter: Box::from(hg),
