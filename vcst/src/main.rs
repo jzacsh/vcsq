@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
-use libvcst::repo::{dir_clone_string, DirPath, Repo, RepoLoadError};
+use libvcst::repo::{DirPath, Repo, RepoLoadError};
 use std::path::PathBuf;
 use std::process::exit;
 use thiserror::Error;
@@ -113,8 +113,17 @@ enum VcstQuery {
 }
 
 impl VcstQuery {
-    fn dir(&self) -> String {
-        dir_clone_string(self.dir_path())
+    fn dir(&self) -> Result<String, VcstError> {
+        return Ok(self
+            .dir_path()
+            .to_str()
+            .ok_or_else(|| {
+                VcstError::Usage(format!(
+                    "invalid unicode found in dir: {:?}",
+                    self.dir_path()
+                ))
+            })?
+            .to_string());
     }
 
     // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
@@ -139,7 +148,7 @@ struct PlexerQuery {
 
 fn from_cli() -> Result<PlexerQuery, VcstError> {
     let query = VcstArgs::parse().reduce()?;
-    let dir: String = query.dir();
+    let dir: String = query.dir()?;
     let dir: DirPath = PathBuf::from(dir);
     let plexer = RepoPlexer::new(dir)?;
     Ok(PlexerQuery { plexer, cli: query })

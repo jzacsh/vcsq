@@ -4,14 +4,6 @@ use thiserror::Error;
 
 pub type DirPath = PathBuf;
 
-// TODO: (rust) maybe this a vote for just not type-aliasing PathBuf?
-pub fn dir_clone_string(dir: &DirPath) -> String {
-    return dir
-        .to_str()
-        .expect("bug? pathbuf failed to to_str()")
-        .to_string();
-}
-
 #[derive(Error, Debug)]
 pub enum RepoLoadError {
     /// A system-level error, not necessarily related to any VCS, eg: the directory doesn't exist,
