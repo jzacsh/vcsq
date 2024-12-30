@@ -130,9 +130,6 @@ mod cli_edges {
     #[test]
     fn no_args() {
         let mut cmd = Command::cargo_bin("vcst").unwrap();
-        //
-        // Assert
-        //
         cmd.assert()
             .failure()
             .stdout(predicate::str::is_empty())
@@ -149,6 +146,20 @@ mod cli_edges {
 
     #[test]
     fn bare_dir() {
-        assert_eq!(42, 42); // --dir required
+        let test_dir = crate::setup_tests().git_repo;
+        // Prove our assert-phase reults won't be due to test-dir _not_ eixsitng (eg: due to some
+        // test-hraness/setup failure).
+        assert!(test_dir.exists());
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let assert = cmd.arg(test_dir).assert();
+        assert
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::str::starts_with(
+                "error: unrecognized subcommand",
+            ))
+            .stderr(predicate::str::contains("Usage: vcst [OPTIONS] [COMMAND]"))
+            .stderr(predicate::str::contains("try '--help'"));
     }
 }
