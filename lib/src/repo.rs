@@ -54,9 +54,14 @@ impl From<std::io::Error> for RepoLoadError {
 // rpeo, or maybe a JJ-colocated-git repo, or JJ-colocated-p4 repo, or JJ-wrapping-git
 // repo? Just true for all of those? Or some generic type we can define that would let JJ
 // pack the answer here?
-// TDOO design error return type that can distinguish between OS/access errors, and simply :
-// no, this isn't a Self repo.
-//fn is_vcs(dir: DirPath) -> Result<Option<Self>, &'static str>;
+
+// TODO: (rust) ability to provide an API for plexer.rs to use, so it knwos it always can call an
+// adapter's new() with the same api? ie:
+// ```rs
+//   fn new(dir: DirPath) -> Result<Option<Repo>, RepoLoadError>;
+// ```
+// Right now we do this by hand (trying to keep them in sync) but my attempts to describe this with
+// types has lead to fights against object-size knowledge rustc complains about.
 
 /// Operations any VCS should be able to answer about a repo.
 pub trait Repo
