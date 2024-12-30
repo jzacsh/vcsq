@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
 use libvcst::repo::{DirPath, Repo, RepoLoadError};
+use std::io;
 use std::path::PathBuf;
 use std::process::exit;
 use thiserror::Error;
@@ -147,24 +148,33 @@ impl VcstQuery {
     }
 }
 
-struct PlexerQuery {
+struct PlexerQuery<'a> {
     plexer: RepoPlexer,
     cli: VcstQuery,
+    stdout: &'a mut dyn io::Write,
 }
 
-impl PlexerQuery {
-    fn new(args: VcstArgs) -> Result<PlexerQuery, VcstError> {
+impl PlexerQuery<'_> {
+    fn new<'a>(
+        args: VcstArgs,
+        stdout: &'a mut dyn io::Write,
+    ) -> Result<PlexerQuery<'a>, VcstError> {
         let query = args.reduce()?;
         let dir: String = query.dir()?;
         let dir: DirPath = PathBuf::from(dir);
         let plexer = RepoPlexer::new(dir)?;
-        Ok(PlexerQuery { plexer, cli: query })
+        Ok(PlexerQuery {
+            plexer,
+            cli: query,
+            stdout,
+        })
     }
 
-    pub fn handle_query(&self) -> Result<(), VcstError> {
+    pub fn handle_query(&mut self) -> Result<(), VcstError> {
         match self.cli {
             VcstQuery::Brand { dir: _ } => {
-                println!("{:?}", self.plexer.brand);
+                write!(self.stdout, "{:?}", self.plexer.brand)
+                    .expect(format!("failed stdout write of: {:?}", self.plexer.brand).as_str());
             }
             VcstQuery::Root { dir: _ } => {
                 match self.plexer.root() {
@@ -175,7 +185,8 @@ impl PlexerQuery {
                                 root_path
                             ));
                         })?;
-                        println!("{}", dir_path);
+                        write!(self.stdout, "{}", dir_path)
+                            .expect(format!("failed stdout write of: {}", dir_path).as_str());
                     }
                     Err(e) => {
                         return Err(VcstError::Unknown(format!("root dir: {:?}", e)));
@@ -201,19 +212,30 @@ impl PlexerQuery {
     }
 }
 
-fn main() {
-    let plexerq = match PlexerQuery::new(VcstArgs::parse()) {
+/// Core logic the CLI binary runs, but with injectable deps.
+///
+/// NOTE: this is separate from main purely so we can e2e (ie: so we can dependency-inject
+/// stdio/stderr, etc. into PlexerQuery). For more on e2e testing a rust CLI, see:
+/// https://doc.rust-lang.org/book/ch11-03-test-organization.html#integration-tests-for-binary-crates
+fn run_fs_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn io::Write) -> u8 {
+    let mut plexerq = match PlexerQuery::new(args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
-            eprintln!("{}", e);
-            exit(1);
+            write!(stderr, "{}", e).expect(format!("failed stderr write of: {}", e).as_str());
+            return 1;
         }
     };
     match plexerq.handle_query() {
         Ok(_) => {}
         Err(e) => {
-            eprintln!("{}", e);
-            exit(1);
+            write!(stderr, "{}", e).expect(format!("failed stderr write of: {}", e).as_str());
+            return 1;
         }
     };
+    return 0;
+}
+
+fn main() {
+    let exit_code = run_fs_query(VcstArgs::parse(), &mut io::stdout(), &mut io::stderr());
+    exit(exit_code.into());
 }
