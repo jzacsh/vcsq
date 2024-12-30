@@ -38,7 +38,11 @@ mod brand {
     #[test]
     fn git() {
         let test_dir = crate::setup_tests().git_repo;
-        assert_eq!(42, 42);
+        // TODO: (rust) see if
+        // https://rust-cli.github.io/book/tutorial/testing.html#testing-cli-applications-by-running-them
+        // has tips on how to get access to run_fs_query(); Perhaps just move it to src/lib.rs or
+        // something silly? or make a proper cli/ mod directory that tests can then access?
+        //vcst::vcst_query(42, 42);
     }
 
     #[test]

@@ -8,6 +8,10 @@ pub static TEST_VCS_BASENAME_JJ: &'static str = "test-jj-on-git-repo";
 pub static TEST_VCS_BASENAME_NONVCS: &'static str = "test-not-vcs";
 pub static TEST_VCS_BASENAME_NONDIR: &'static str = "test-not-dir";
 
+// TODO: (rust) how much of this file do the following two crates make obsolete/deletable?
+// - https://docs.rs/assert_cmd/latest/assert_cmd
+// - https://docs.rs/predicates/latest/predicates
+
 #[derive(Error, Debug)]
 pub enum TestSetupError {
     #[error("system: {0}")]
