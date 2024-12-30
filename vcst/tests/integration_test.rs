@@ -5,6 +5,11 @@ use std::sync::Once;
 
 static ONE_REPO_SETUP: Once = Once::new();
 
+static ERROR_NO_KNOWN_VCS: &'static str =
+    "vcs error: if dir is a VCS, it\'s of an unknown brand (tried 2: [Git, Mercurial])";
+
+static ERROR_NOT_VALID_DIR: &'static str = "usage error: dir must be a readable directory";
+
 /// Setup tests, and ensure heavy operations aren't thrashing our disk (or ramdisk) more than once
 /// a run.
 ///
@@ -35,6 +40,7 @@ fn setup_tests() -> TestDirs {
 }
 
 mod brand {
+    use crate::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
     use assert_cmd::Command;
     use predicates::prelude::*;
 
@@ -77,9 +83,7 @@ mod brand {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(
-                "vcs error: if dir is a VCS, it\'s of an unknown brand (tried 2: [Git, Mercurial])",
-            ));
+            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS.to_string()));
     }
 
     #[test]
@@ -91,9 +95,7 @@ mod brand {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(
-                "usage error: dir must be a readable directory",
-            ));
+            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
     }
 
     #[test]
@@ -106,13 +108,12 @@ mod brand {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(
-                "usage error: dir must be a readable directory",
-            ));
+            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
     }
 }
 
 mod root {
+    use crate::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
     use assert_cmd::Command;
     use predicates::prelude::*;
 
@@ -152,14 +153,30 @@ mod root {
 
     #[test]
     fn novcs() {
-        let _ = crate::setup_tests().not_vcs; /* DO NOT SUBMIT - add plain_dir */
-        assert_eq!(42, 42); // TODO: write real test
+        let test_dir = crate::setup_tests().not_vcs;
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let expected_root = test_dir.to_str().expect("non-vcs dir path utf8");
+
+        let assert = cmd.arg("root").arg(&test_dir).assert();
+        assert
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS.to_string()));
     }
 
     #[test]
     fn non_dir() {
-        let _ = crate::setup_tests().not_dir; /* DO NOT SUBMIT - add plain_dir */
-        assert_eq!(42, 42); // TODO: write real test
+        let not_dir = crate::setup_tests().not_dir;
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let expected_root = not_dir.to_str().expect("not-dir path utf8");
+
+        let assert = cmd.arg("root").arg(&not_dir).assert();
+        assert
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
     }
 
     #[test]
