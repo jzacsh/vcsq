@@ -35,10 +35,20 @@ fn setup_tests() -> TestDirs {
 }
 
 mod brand {
+    use vcst::{vcst_query, VcstArgs};
+
     #[test]
     fn git() {
+        //
+        // Arrange
+        //
         let test_dir = crate::setup_tests().git_repo;
-        //vcst::vcst_query(42, 42);
+        //let mut fake_stdout = String::new();
+        //let mut fake_stderr = String::new();
+        //let vcst_args: VcstArgs = todo!();
+
+        assert_eq!(42, 42);
+        // vcst_query(V, fake_stdout, fake_stderr);
     }
 
     #[test]
