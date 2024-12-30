@@ -7,3 +7,6 @@ edition = "2021"
 clap = { version = "4.5.23", features = ["derive"] }
 libvcst = { path = "../lib" }
 thiserror = "2.0.9"
+
+[dev-dependencies]
+chrono = "0.4.39"
