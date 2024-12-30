@@ -10,3 +10,4 @@ thiserror = "2.0.9"
 
 [dev-dependencies]
 chrono = "0.4.39"
+uuid = { version = "1.11.0", features = ["v4"] }
