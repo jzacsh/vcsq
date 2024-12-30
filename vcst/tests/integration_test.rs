@@ -11,6 +11,9 @@ static ONE_REPO_SETUP: Once = Once::new();
 /// cargo test -- --nocapture
 /// ```
 fn setup_tests() {
+    // TODO: (rust) how to capture the mktemp root out of this? we basically need
+    // setup_temp_repos() to return all three tempdirs it made (one PathBuf for each VCS repo
+    // path).
     ONE_REPO_SETUP.call_once(|| {
         let tmpdir_root = crate::common::mktemp("vcst-e2e-testdirs").expect("setting up test dir");
         eprintln!("test setup: {:?}", tmpdir_root.clone());
