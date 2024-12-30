@@ -1,9 +1,9 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
 use libvcst::repo::{dir_clone_string, DirPath, Repo, RepoLoadError};
-use std::error::Error;
 use std::path::PathBuf;
 use std::process::exit;
+use thiserror::Error;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -22,38 +22,33 @@ struct VcstArgs {
     query: Option<VcstQuery>,
 }
 
+#[derive(Error, Debug)]
+enum VcstError {
+    #[error("usage error: {0}")]
+    Usage(String),
+
+    #[error("vcs error")]
+    Plexing(#[from] RepoLoadError),
+}
+
 impl VcstArgs {
     /// Alternative to clap's parse, just so we can handle defaults
-    pub fn init() -> Result<VcstArgs, RepoLoadError> {
-        let mut args = VcstArgs::parse();
-        // TODO: (rust) delete all this clunky method if Clap has a way to express defaults directly
-        // with its derive macros.
-        if let Some(ref dir) = args.dir {
-            if let Some(ref query) = args.query {
-                // TODO: (feature,clap) fix this clunkiness: somehow allow lone positional arg of a
-                // directory for the case that no subcommand is passed. IDK how to do that in clap.
-
-                let dir_positional = query.dir().to_string();
-                assert!(
-                    dir_clone_string(dir) == dir_positional,
-                    "clunky ux: you passed --dir different than DIR; you only need one; got: --dir={:?} and DIR={:?}",
-                    dir_clone_string(dir),
-                    dir_positional);
-            } else {
-                args.query = Some(VcstQuery::Brand { dir: dir.clone() });
+    ///
+    // TODO: (feature,clap) fix this clunkiness: somehow allow lone positional arg of a
+    // directory for the case that no subcommand is passed. IDK how to do that in clap.
+    pub fn reduce(&self) -> Result<VcstQuery, VcstError> {
+        match &self.query {
+            Some(q) => Ok(q.clone()), // TODO: (rust) can we args.query.unwrap_or_else() but that can accept errors?
+            None => {
+                let dir = self
+                    .dir
+                    .clone()
+                    .ok_or(VcstError::Usage(
+                        "require either subcmd with a query or a direct --dir".into(),
+                    ))?
+                    .clone();
+                Ok(VcstQuery::Brand { dir })
             }
-        }
-        Ok(args)
-    }
-
-    pub fn dir(&self) -> String {
-        if let Some(ref dir) = self.dir {
-            return dir_clone_string(dir);
-        }
-        if let Some(ref query) = self.query {
-            query.dir().clone()
-        } else {
-            panic!("require either subcmd with a query or direct --dir");
         }
     }
 }
@@ -139,24 +134,21 @@ impl VcstQuery {
 
 struct PlexerQuery {
     plexer: Option<RepoPlexer>,
-    cli: VcstArgs,
+    cli: VcstQuery,
 }
 
-fn from_cli() -> Result<PlexerQuery, RepoLoadError> {
-    let vcst_args = VcstArgs::init()?;
-    let dir: String = vcst_args.dir();
+fn from_cli() -> Result<PlexerQuery, VcstError> {
+    let query = VcstArgs::parse().reduce()?;
+    let dir: String = query.dir();
     let dir: DirPath = PathBuf::from(dir);
     let plexer = RepoPlexer::new(dir)?;
-    Ok(PlexerQuery {
-        plexer,
-        cli: vcst_args,
-    })
+    Ok(PlexerQuery { plexer, cli: query })
 }
 
 // TODO: (rust/clap): what happens with all errors we unwrap? should we just do
 // https://doc.rust-lang.org/1.61.0/std/process/struct.ExitCode.html#examples instead?
 // TODO: (rust) setup clippy somehow?
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), VcstError> {
     let vcst_query = match from_cli() {
         Err(e) => {
             eprintln!("{}", e);
@@ -171,11 +163,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
         Some(plexer) => plexer,
     };
-    match vcst_query
-        .cli
-        .query
-        .expect("bug: init() should have guaranteed a query")
-    {
+
+    match vcst_query.cli {
         VcstQuery::Brand { dir: _ } => {
             println!("{:?}", plexer.brand);
         }
