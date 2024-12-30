@@ -47,38 +47,38 @@ mod brand {
         //let mut fake_stderr = String::new();
         //let vcst_args: VcstArgs = todo!();
 
-        assert_eq!(42, 42);
-        // vcst_query(V, fake_stdout, fake_stderr);
+        assert_eq!(42, 42); // TODO: write real test
+                            // vcst_query(V, fake_stdout, fake_stderr);
     }
 
     #[test]
     fn hg() {
         let test_dir = crate::setup_tests().hg_repo;
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn jj() {
         let test_dir = crate::setup_tests().jj_repo;
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn novcs() {
         let _ = crate::setup_tests().not_vcs; /* DO NOT SUBMIT - add plain_dir */
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn non_dir() {
         let _ = crate::setup_tests().not_dir; /* DO NOT SUBMIT - add plain_dir */
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn non_extant() {
         let mut non_extant = crate::setup_tests().non_extant();
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 }
 
@@ -88,37 +88,37 @@ mod root {
     #[test]
     fn git() {
         let test_dir = crate::setup_tests().git_repo;
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn hg() {
         let test_dir = crate::setup_tests().hg_repo;
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn jj() {
         let test_dir = crate::setup_tests().jj_repo;
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn novcs() {
         let _ = crate::setup_tests().not_vcs; /* DO NOT SUBMIT - add plain_dir */
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn non_dir() {
         let _ = crate::setup_tests().not_dir; /* DO NOT SUBMIT - add plain_dir */
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 
     #[test]
     fn non_extant() {
         let mut non_extant = crate::setup_tests().non_extant();
-        assert_eq!(42, 42);
+        assert_eq!(42, 42); // TODO: write real test
     }
 }
 
@@ -140,8 +140,8 @@ mod cli_edges {
 
     #[test]
     fn no_subcmd() {
-        assert_eq!(42, 42); // `--dir dir`
-        assert_eq!(42, 42); // assert `--dir=DIR` is the same as `brand DIR`
+        assert_eq!(42, 42); // TODO: `--dir dir`
+        assert_eq!(42, 42); // TODO: assert `--dir=DIR` is the same as `brand DIR`
     }
 
     #[test]
