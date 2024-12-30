@@ -145,67 +145,75 @@ impl VcstQuery {
 }
 
 struct PlexerQuery {
-    plexer: Option<RepoPlexer>,
+    plexer: RepoPlexer,
     cli: VcstQuery,
 }
 
-fn from_cli() -> Result<PlexerQuery, VcstError> {
-    let query = VcstArgs::parse().reduce()?;
-    let dir: String = query.dir()?;
-    let dir: DirPath = PathBuf::from(dir);
-    let plexer = RepoPlexer::new(dir)?;
-    Ok(PlexerQuery { plexer, cli: query })
+impl PlexerQuery {
+    fn new(args: VcstArgs) -> Result<PlexerQuery, VcstError> {
+        let query = args.reduce()?;
+        let dir: String = query.dir()?;
+        let dir: DirPath = PathBuf::from(dir);
+        let plexer = RepoPlexer::new(dir)?;
+        Ok(PlexerQuery { plexer, cli: query })
+    }
+
+    pub fn handle_query(&self) -> Result<(), VcstError> {
+        match self.cli {
+            VcstQuery::Brand { dir: _ } => {
+                println!("{:?}", self.plexer.brand);
+            }
+            VcstQuery::Root { dir: _ } => {
+                match self.plexer.root() {
+                    Ok(root_path) => {
+                        let dir_path = root_path.as_path().to_str().ok_or_else(|| {
+                            return VcstError::Unknown(format!(
+                                "vcs generated invalid unicode: {:?}",
+                                root_path
+                            ));
+                        })?;
+                        println!("{}", dir_path);
+                    }
+                    Err(e) => {
+                        return Err(VcstError::Unknown(format!("root dir: {:?}", e)));
+                    }
+                };
+            }
+            VcstQuery::IsClean { dir: _ } => todo!(),
+            VcstQuery::CurrentId {
+                dir: _,
+                dirty_ok: _,
+            } => todo!(),
+            VcstQuery::CurrentName {
+                dir: _,
+                dirty_ok: _,
+            } => todo!(),
+            VcstQuery::DirtyFiles { dir: _ } => todo!(),
+            VcstQuery::CurrentFiles {
+                dir: _,
+                dirty_ok: _,
+            } => todo!(),
+        }
+        Ok(())
+    }
 }
 
 // TODO: (rust/clap): what happens with all errors we unwrap? should we just do
 // https://doc.rust-lang.org/1.61.0/std/process/struct.ExitCode.html#examples instead?
 // TODO: (rust) setup clippy somehow?
-fn main() -> Result<(), VcstError> {
-    let vcst_query = match from_cli() {
+fn main() {
+    let plexerq = match PlexerQuery::new(VcstArgs::parse()) {
+        Ok(pq) => pq,
         Err(e) => {
             eprintln!("{}", e);
             exit(1);
         }
-        Ok(vcst) => vcst,
     };
-    let plexer = match vcst_query.plexer {
-        None => {
-            eprintln!("dir appears not to be a VCS repo");
+    match plexerq.handle_query() {
+        Ok(_) => {}
+        Err(e) => {
+            eprintln!("{}", e);
             exit(1);
         }
-        Some(plexer) => plexer,
     };
-
-    match vcst_query.cli {
-        VcstQuery::Brand { dir: _ } => {
-            println!("{:?}", plexer.brand);
-        }
-        VcstQuery::Root { dir: _ } => match plexer.root() {
-            Ok(root_path) => {
-                let dir_path = root_path.as_path().to_str().ok_or_else(|| {
-                    VcstError::Unknown(format!("vcs generated invalid unicode: {:?}", root_path))
-                })?;
-                println!("{}", dir_path);
-            }
-            Err(e) => {
-                eprintln!("root dir: {:?}", e);
-                exit(1);
-            }
-        },
-        VcstQuery::IsClean { dir: _ } => todo!(),
-        VcstQuery::CurrentId {
-            dir: _,
-            dirty_ok: _,
-        } => todo!(),
-        VcstQuery::CurrentName {
-            dir: _,
-            dirty_ok: _,
-        } => todo!(),
-        VcstQuery::DirtyFiles { dir: _ } => todo!(),
-        VcstQuery::CurrentFiles {
-            dir: _,
-            dirty_ok: _,
-        } => todo!(),
-    }
-    Ok(())
 }

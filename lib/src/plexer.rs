@@ -21,7 +21,7 @@ pub struct RepoPlexer {
 impl RepoPlexer {
     /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
     /// returns a Repo object that can answer further questions about said repo.
-    pub fn new(dir: DirPath) -> Result<Option<RepoPlexer>, RepoLoadError> {
+    pub fn new(dir: DirPath) -> Result<RepoPlexer, RepoLoadError> {
         let mut attempts = Vec::with_capacity(5);
 
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
@@ -32,18 +32,18 @@ impl RepoPlexer {
 
         attempts.push(VcsBrand::Git);
         if let Some(git) = RepoGit::new(dir.clone())? {
-            return Ok(Some(Self {
+            return Ok(Self {
                 brand: VcsBrand::Git,
                 adapter: Box::from(git),
-            }));
+            });
         }
 
         attempts.push(VcsBrand::Mercurial);
         if let Some(hg) = RepoHg::new(dir.clone())? {
-            return Ok(Some(Self {
+            return Ok(Self {
                 brand: VcsBrand::Mercurial,
                 adapter: Box::from(hg),
-            }));
+            });
         }
 
         Err(format!(
