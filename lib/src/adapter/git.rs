@@ -60,12 +60,3 @@ impl Repo for RepoGit {
         todo!();
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn it_works() {
-        assert_eq!("git.rs -42", "git.rs 42");
-    }
-}
