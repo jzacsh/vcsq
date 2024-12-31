@@ -36,6 +36,11 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
 
 ### TODOs
 
+- [ ] ci/cd clippy: get gitlab ci to run clippy (and _error out_ if changes
+   presented) in both vcst/ and lib/: `cargo clippy --allow-no-vcs --fix` is the
+   run I use and want to be warned if I haven't run.
+- [ ] address clippy::pedantic, then roll it into above ci/cd stage:
+      `cargo clippy --all -- -W clippy::pedantic`
 - [ ] cleanup all the CLI string handling (the `String::from_utf8` and
       `expect(.*utf8` references) to use `String::from_utf8_lossy`
 - [ ] cleanup some of the error enums that aren't being fully utilized (eg: some
@@ -79,7 +84,6 @@ TODO consider either/or:
 [wwwVcsts]: https://gitlab.com/jzacsh/jzacsh.gitlab.io/-/blob/fix-jj-usage-vcslib-refactoring/src/bin/vcslib.ts?ref_type=heads
 [gitlab_ci_badge]: https://gitlab.com/jzacsh/vcst/badges/main/pipeline.svg
 [gitlab_ci_dash]: https://gitlab.com/jzacsh/vcst/-/jobs
-
 
 ## License
 
