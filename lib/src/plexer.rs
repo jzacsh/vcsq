@@ -1,5 +1,6 @@
 use crate::adapter::git::RepoGit;
 use crate::adapter::hg::RepoHg;
+use crate::adapter::jj::RepoJj;
 use crate::repo::{DirPath, Repo, RepoLoadError};
 
 /// The particular brands of VCS this library supports.
@@ -7,7 +8,7 @@ use crate::repo::{DirPath, Repo, RepoLoadError};
 pub enum VcsBrand {
     Git,
     Mercurial,
-    // TODO::(feature) Jujutsu,
+    Jujutsu,
 }
 
 /// Multiplexes all available VCS adapters into one interface so you don't have to figure out which
@@ -43,6 +44,14 @@ impl RepoPlexer {
             return Ok(Self {
                 brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(hg),
+            });
+        }
+
+        attempts.push(VcsBrand::Jujutsu);
+        if let Some(jj) = RepoJj::new(dir.clone())? {
+            return Ok(Self {
+                brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
+                adapter: Box::from(jj),
             });
         }
 

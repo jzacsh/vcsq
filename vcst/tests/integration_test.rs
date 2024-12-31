@@ -6,7 +6,7 @@ use std::sync::Once;
 static ONE_REPO_SETUP: Once = Once::new();
 
 static ERROR_NO_KNOWN_VCS: &'static str =
-    "vcs error: if dir is a VCS, it\'s of an unknown brand (tried 2: [Git, Mercurial])";
+    "vcs error: if dir is a VCS, it\'s of an unknown brand (tried 3: [Git, Mercurial, Jujutsu])";
 
 static ERROR_NOT_VALID_DIR: &'static str = "usage error: dir must be a readable directory";
 
@@ -74,9 +74,14 @@ mod brand {
     #[test]
     fn jj() {
         let test_dir = crate::setup_tests().jj_repo;
-        assert_eq!(42, 42); // TODO: write real test
-    }
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
 
+        let assert = cmd.arg("brand").arg(test_dir).assert();
+        assert
+            .success()
+            .stdout(predicate::eq("Jujutsu"))
+            .stderr(predicate::str::is_empty());
+    }
     #[test]
     fn novcs() {
         let test_dir = crate::setup_tests().not_vcs;
@@ -151,9 +156,16 @@ mod root {
     #[test]
     fn jj() {
         let test_dir = crate::setup_tests().jj_repo;
-        assert_eq!(42, 42); // TODO: write real test
-    }
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
 
+        let expected_root = test_dir.display().to_string();
+
+        let assert = cmd.arg("root").arg(&test_dir).assert();
+        assert
+            .success()
+            .stderr(predicate::str::is_empty())
+            .stdout(predicate::str::diff(expected_root));
+    }
     #[test]
     fn novcs() {
         let test_dir = crate::setup_tests().not_vcs;
