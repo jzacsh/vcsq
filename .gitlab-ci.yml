@@ -36,5 +36,4 @@ test:cargo:
   stage: test
   script:
     - rustc --version && cargo --version  # Print version info for debugging
-    - cd vcst
-    - cargo test --workspace --verbose
+    - cd vcst && cargo test --workspace --verbose -- --nocapture
