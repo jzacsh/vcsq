@@ -1,16 +1,31 @@
 # vcst: VCSrusT - Version Control System (VCS) utils in Rust
 
-Tries to answer generic questions about a VCS repo, without making you think
-about the particular flavor of VCS at play.
+`vcst` tries to answer a _small set_ of generic questions about "any" type of
+VCS repo, without making you think about the particular flavor of VCS at play.
 
 This repo lives at <https://gitlab.com/jzacsh/vcst>
 
-**STATUS**: 80% effort is done; 30% functionality is done. Early days, has some
-functionality ported in from the originals (see "design goals" section), and
-enormous amount of test-infra and outlining to enable the rest of the APIs, and
-now just remains some drudge-work to finish the port.
+**STATUS** [![Build Status][gitlab_ci_badge]][gitlab_ci_dash]: tl;dr is the
+effort's 80% done, but the functionality's only 30% through. Some early/core
+functionality (see "design goals" section) is already done (and I should
+probably just port my `$PS1` already), an enormous amount of test-infra and
+outlining to enable the rest of the APIs, and now just remains some drudge-work
+to finish the port.
 
-## Development [![Build Status][gitlab_ci_badge]][gitlab_ci_dash]
+## Design Goals
+
+**Goal**: answer 101 introspective questions about a repo/directory.
+
+This very much inspired by Greg's famous `vcprompt` I'd been using for years,
+but also APIs I've frequently[^freq] wanted for scripting purposes. Each of
+those APIs I wished for is now outlined in this codebase's `VcstQuery` enum of
+in the namesaked reference binary (at `./vcst/src/lib.rs`).
+
+The goal is to have coverage for the popular VCS I personally encounter
+regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
+possible to add new ones.
+
+## Development
 
 Logic in `lib/` and in main (`vcst/`) is covered by e2e tests, so just run them
 continuously via:
@@ -52,16 +67,6 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
   that default to map_err() to `Unknown`-fallbackish variants). This is because
   some of the better alternatives were only added _later_ (eg:
   `RepoLoadError::Stderr`) which could fix some
-
-## Design Goals
-
-**Goal**: answer 101 introspective questions about a repo/directory.
-
-Questions I frequently[^freq] want to answered are now outlined as `VcstQuery`
-enum of in the namesaked reference binary (at `./vcst/src/main.rs`).
-
-The goal is to have coverage popular VCS I personally encounter regulalry, like
-`git`, `hg`, `jj`.
 
 ## Tests
 
