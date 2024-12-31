@@ -29,6 +29,14 @@ The goal is to have coverage for the popular VCS I personally encounter
 regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
 possible to add new ones.
 
+### Shelling Out
+
+Ultimately this is just like a shell script: it's relying on the CLI of the VCS
+actually being in your `$PATH`, and interacting with it as such. I think it'd be
+fun to explore calling the VCS's own libraries at some point, and I tried to
+write the library with that in mind from the start. _But_ that's a whole nother
+of wax and very unlikely to happen any time soon.
+
 ## Usage
 
 TODO: (feature) outline installation, and super-basic `$PS1` bash integration.
