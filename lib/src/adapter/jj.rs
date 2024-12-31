@@ -30,11 +30,15 @@ impl RepoJj {
         }
     }
 
-    fn jj_root(&self) -> Command {
+    fn start_shellout(&self) -> Command {
         let mut cmd = Command::new("jj");
+        cmd.current_dir(self.dir.clone());
+        cmd
+    }
 
-        cmd.arg("root").current_dir(self.dir.clone());
-
+    fn jj_root(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("root");
         cmd
     }
 }

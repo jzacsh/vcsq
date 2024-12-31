@@ -37,11 +37,15 @@ impl RepoGit {
         }
     }
 
-    fn git_show_top_level(&self) -> Command {
+    fn start_shellout(&self) -> Command {
         let mut cmd = Command::new("git");
-        cmd.arg("rev-parse")
-            .arg("--show-toplevel")
-            .current_dir(self.dir.clone());
+        cmd.current_dir(self.dir.clone());
+        cmd
+    }
+
+    fn git_show_top_level(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("rev-parse").arg("--show-toplevel");
         cmd
     }
 }

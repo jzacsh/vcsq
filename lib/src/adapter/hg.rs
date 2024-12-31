@@ -32,23 +32,18 @@ impl RepoHg {
 
     fn start_shellout(&self) -> Command {
         let mut cmd = Command::new("hg");
-
         cmd.current_dir(self.dir.clone());
-
         cmd
     }
 
     fn hg_root(&self) -> Command {
         let mut cmd = self.start_shellout();
-
         cmd.arg("root");
-
         cmd
     }
 
     fn dirty_files(&self) -> Command {
         let mut cmd = self.start_shellout();
-
         cmd.env("HGPLAIN", "1")
             .arg("status")
             .arg("--modified")
@@ -56,7 +51,6 @@ impl RepoHg {
             .arg("--removed")
             .arg("--deleted")
             .arg("--unknown");
-
         cmd
     }
 }
