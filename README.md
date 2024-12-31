@@ -10,13 +10,13 @@ This repo lives at <https://gitlab.com/jzacsh/vcst>
 [![Build Status][gitlab_ci_badge]][gitlab_ci_dash] shows e2e tess' status. I'm
 hoping for near-complete coverage.
 
-_tl;dr_ is the effort's 80% done, but the functionality's only 30% through. Some
-early/core functionality (see "design goals" section) is already done (and I
-should probably just port my `$PS1` already), an enormous amount of test-infra
-and outlining to enable the rest of the APIs, and now just remains some
-drudge-work to finish the port.
+_tl;dr_ the effort's 80% done, but the functionality's only 30% through. Some
+early/core functionality (see "goals" section) is already done (and I should
+probably just port my `$PS1` already), an enormous amount of test-infra and
+outlining to enable the rest of the APIs, and now just remains some drudge-work
+to finish the port.
 
-## Design Goals
+## Design & Goals
 
 **Goal**: answer 101 introspective questions about a repo/directory.
 
@@ -29,6 +29,10 @@ The goal is to have coverage for the popular VCS I personally encounter
 regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
 possible to add new ones.
 
+### Usage
+
+TODO: (feature) outline installation, and super-basic `$PS1` bash integration.
+
 ### Shelling Out
 
 Ultimately this is just like a shell script: it's relying on the CLI of the VCS
@@ -37,22 +41,20 @@ fun to explore calling the VCS's own libraries at some point, and I tried to
 write the library with that in mind from the start. _But_ that's a whole nother
 of wax and very unlikely to happen any time soon.
 
-## Usage
-
-TODO: (feature) outline installation, and super-basic `$PS1` bash integration.
-
 ## Development
 
-Logic in `lib/` and in main (`vcst/`) is covered by e2e tests, so just run them
-continuously via:
+The codebase is a library (`./lib/`) and its dependent: a CLI at `./vcst/`.
+
+Since logic in `lib/` is designed for its only client (`vcst/`), that client's e2e
+tests are _the_ test coverage for this entire codebase, so local development
+just involves producing a debug binary and making sure you haven't broken tests:
 
 ```sh
 $ cd vcst && cargo watch test  --color=always -- --nocapture
 # ...
 ```
 
-And so the binary is always available for manual testing, just keep it built
-via (in a separate terminal):
+In a second terminal I ensure the binary is being continuously rebuilt:
 
 ```sh
 $ cd vcst && cargo watch -x build
@@ -62,8 +64,21 @@ $ cd vcst && cargo watch -x build
 # there's compiler errors you're trying to read.
 ```
 
+### Tests
+
+e2e tests of the CLI binary, in `vcst/tests/`, are the strategy for the moment;
+they covery every API that `lib/` is meant to offer.
+
 Gitlab servers also run this for us on every merge to main, via `.gitlab-ci.yml`
 instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs>
+
+TODO: (test infra) consider either/both:
+
+1. starting to teardown the vcst tests temp directory (see
+   `vcst/tests/common/mod.rs` for the tempdir setup funcs that get called for
+    every test in `vcst/tests/integration_test.rs`)
+2. root-less container setup to easily run our e2e tests (so we can contain any
+   potentially buggy teardown(), and not delte our own root directory).
 
 ### TODOs
 
@@ -93,19 +108,6 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
 
 [vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
-
-### Tests
-
-e2e tests of the CLI binary, in `vcst/tests/`, are the strategy for the moment;
-they covery every API that `lib/` is meant to offer.
-
-TODO consider either/or:
-
-1. starting to teardown the vcst tests temp directory (see
-   `vcst/tests/common/mod.rs` for the tempdir setup funcs that get called for
-    every test in `vcst/tests/integration_test.rs`)
-2. root-less container setup to easily run our e2e tests (so we can contain any
-   potentially buggy teardown(), and not delte our own root directory).
 
 [^freq]:
     See the three predecessors/mini-libs that inspired this one, at:
