@@ -63,8 +63,10 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
    presented) in both vcst/ and lib/: `cargo clippy --allow-no-vcs --fix` is the
    run I use and want to be warned if I haven't run.
 - [x] install jj VCS to $PATH of gitlab ci/cd
-      -  [ ] move `git --version && hg --version && jj --version` frmo ci/cd yml
-      into test harness startup as a sanity-check _anywhere_ the test runs.
+
+  - [ ] move `git --version && hg --version && jj --version` frmo ci/cd yml into
+  test harness startup as a sanity-check _anywhere_ the test runs.
+
 - [ ] feature: run a dump of what VCS we find in path, as part of `--version`
       output, or some place of the sort.
 - [ ] address clippy::pedantic, then roll it into above ci/cd stage:
