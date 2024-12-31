@@ -1,4 +1,3 @@
-use crate::common::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
 use crate::common::setup::{make_test_temp, TestDirs};
 use assert_cmd::Command;
 use predicates::prelude::*;
@@ -45,4 +44,14 @@ fn hg() {
 #[test]
 fn jj() {
     assert_eq!(42, 42); // TODO: write test
+}
+
+#[test]
+fn no_vcs() {
+    assert_eq!(42, 42); // TODO: write test ERROR_NO_KNOWN_VCS
+}
+
+#[test]
+fn no_dir() {
+    assert_eq!(42, 42); // TODO: write test ERROR_NOT_VALID_DIR
 }
