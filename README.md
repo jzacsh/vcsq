@@ -10,7 +10,7 @@ functionality ported in from the originals (see "design goals" section), and
 enormous amount of test-infra and outlining to enable the rest of the APIs, and
 now just remains some drudge-work to finish the port.
 
-## Development
+## Development [![Build Status][gitlab_ci_badge]][gitlab_ci_dash]
 
 Logic in `lib/` and in main (`vcst/`) is covered by e2e tests, so just run them
 continuously via:
@@ -74,6 +74,9 @@ TODO consider either/or:
 [dotsVcsq]: https://gitlab.com/jzacsh/dotfiles/-/blob/main/bin/lib/vcsq
 [dotsVcsq_ref]: https://gitlab.com/jzacsh/dotfiles/-/blob/2543adf4a6d4fcf946d0fda2c70658f72739a250/bin/lib/vcsq
 [wwwVcsts]: https://gitlab.com/jzacsh/jzacsh.gitlab.io/-/blob/fix-jj-usage-vcslib-refactoring/src/bin/vcslib.ts?ref_type=heads
+[gitlab_ci_badge]: https://gitlab.com/jzacsh/vcst/badges/main/pipeline.svg
+[gitlab_ci_dash]: https://gitlab.com/jzacsh/vcst/-/jobs
+
 
 ## License
 
