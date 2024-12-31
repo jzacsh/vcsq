@@ -17,8 +17,11 @@ pub static TEST_VCS_BASENAME_NONDIR: &str = "test-not-dir";
 
 #[derive(Error, Debug)]
 pub enum TestSetupError {
-    #[error("system: {0}")]
-    System(#[from] std::io::Error),
+    #[error("system failed {}: {}", .context, .source)]
+    System {
+        context: String,
+        source: std::io::Error,
+    },
 
     #[error("cli failed and stderr had unicode problem: {0}")]
     CliFail(#[from] FromUtf8Error),
@@ -87,18 +90,25 @@ impl TestDirs {
         use std::fs;
 
         let generic_root = make_test_temp::get_mktemp_root(testdir_bname)?;
-        let test_run_dirs: Vec<PathBuf> = fs::read_dir(generic_root)?
-            .map(|res| res.map(|e| e.path()))
-            .collect::<Result<_, std::io::Error>>()?;
-        let mut test_run_dirs: Vec<PathBuf> = test_run_dirs
+        let mut test_run_dirs = fs::read_dir(&generic_root)
+            // TODO: (rust) consider extracting[1] out theses errors (they get dropped via
+            // filter_map() later) so we can err _iff_ there are zero OK results.
+            // [1]: https://doc.rust-lang.org/rust-by-example/error/iter_result.html#collect-the-failed-items-with-map_err-and-filter_map
+            .map_err(|source| TestSetupError::System {
+                context: format!("fs::read_dir({})", generic_root.to_string_lossy()),
+                source,
+            })?
+            .map(|res| res.map(|p| p.path()))
+            .filter_map(|r| r.ok())
             .into_iter()
             .filter(|p| p.is_dir())
             .collect::<Vec<_>>();
         test_run_dirs.sort();
-        let newest_test_dir = test_run_dirs
-            .into_iter()
-            .last()
-            .ok_or("no dirs found".to_string())?;
+        let newest_test_dir = test_run_dirs.into_iter().last().ok_or(format!(
+            "list_temp_repos({}) no dirs found under: {}",
+            testdir_bname,
+            generic_root.to_string_lossy().to_string()
+        ))?;
         Ok(newest_test_dir)
     }
 
@@ -170,10 +180,19 @@ pub mod vcs_test_setup {
         tmpdir_root: PathBuf,
     ) -> Result<(), TestSetupError> {
         let cli_output = Command::new(cmd)
-            .args(args)
+            .args(&args)
             .stdout(Stdio::null())
-            .current_dir(tmpdir_root)
-            .output()?;
+            .current_dir(&tmpdir_root)
+            .output()
+            .map_err(|source| TestSetupError::System {
+                context: format!(
+                    "`{} {:?}` at {}",
+                    &cmd,
+                    &args,
+                    &tmpdir_root.to_string_lossy()
+                ),
+                source,
+            })?;
         if cli_output.status.success() {
             Ok(())
         } else {
@@ -197,7 +216,10 @@ pub mod vcs_test_setup {
     fn setup_temp_nonvcs_dir(mut tmpdir_root: PathBuf) -> Result<(), TestSetupError> {
         use std::fs::create_dir;
         tmpdir_root.push(TEST_VCS_BASENAME_NONVCS);
-        create_dir(tmpdir_root)?;
+        create_dir(&tmpdir_root).map_err(|source| TestSetupError::System {
+            context: format!("create_dir({})", tmpdir_root.to_string_lossy()),
+            source,
+        })?;
         Ok(())
     }
 
@@ -253,7 +275,10 @@ pub mod make_test_temp {
 
         root_dir.push(basename);
         if !root_dir.exists() {
-            create_dir(&root_dir)?
+            create_dir(&root_dir).map_err(|source| TestSetupError::System {
+                context: format!("get_mktemp_root({})", basename),
+                source,
+            })?
         }
         Ok(root_dir)
     }
@@ -262,11 +287,18 @@ pub mod make_test_temp {
     pub fn mktemp(basename: &str) -> Result<PathBuf, TestSetupError> {
         use std::fs::create_dir;
 
-        let mut root_dir: PathBuf = get_mktemp_root(basename)?;
+        let mut root_dir: PathBuf = get_mktemp_root(&basename)?;
 
         let iso_str = now_stamp("%F-at-%s");
         root_dir.push(iso_str);
-        create_dir(&root_dir)?;
+        create_dir(&root_dir).map_err(|source| TestSetupError::System {
+            context: format!(
+                "mktemp({}): create_dir({})",
+                basename,
+                root_dir.to_string_lossy()
+            ),
+            source,
+        })?;
 
         assert!(
             root_dir.exists(),
