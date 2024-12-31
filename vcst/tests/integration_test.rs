@@ -86,7 +86,7 @@ mod brand {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS.to_string()));
+            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS));
     }
 
     #[test]
@@ -165,7 +165,7 @@ mod root {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS.to_string()));
+            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS));
     }
 
     #[test]
@@ -179,13 +179,20 @@ mod root {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
+            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
     }
 
     #[test]
     fn non_extant() {
-        let mut non_extant = crate::setup_tests().non_extant();
-        assert_eq!(42, 42); // TODO: write real test
+        let test_dirs = crate::setup_tests();
+        let non_extant_path = test_dirs.non_extant();
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let assert = cmd.arg("root").arg(non_extant_path).assert();
+        assert
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
     }
 }
 
