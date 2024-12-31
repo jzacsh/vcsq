@@ -5,12 +5,16 @@ VCS repo, without making you think about the particular flavor of VCS at play.
 
 This repo lives at <https://gitlab.com/jzacsh/vcst>
 
-**STATUS** [![Build Status][gitlab_ci_badge]][gitlab_ci_dash]: tl;dr is the
-effort's 80% done, but the functionality's only 30% through. Some early/core
-functionality (see "design goals" section) is already done (and I should
-probably just port my `$PS1` already), an enormous amount of test-infra and
-outlining to enable the rest of the APIs, and now just remains some drudge-work
-to finish the port.
+## Project Status
+
+[![Build Status][gitlab_ci_badge]][gitlab_ci_dash] shows e2e tess' status. I'm
+hoping for near-complete coverage.
+
+_tl;dr_ is the effort's 80% done, but the functionality's only 30% through. Some
+early/core functionality (see "design goals" section) is already done (and I
+should probably just port my `$PS1` already), an enormous amount of test-infra
+and outlining to enable the rest of the APIs, and now just remains some
+drudge-work to finish the port.
 
 ## Design Goals
 
@@ -24,6 +28,10 @@ in the namesaked reference binary (at `./vcst/src/lib.rs`).
 The goal is to have coverage for the popular VCS I personally encounter
 regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
 possible to add new ones.
+
+## Usage
+
+TODO: (feature) outline installation, and super-basic `$PS1` bash integration.
 
 ## Development
 
@@ -68,7 +76,7 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
   some of the better alternatives were only added _later_ (eg:
   `RepoLoadError::Stderr`) which could fix some
 
-## Tests
+### Tests
 
 e2e tests of the CLI binary, in `vcst/tests/`, are the strategy for the moment;
 they covery every API that `lib/` is meant to offer.
