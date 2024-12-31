@@ -30,10 +30,32 @@ impl RepoHg {
         }
     }
 
-    fn hg_root(&self) -> Command {
+    fn start_shellout(&self) -> Command {
         let mut cmd = Command::new("hg");
 
-        cmd.arg("root").current_dir(self.dir.clone());
+        cmd.current_dir(self.dir.clone());
+
+        cmd
+    }
+
+    fn hg_root(&self) -> Command {
+        let mut cmd = self.start_shellout();
+
+        cmd.arg("root");
+
+        cmd
+    }
+
+    fn dirty_files(&self) -> Command {
+        let mut cmd = self.start_shellout();
+
+        cmd.env("HGPLAIN", "1")
+            .arg("status")
+            .arg("--modified")
+            .arg("--added")
+            .arg("--removed")
+            .arg("--deleted")
+            .arg("--unknown");
 
         cmd
     }
@@ -47,5 +69,28 @@ impl Repo for RepoHg {
         }
         let stdout = String::from_utf8(output.stdout)?.trim().to_string();
         Ok(PathBuf::from(stdout))
+    }
+
+    fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {
+        let output = self
+            .dirty_files()
+            .output()
+            .map_err(|e| RepoLoadError::Command {
+                context: Some("hg cli"),
+                source: e,
+            })?;
+        if !output.status.success() {
+            return Err(RepoLoadError::Stderr {
+                context: Some("hg cli"),
+                stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+            });
+        }
+        Ok(String::from_utf8_lossy(&output.stdout)
+            .to_string()
+            .lines()
+            .into_iter()
+            .filter(|ln| !ln.is_empty())
+            .map(|ln| PathBuf::from(ln))
+            .collect())
     }
 }

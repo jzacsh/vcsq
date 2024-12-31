@@ -206,7 +206,17 @@ impl PlexerQuery<'_> {
                 dir: _,
                 dirty_ok: _,
             } => todo!(),
-            VcstQuery::DirtyFiles { dir: _ } => todo!(),
+            VcstQuery::DirtyFiles { dir: _ } => {
+                let dirty_files = self
+                    .plexer
+                    .dirty_files()
+                    .map_err(|e| VcstError::Plexing(e))?;
+                for dirty_file in dirty_files {
+                    write!(self.stdout, "{}\n", dirty_file.display()).expect(
+                        format!("failed stdout write of: {}", dirty_file.display()).as_str(),
+                    );
+                }
+            }
             VcstQuery::CurrentFiles {
                 dir: _,
                 dirty_ok: _,

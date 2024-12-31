@@ -72,4 +72,8 @@ where
 
     /// Prints the root dir of the repo.
     fn root(&self) -> Result<DirPath, RepoLoadError>;
+
+    /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output is
+    /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
+    fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError>;
 }

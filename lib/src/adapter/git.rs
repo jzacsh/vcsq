@@ -55,6 +55,10 @@ impl Repo for RepoGit {
         let stdout = String::from_utf8(output.stdout)?.trim().to_string();
         Ok(PathBuf::from(stdout))
     }
+
+    fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {
+        todo!();
+    }
 }
 
 #[cfg(test)]

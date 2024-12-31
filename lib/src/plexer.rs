@@ -68,6 +68,10 @@ impl Repo for RepoPlexer {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
         self.adapter.root()
     }
+
+    fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {
+        self.adapter.dirty_files()
+    }
 }
 
 // NOTE: lack of unit tests here, is purely because of the coverage via e2e tests via ../vcst
