@@ -33,6 +33,10 @@ $ cd vcst && cargo watch -x build
 
 - [ ] cleanup all the CLI string handling (the `String::from_utf8` and
       `expect(.*utf8` references) to use `String::from_utf8_lossy`
+- [ ] cleanup some of the error enums that aren't being fully utilized (eg: some
+  that default to map_err() to `Unknown`-fallbackish variants). This is because
+  some of the better alternatives were only added _later_ (eg:
+  `RepoLoadError::Stderr`) which could fix some
 
 ## Design Goals
 
