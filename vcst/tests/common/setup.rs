@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::string::FromUtf8Error;
 use std::sync::Once;
 use thiserror::Error;
@@ -77,7 +77,7 @@ impl TestDirs {
     }
 
     /// Mutates disk to start temp directory tree.
-    fn create(testdir_bname: &PathBuf) -> Result<(), TestSetupError> {
+    fn create(testdir_bname: &Path) -> Result<(), TestSetupError> {
         use vcs_test_setup::setup_temp_repos;
         setup_temp_repos(testdir_bname)
     }
@@ -160,6 +160,7 @@ pub mod vcs_test_setup {
         TEST_VCS_BASENAME_GIT, TEST_VCS_BASENAME_HG, TEST_VCS_BASENAME_JJ,
         TEST_VCS_BASENAME_NONDIR, TEST_VCS_BASENAME_NONVCS,
     };
+    use std::path::Path;
     use std::path::PathBuf;
     use std::process::{Command, Stdio};
 
@@ -208,12 +209,12 @@ pub mod vcs_test_setup {
         touch(plain_file.as_path())
     }
     /// Creates new temp directories on disk.
-    pub fn setup_temp_repos(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
-        setup_temp_repo_git(tmpdir_root.clone())?;
-        setup_temp_repo_hg(tmpdir_root.clone())?;
-        setup_temp_repo_jj(tmpdir_root.clone())?;
-        setup_temp_nonvcs_dir(tmpdir_root.clone())?;
-        setup_temp_plainfile(tmpdir_root.clone())?;
+    pub fn setup_temp_repos(tmpdir_root: &Path) -> Result<(), TestSetupError> {
+        setup_temp_repo_git(tmpdir_root.to_path_buf())?;
+        setup_temp_repo_hg(tmpdir_root.to_path_buf())?;
+        setup_temp_repo_jj(tmpdir_root.to_path_buf())?;
+        setup_temp_nonvcs_dir(tmpdir_root.to_path_buf())?;
+        setup_temp_plainfile(tmpdir_root.to_path_buf())?;
         Ok(())
     }
 }
@@ -280,6 +281,7 @@ pub mod make_test_temp {
 
         OpenOptions::new()
             .create(true)
+            .truncate(false)
             .write(true)
             .open(path)
             .map_err(|e| {
