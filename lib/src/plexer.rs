@@ -70,13 +70,5 @@ impl Repo for RepoPlexer {
     }
 }
 
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn it_works() {
-        // TODO: (rust) decide on unit testing strategy here (how to dependency-inject filesystem
-        // interactions? don't bother, just straight to e2e tests?)
-        assert_eq!("plexer -42", "plexer.rs 42");
-    }
-}
+// NOTE: lack of unit tests here, is purely because of the coverage via e2e tests via ../vcst
+// binary target. That doesn't mean unit tests won't be appropriate in this file in the future.

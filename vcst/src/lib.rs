@@ -239,3 +239,7 @@ pub fn vcst_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn i
     };
     return 0;
 }
+
+// NOTE: lack of unit tests here, is purely because of the coverage via e2e tests ./tests/
+// sub-codebase of this binary target. That doesn't mean unit tests won't be appropriate in this
+// file in the future.
