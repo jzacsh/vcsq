@@ -34,5 +34,9 @@ build:cargo:
 test:cargo:
   stage: test
   script:
+    # install jj VCS, per 20241231 instructions at
+    # https://jj-vcs.github.io/jj/latest/install-and-setup/#cargo-binstall
+    - cargo binstall --strategies crate-meta-data jj-cli
     - rustc --version && cargo --version  # Print version info for debugging
+    - git --version && hg --version && jj --version  # vcst/domain-specific debug info
     - cd vcst && cargo test --workspace --verbose -- --nocapture
