@@ -81,6 +81,7 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
       `cargo clippy --all -- -W clippy::pedantic`
 - [ ] cleanup all the CLI string handling (the `String::from_utf8` and
       `expect(.*utf8` references) to use `String::from_utf8_lossy`
+- [ ] feature: add ["list tracked files" concept][vcsListUsecase]
 - [ ] cleanup some of the error enums that aren't being fully utilized (eg: some
   that default to map_err() to `Unknown`-fallbackish variants). This is because
   some of the better alternatives were only added _later_ (eg:
@@ -88,6 +89,7 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
 - [ ] before releasing, setup a Github mirror [via gitlab's mechanism for
   this][gLabToGhubMirror]
 
+[vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
 
 ### Tests
