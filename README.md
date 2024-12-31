@@ -31,6 +31,9 @@ $ cd vcst && cargo watch -x build
 # there's compiler errors you're trying to read.
 ```
 
+Gitlab servers also run this for us on every merge to main, via `.gitlab-ci.yml`
+instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs>
+
 ### TODOs
 
 - [ ] cleanup all the CLI string handling (the `String::from_utf8` and
