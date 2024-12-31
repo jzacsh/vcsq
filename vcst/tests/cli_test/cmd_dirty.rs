@@ -9,10 +9,13 @@ fn git() {
 }
 
 #[test]
-fn hg_clean() {
+fn hg() {
     let test_dirs = TestDirs::create_once();
     let test_dir = test_dirs.hg_repo;
 
+    //
+    // Arrange+Assert: clean repo lists nothing dirty
+    //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
     let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
     assert
@@ -29,7 +32,7 @@ fn hg_clean() {
     let _ = make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
 
     //
-    // Assert: dirty repo how has report of what's dirty
+    // Assert: dirty repo now has report of what's dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
     let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
