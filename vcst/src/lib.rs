@@ -99,7 +99,7 @@ pub enum VcstQuery {
         dirty_ok: bool,
     },
 
-    /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output is
+    /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output if
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
     #[command(arg_required_else_help = true)]
     DirtyFiles { dir: DirPath },
@@ -177,7 +177,7 @@ impl PlexerQuery<'_> {
     pub fn handle_query(&mut self) -> Result<(), VcstError> {
         match self.cli {
             VcstQuery::Brand { dir: _ } => {
-                write!(self.stdout, "{:?}", self.plexer.brand)
+                write!(self.stdout, "{:?}\n", self.plexer.brand)
                     .expect(format!("failed stdout write of: {:?}", self.plexer.brand).as_str());
             }
             VcstQuery::Root { dir: _ } => {
@@ -189,7 +189,7 @@ impl PlexerQuery<'_> {
                                 root_path
                             ));
                         })?;
-                        write!(self.stdout, "{}", dir_path)
+                        write!(self.stdout, "{}\n", dir_path)
                             .expect(format!("failed stdout write of: {}", dir_path).as_str());
                     }
                     Err(e) => {
@@ -226,14 +226,14 @@ pub fn vcst_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn i
     let mut plexerq = match PlexerQuery::new(args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
-            write!(stderr, "{}", e).expect(format!("failed stderr write of: {}", e).as_str());
+            write!(stderr, "{}\n", e).expect(format!("failed stderr write of: {}", e).as_str());
             return 1;
         }
     };
     match plexerq.handle_query() {
         Ok(_) => {}
         Err(e) => {
-            write!(stderr, "{}", e).expect(format!("failed stderr write of: {}", e).as_str());
+            write!(stderr, "{}\n", e).expect(format!("failed stderr write of: {}", e).as_str());
             return 1;
         }
     };

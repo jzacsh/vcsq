@@ -11,7 +11,7 @@ fn git() {
     let assert = cmd.arg("brand").arg(test_dir).assert();
     assert
         .success()
-        .stdout(predicate::eq("Git"))
+        .stdout(predicate::eq("Git\n"))
         .stderr(predicate::str::is_empty());
 }
 
@@ -23,7 +23,7 @@ fn hg() {
     let assert = cmd.arg("brand").arg(test_dir).assert();
     assert
         .success()
-        .stdout(predicate::eq("Mercurial"))
+        .stdout(predicate::eq("Mercurial\n"))
         .stderr(predicate::str::is_empty());
 }
 
@@ -35,7 +35,7 @@ fn jj() {
     let assert = cmd.arg("brand").arg(test_dir).assert();
     assert
         .success()
-        .stdout(predicate::eq("Jujutsu"))
+        .stdout(predicate::eq("Jujutsu\n"))
         .stderr(predicate::str::is_empty());
 }
 #[test]
@@ -47,7 +47,7 @@ fn novcs() {
     assert
         .failure()
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::diff(ERROR_NO_KNOWN_VCS));
+        .stderr(predicate::str::diff(ERROR_NO_KNOWN_VCS.to_string() + "\n"));
 }
 
 #[test]
@@ -59,7 +59,7 @@ fn non_dir() {
     assert
         .failure()
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
+        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR.to_string() + "\n"));
 }
 
 #[test]
@@ -72,5 +72,5 @@ fn non_extant() {
     assert
         .failure()
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
+        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR.to_string() + "\n"));
 }

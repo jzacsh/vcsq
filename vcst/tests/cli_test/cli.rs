@@ -10,7 +10,7 @@ fn no_args() {
     cmd.assert()
         .failure()
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::diff(ERROR_DIR_MISSING));
+        .stderr(predicate::str::diff(ERROR_DIR_MISSING.to_string() + "\n"));
 }
 
 #[test]
@@ -23,7 +23,7 @@ fn no_subcmd() {
         .arg(test_dir)
         .assert()
         .success()
-        .stdout(predicate::eq("Git"))
+        .stdout(predicate::eq("Git\n"))
         .stderr(predicate::str::is_empty());
 }
 

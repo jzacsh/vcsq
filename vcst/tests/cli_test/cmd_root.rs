@@ -14,7 +14,7 @@ fn git() {
     assert
         .success()
         .stderr(predicate::str::is_empty())
-        .stdout(predicate::str::diff(expected_root));
+        .stdout(predicate::str::diff(expected_root + "\n"));
 }
 
 #[test]
@@ -28,7 +28,7 @@ fn hg() {
     assert
         .success()
         .stderr(predicate::str::is_empty())
-        .stdout(predicate::str::diff(expected_root));
+        .stdout(predicate::str::diff(expected_root + "\n"));
 }
 
 #[test]
@@ -42,7 +42,7 @@ fn jj() {
     assert
         .success()
         .stderr(predicate::str::is_empty())
-        .stdout(predicate::str::diff(expected_root));
+        .stdout(predicate::str::diff(expected_root + "\n"));
 }
 #[test]
 fn novcs() {
@@ -53,7 +53,7 @@ fn novcs() {
     assert
         .failure()
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::diff(ERROR_NO_KNOWN_VCS));
+        .stderr(predicate::str::diff(ERROR_NO_KNOWN_VCS.to_string() + "\n"));
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn non_dir() {
     assert
         .failure()
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
+        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR.to_string() + "\n"));
 }
 
 #[test]
@@ -78,5 +78,5 @@ fn non_extant() {
     assert
         .failure()
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
+        .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR.to_string() + "\n"));
 }
