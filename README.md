@@ -77,6 +77,10 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
   that default to map_err() to `Unknown`-fallbackish variants). This is because
   some of the better alternatives were only added _later_ (eg:
   `RepoLoadError::Stderr`) which could fix some
+- [ ] before releasing, setup a Github mirror [via gitlab's mechanism for
+  this][gLabToGhubMirror]
+
+[gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
 
 ### Tests
 
