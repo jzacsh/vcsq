@@ -5,20 +5,28 @@ about the particular flavor of VCS at play.
 
 This repo lives at <https://gitlab.com/jzacsh/vcst>
 
+**STATUS**: early days, mostly boilerplate/setup, with only some functionality
+ported in from the originals (see "design goals" section).
+
 ## Development
 
-In `lib/` just unit tests right now:
+Logic in `lib/` and in main (`vcst/`) is covered by e2e tests, so just run them
+continuously via:
 
 ```sh
-$ cd lib && cargo watch -x test
+$ cd vcst && cargo watch test  --color=always -- --nocapture
 # ...
 ```
 
-In `vcst/` just runt he binary:
+And so the binary is always available for manual testing, just keep it built
+via (in a separate terminal):
 
 ```sh
-$ cd vcst && cargo watch -x run
+$ cd vcst && cargo watch -x build
 # ...
+# can also be tacked onto the previous command via another '-x build' arg at the
+# before the test args, but then you get the issue of too-many-lines-output when
+# there's compiler errors you're trying to read.
 ```
 
 ## Design Goals
@@ -33,12 +41,16 @@ The goal is to have coverage popular VCS I personally encounter regulalry, like
 
 ## Tests
 
-e2e tests are going to be the easiest to maintain and leverage, and I imagine
-that will mean simply a temp filesystem.
+e2e tests of the CLI binary, in `vcst/tests/`, are the strategy for the moment;
+they covery every API that `lib/` is meant to offer.
 
-TODO figure out how to get root-less container setup easily so we can contain
-some tests (because I don't want a unit-test's buggy teardown() func to delete
-my root directory, for example).
+TODO consider either/or:
+
+1. starting to teardown the vcst tests temp directory (see
+   `vcst/tests/common/mod.rs` for the tempdir setup funcs that get called for
+    every test in `vcst/tests/integration_test.rs`)
+2. root-less container setup to easily run our e2e tests (so we can contain any
+   potentially buggy teardown(), and not delte our own root directory).
 
 [^freq]:
     See the three predecessors/mini-libs that inspired this one, at:
