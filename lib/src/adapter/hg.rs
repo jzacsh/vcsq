@@ -88,9 +88,8 @@ impl Repo for RepoHg {
         Ok(String::from_utf8_lossy(&output.stdout)
             .to_string()
             .lines()
-            .into_iter()
             .filter(|ln| !ln.is_empty())
-            .map(|ln| PathBuf::from(ln))
+            .map(PathBuf::from)
             .collect())
     }
 }

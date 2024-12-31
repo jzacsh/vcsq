@@ -5,11 +5,11 @@ use thiserror::Error;
 
 static ONCE_TESTDIRS_SETUP: Once = Once::new();
 
-pub static TEST_VCS_BASENAME_GIT: &'static str = "test-git-repo";
-pub static TEST_VCS_BASENAME_HG: &'static str = "test-hg-repo";
-pub static TEST_VCS_BASENAME_JJ: &'static str = "test-jj-on-git-repo";
-pub static TEST_VCS_BASENAME_NONVCS: &'static str = "test-not-vcs";
-pub static TEST_VCS_BASENAME_NONDIR: &'static str = "test-not-dir";
+pub static TEST_VCS_BASENAME_GIT: &str = "test-git-repo";
+pub static TEST_VCS_BASENAME_HG: &str = "test-hg-repo";
+pub static TEST_VCS_BASENAME_JJ: &str = "test-jj-on-git-repo";
+pub static TEST_VCS_BASENAME_NONVCS: &str = "test-not-vcs";
+pub static TEST_VCS_BASENAME_NONDIR: &str = "test-not-dir";
 
 // TODO: (rust) how much of this file do the following two crates make obsolete/deletable?
 // - https://docs.rs/assert_cmd/latest/assert_cmd
@@ -88,7 +88,6 @@ impl TestDirs {
 
         let generic_root = make_test_temp::get_mktemp_root(testdir_bname)?;
         let test_run_dirs: Vec<PathBuf> = fs::read_dir(generic_root)?
-            .into_iter()
             .map(|res| res.map(|e| e.path()))
             .collect::<Result<_, std::io::Error>>()?;
         let mut test_run_dirs: Vec<PathBuf> = test_run_dirs
@@ -296,7 +295,7 @@ pub mod make_test_temp {
     fn now_stamp(format: &str) -> String {
         use chrono::prelude::{DateTime, Utc};
         use std::time::SystemTime;
-        let date_time: DateTime<Utc> = SystemTime::now().clone().into();
+        let date_time: DateTime<Utc> = SystemTime::now().into();
         date_time.format(format).to_string()
     }
 }

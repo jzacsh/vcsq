@@ -120,7 +120,7 @@ pub enum VcstQuery {
 
 impl VcstQuery {
     fn dir(&self) -> Result<String, VcstError> {
-        return Ok(self
+        Ok(self
             .dir_path()
             .to_str()
             .ok_or_else(|| {
@@ -129,7 +129,7 @@ impl VcstQuery {
                     self.dir_path()
                 ))
             })?
-            .to_string());
+            .to_string())
     }
 
     // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
@@ -154,10 +154,10 @@ struct PlexerQuery<'a> {
 }
 
 impl PlexerQuery<'_> {
-    fn new<'a>(
+    fn new(
         args: VcstArgs,
-        stdout: &'a mut dyn io::Write,
-    ) -> Result<PlexerQuery<'a>, VcstError> {
+        stdout: &mut dyn io::Write,
+    ) -> Result<PlexerQuery<'_>, VcstError> {
         let query = args.reduce()?;
         let dir: String = query.dir()?;
         let dir: DirPath = PathBuf::from(dir);
@@ -177,20 +177,20 @@ impl PlexerQuery<'_> {
     pub fn handle_query(&mut self) -> Result<(), VcstError> {
         match self.cli {
             VcstQuery::Brand { dir: _ } => {
-                write!(self.stdout, "{:?}\n", self.plexer.brand)
-                    .expect(format!("failed stdout write of: {:?}", self.plexer.brand).as_str());
+                writeln!(self.stdout, "{:?}", self.plexer.brand)
+                    .unwrap_or_else(|_| panic!("failed stdout write of: {:?}", self.plexer.brand));
             }
             VcstQuery::Root { dir: _ } => {
                 match self.plexer.root() {
                     Ok(root_path) => {
                         let dir_path = root_path.as_path().to_str().ok_or_else(|| {
-                            return VcstError::Unknown(format!(
+                            VcstError::Unknown(format!(
                                 "vcs generated invalid unicode: {:?}",
                                 root_path
-                            ));
+                            ))
                         })?;
-                        write!(self.stdout, "{}\n", dir_path)
-                            .expect(format!("failed stdout write of: {}", dir_path).as_str());
+                        writeln!(self.stdout, "{}", dir_path)
+                            .unwrap_or_else(|_| panic!("failed stdout write of: {}", dir_path));
                     }
                     Err(e) => {
                         return Err(VcstError::Unknown(format!("root dir: {:?}", e)));
@@ -210,11 +210,9 @@ impl PlexerQuery<'_> {
                 let dirty_files = self
                     .plexer
                     .dirty_files()
-                    .map_err(|e| VcstError::Plexing(e))?;
+                    .map_err(VcstError::Plexing)?;
                 for dirty_file in dirty_files {
-                    write!(self.stdout, "{}\n", dirty_file.display()).expect(
-                        format!("failed stdout write of: {}", dirty_file.display()).as_str(),
-                    );
+                    writeln!(self.stdout, "{}", dirty_file.display()).unwrap_or_else(|_| panic!("failed stdout write of: {}", dirty_file.display()));
                 }
             }
             VcstQuery::CurrentFiles {
@@ -236,18 +234,18 @@ pub fn vcst_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn i
     let mut plexerq = match PlexerQuery::new(args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
-            write!(stderr, "{}\n", e).expect(format!("failed stderr write of: {}", e).as_str());
+            writeln!(stderr, "{}", e).unwrap_or_else(|_| panic!("failed stderr write of: {}", e));
             return 1;
         }
     };
     match plexerq.handle_query() {
         Ok(_) => {}
         Err(e) => {
-            write!(stderr, "{}\n", e).expect(format!("failed stderr write of: {}", e).as_str());
+            writeln!(stderr, "{}", e).unwrap_or_else(|_| panic!("failed stderr write of: {}", e));
             return 1;
         }
     };
-    return 0;
+    0
 }
 
 // NOTE: lack of unit tests here, is purely because of the coverage via e2e tests ./tests/

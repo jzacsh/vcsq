@@ -28,7 +28,7 @@ fn hg() {
     let mut untracked_file = test_dir.clone();
     untracked_file.push("MY_DOC.md");
 
-    let _ = make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
+    make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
 
     //
     // Assert: dirty repo now has report of what's dirty
