@@ -5,8 +5,10 @@ about the particular flavor of VCS at play.
 
 This repo lives at <https://gitlab.com/jzacsh/vcst>
 
-**STATUS**: early days, mostly boilerplate/setup, with only some functionality
-ported in from the originals (see "design goals" section).
+**STATUS**: 80% effort is done; 30% functionality is done. Early days, has some
+functionality ported in from the originals (see "design goals" section), and
+enormous amount of test-infra and outlining to enable the rest of the APIs, and
+now just remains some drudge-work to finish the port.
 
 ## Development
 
