@@ -1,5 +1,7 @@
+use crate::cmd::{Utf8CmdOutput, Utf8CmdOutputLossy};
 use std::convert::From;
 use std::path::PathBuf;
+use std::process::Output;
 use thiserror::Error;
 
 pub type DirPath = PathBuf;
@@ -14,16 +16,13 @@ pub enum RepoLoadError {
     /// An error ocurred trying to call out to the VCS binary
     #[error("vcs call failed: {:?}: {:?}", .context, .source)]
     Command {
-        context: Option<&'static str>,
+        context: String,
         source: std::io::Error,
     },
 
     /// VCS binary failed and printed an error message
     #[error("vcs stderr: {:?}: {:?}", .context, .stderr)]
-    Stderr {
-        context: Option<&'static str>,
-        stderr: String,
-    },
+    Stderr { context: String, stderr: String },
 
     /// An error ocurred reading the directory name
     #[error("vcs returned a problematic root name")]
@@ -34,6 +33,59 @@ pub enum RepoLoadError {
     Unknown(String),
 }
 
+impl RepoLoadError {
+    pub fn unwrap_cmd(
+        context: String,
+        cmd_output: std::io::Result<Output>,
+    ) -> Result<Utf8CmdOutput, Self> {
+        let output = cmd_output.map_err(|e| RepoLoadError::Command {
+            context: context.clone(),
+            source: e,
+        })?;
+        let utf8_output = Utf8CmdOutput::from(output);
+        if !utf8_output.status.success() {
+            return Err(RepoLoadError::Stderr {
+                context: context.clone(),
+                stderr: utf8_output.stderr.map_err(|e| {
+                    format!(
+                        "bad utf8 from stderr: {}; lossy conversion: {}",
+                        e, utf8_output.stderr_lossy
+                    )
+                })?,
+            });
+        }
+
+        Ok(utf8_output)
+    }
+
+    pub fn unwrap_cmd_lossy(
+        context: String,
+        cmd_output: std::io::Result<Output>,
+    ) -> Result<Utf8CmdOutputLossy, Self> {
+        let output = cmd_output.map_err(|e| RepoLoadError::Command {
+            context: context.clone(),
+            source: e,
+        })?;
+        Ok(Utf8CmdOutputLossy::from(output))
+    }
+
+    // TODO: (cleanup) factor out the same unwrap_cmd_lossy/expect_cmd_lossy split (and document
+    // all 4 methods) for the non-lossy pair of methods.
+    pub fn expect_cmd_lossy(
+        context: String,
+        cmd_output: std::io::Result<Output>,
+    ) -> Result<Utf8CmdOutputLossy, Self> {
+        let utf8_output = Self::unwrap_cmd_lossy(context.clone(), cmd_output)?;
+        if !utf8_output.status.success() {
+            return Err(RepoLoadError::Stderr {
+                context: context.clone(),
+                stderr: utf8_output.stderr,
+            });
+        }
+        Ok(utf8_output)
+    }
+}
+
 impl From<String> for RepoLoadError {
     fn from(item: String) -> Self {
         RepoLoadError::Unknown(item)
@@ -41,9 +93,11 @@ impl From<String> for RepoLoadError {
 }
 
 impl From<std::io::Error> for RepoLoadError {
+    // TODO: (cleanup) findout if this is getting called anywhere, anad maybe delete/improve this
+    // case
     fn from(source: std::io::Error) -> Self {
         RepoLoadError::Command {
-            context: None,
+            context: "bug: unexpected io error".to_string(),
             source,
         }
     }

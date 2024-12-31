@@ -16,22 +16,19 @@ impl RepoGit {
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
     pub fn new(dir: DirPath) -> Result<Option<Self>, RepoLoadError> {
-        let repo_git = RepoGit { dir };
-        let is_ok = repo_git
-            .git_show_top_level()
-            // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
-            .stdout(Stdio::null())
-            // TODO: map stderr to Err() values
-            .stderr(Stdio::null())
-            .output()
-            .map_err(|e| RepoLoadError::Command {
-                context: Some("git cli"),
-                source: e,
-            })?
-            .status
-            .success();
+        let repo = RepoGit { dir };
+        let is_ok = RepoLoadError::unwrap_cmd_lossy(
+            "git cli".to_string(),
+            repo.git_show_top_level()
+                // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .output(),
+        )?
+        .status
+        .success();
         if is_ok {
-            Ok(Some(repo_git))
+            Ok(Some(repo))
         } else {
             Ok(None)
         }
@@ -52,12 +49,18 @@ impl RepoGit {
 
 impl Repo for RepoGit {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
-        let output = self.git_show_top_level().output()?;
-        if !output.status.success() {
-            return Err("bug? silent error from git".to_string().into());
-        }
-        let stdout = String::from_utf8(output.stdout)?.trim().to_string();
-        Ok(PathBuf::from(stdout))
+        let output = RepoLoadError::expect_cmd_lossy(
+            "git cli".to_string(),
+            self.git_show_top_level().output(),
+        )?;
+        output
+            .stdout
+            .lines()
+            .last()
+            .map(PathBuf::from)
+            .ok_or_else(|| {
+                RepoLoadError::Unknown("git cli unexpectedly returned empty output".to_string())
+            })
     }
 
     fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {
