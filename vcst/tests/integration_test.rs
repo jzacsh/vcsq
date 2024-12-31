@@ -171,7 +171,6 @@ mod root {
         let test_dir = crate::setup_tests().not_vcs;
         let mut cmd = Command::cargo_bin("vcst").unwrap();
 
-        let expected_root = test_dir.display().to_string();
         let assert = cmd.arg("root").arg(&test_dir).assert();
         assert
             .failure()
@@ -183,8 +182,6 @@ mod root {
     fn non_dir() {
         let not_dir = crate::setup_tests().not_dir;
         let mut cmd = Command::cargo_bin("vcst").unwrap();
-
-        let expected_root = not_dir.display().to_string();
 
         let assert = cmd.arg("root").arg(&not_dir).assert();
         assert
