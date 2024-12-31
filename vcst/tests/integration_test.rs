@@ -10,6 +10,9 @@ static ERROR_NO_KNOWN_VCS: &'static str =
 
 static ERROR_NOT_VALID_DIR: &'static str = "usage error: dir must be a readable directory";
 
+static ERROR_DIR_MISSING: &'static str =
+    "usage error: require either subcmd with a query or a direct --dir";
+
 /// Setup tests, and ensure heavy operations aren't thrashing our disk (or ramdisk) more than once
 /// a run.
 ///
@@ -188,6 +191,7 @@ mod root {
 
 /// TODO: (feature,cleap) fix CLI-clunkiness and make a global dir arg
 mod cli_edges {
+    use crate::ERROR_DIR_MISSING;
     use assert_cmd::Command;
     use predicates::prelude::*;
 
@@ -197,15 +201,21 @@ mod cli_edges {
         cmd.assert()
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(
-                "usage error: require either subcmd with a query or a direct --dir",
-            ));
+            .stderr(predicate::eq(ERROR_DIR_MISSING));
     }
 
     #[test]
     fn no_subcmd() {
-        assert_eq!(42, 42); // TODO: `--dir dir`
-        assert_eq!(42, 42); // TODO: assert `--dir=DIR` is the same as `brand DIR`
+        let test_dir = crate::setup_tests().git_repo;
+
+        // Defaults to "brand" subcmd behavior
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+        cmd.arg("--dir")
+            .arg(test_dir)
+            .assert()
+            .success()
+            .stdout(predicate::eq("Git"))
+            .stderr(predicate::str::is_empty());
     }
 
     #[test]
