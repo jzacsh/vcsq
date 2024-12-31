@@ -86,7 +86,7 @@ mod brand {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS));
+            .stderr(predicate::str::diff(ERROR_NO_KNOWN_VCS));
     }
 
     #[test]
@@ -98,7 +98,7 @@ mod brand {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
+            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
     }
 
     #[test]
@@ -111,7 +111,7 @@ mod brand {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
+            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
     }
 }
 
@@ -125,13 +125,13 @@ mod root {
         let test_dir = crate::setup_tests().git_repo;
         let mut cmd = Command::cargo_bin("vcst").unwrap();
 
-        let expected_root = test_dir.to_str().expect("git repo path utf8");
+        let expected_root = test_dir.display().to_string();
 
-        let assert = cmd.arg("root").arg(&test_dir).assert();
+        let assert = cmd.arg("root").arg(&expected_root).assert();
         assert
             .success()
             .stderr(predicate::str::is_empty())
-            .stdout(predicate::eq(expected_root));
+            .stdout(predicate::str::diff(expected_root));
     }
 
     #[test]
@@ -139,13 +139,13 @@ mod root {
         let test_dir = crate::setup_tests().hg_repo;
         let mut cmd = Command::cargo_bin("vcst").unwrap();
 
-        let expected_root = test_dir.to_str().expect("hg repo path utf8");
+        let expected_root = test_dir.display().to_string();
 
         let assert = cmd.arg("root").arg(&test_dir).assert();
         assert
             .success()
             .stderr(predicate::str::is_empty())
-            .stdout(predicate::eq(expected_root));
+            .stdout(predicate::str::diff(expected_root));
     }
 
     #[test]
@@ -159,13 +159,12 @@ mod root {
         let test_dir = crate::setup_tests().not_vcs;
         let mut cmd = Command::cargo_bin("vcst").unwrap();
 
-        let expected_root = test_dir.to_str().expect("non-vcs dir path utf8");
-
+        let expected_root = test_dir.display().to_string();
         let assert = cmd.arg("root").arg(&test_dir).assert();
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NO_KNOWN_VCS));
+            .stderr(predicate::str::diff(ERROR_NO_KNOWN_VCS));
     }
 
     #[test]
@@ -173,13 +172,13 @@ mod root {
         let not_dir = crate::setup_tests().not_dir;
         let mut cmd = Command::cargo_bin("vcst").unwrap();
 
-        let expected_root = not_dir.to_str().expect("not-dir path utf8");
+        let expected_root = not_dir.display().to_string();
 
         let assert = cmd.arg("root").arg(&not_dir).assert();
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
+            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
     }
 
     #[test]
@@ -192,7 +191,7 @@ mod root {
         assert
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_NOT_VALID_DIR));
+            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR));
     }
 }
 
@@ -208,7 +207,7 @@ mod cli_edges {
         cmd.assert()
             .failure()
             .stdout(predicate::str::is_empty())
-            .stderr(predicate::eq(ERROR_DIR_MISSING));
+            .stderr(predicate::str::diff(ERROR_DIR_MISSING));
     }
 
     #[test]

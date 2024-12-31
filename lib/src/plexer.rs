@@ -3,7 +3,7 @@ use crate::adapter::hg::RepoHg;
 use crate::repo::{DirPath, Repo, RepoLoadError};
 
 /// The particular brands of VCS this library supports.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum VcsBrand {
     Git,
     Mercurial,
@@ -33,7 +33,7 @@ impl RepoPlexer {
         attempts.push(VcsBrand::Git);
         if let Some(git) = RepoGit::new(dir.clone())? {
             return Ok(Self {
-                brand: VcsBrand::Git,
+                brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(git),
             });
         }
@@ -41,7 +41,7 @@ impl RepoPlexer {
         attempts.push(VcsBrand::Mercurial);
         if let Some(hg) = RepoHg::new(dir.clone())? {
             return Ok(Self {
-                brand: VcsBrand::Mercurial,
+                brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(hg),
             });
         }
