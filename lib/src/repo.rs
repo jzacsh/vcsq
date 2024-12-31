@@ -34,6 +34,10 @@ pub enum RepoLoadError {
 }
 
 impl RepoLoadError {
+    /// Low-level unwrapping of a command that's strict about its expectations that the
+    /// underlying CLI produces valid utf8 cntent.
+    ///
+    /// For a lossy versin of this function see `unwrap_cmd_lossy(...)`.
     pub fn unwrap_cmd(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -42,7 +46,18 @@ impl RepoLoadError {
             context: context.clone(),
             source: e,
         })?;
-        let utf8_output = Utf8CmdOutput::from(output);
+        Ok(Utf8CmdOutput::from(output))
+    }
+
+    /// Like `unwrap_cmd(...)` but additionally expects the command to have succeeded, otherwise
+    /// unpacks the stderr into an Err() case for you.
+    ///
+    /// For a lossy version of this function see `expect_cmd_lossy(...)`.
+    pub fn expect_cmd(
+        context: String,
+        cmd_output: std::io::Result<Output>,
+    ) -> Result<Utf8CmdOutput, Self> {
+        let utf8_output = Self::unwrap_cmd(context.clone(), cmd_output)?;
         if !utf8_output.status.success() {
             return Err(RepoLoadError::Stderr {
                 context: context.clone(),
@@ -54,10 +69,14 @@ impl RepoLoadError {
                 })?,
             });
         }
-
         Ok(utf8_output)
     }
 
+    /// Assumes cmd_output is an interaction with a textual CLI and does a dirty (lossy) conersion
+    /// of its stdout/stderr outputs.
+    ///
+    /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
+    /// `unwrap_cmd(...)`.
     pub fn unwrap_cmd_lossy(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -69,8 +88,11 @@ impl RepoLoadError {
         Ok(Utf8CmdOutputLossy::from(output))
     }
 
-    // TODO: (cleanup) factor out the same unwrap_cmd_lossy/expect_cmd_lossy split (and document
-    // all 4 methods) for the non-lossy pair of methods.
+    /// Like `unwrap_cmd_lossy(...)` but additionally expects the command to have succeeded,
+    /// otherwise unpacks the stderr into an Err() case for you.
+    ///
+    /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
+    /// `expect_cmd(...)`.
     pub fn expect_cmd_lossy(
         context: String,
         cmd_output: std::io::Result<Output>,
