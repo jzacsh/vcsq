@@ -42,6 +42,8 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
 - [x] install jj VCS to $PATH of gitlab ci/cd
       -  [ ] move `git --version && hg --version && jj --version` frmo ci/cd yml
       into test harness startup as a sanity-check _anywhere_ the test runs.
+- [ ] feature: run a dump of what VCS we find in path, as part of `--version`
+      output, or some place of the sort.
 - [ ] address clippy::pedantic, then roll it into above ci/cd stage:
       `cargo clippy --all -- -W clippy::pedantic`
 - [ ] cleanup all the CLI string handling (the `String::from_utf8` and
