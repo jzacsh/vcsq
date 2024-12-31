@@ -29,6 +29,11 @@ $ cd vcst && cargo watch -x build
 # there's compiler errors you're trying to read.
 ```
 
+### TODOs
+
+- [ ] cleanup all the CLI string handling (the `String::from_utf8` and
+      `expect(.*utf8` references) to use `String::from_utf8_lossy`
+
 ## Design Goals
 
 **Goal**: answer 101 introspective questions about a repo/directory.

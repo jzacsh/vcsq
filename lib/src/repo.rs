@@ -12,10 +12,17 @@ pub enum RepoLoadError {
     Directory(String),
 
     /// An error ocurred trying to call out to the VCS binary
-    #[error("vcs call failed: {:?}", .context)]
+    #[error("vcs call failed: {:?}: {:?}", .context, .source)]
     Command {
         context: Option<&'static str>,
         source: std::io::Error,
+    },
+
+    /// VCS binary failed and printed an error message
+    #[error("vcs stderr: {:?}: {:?}", .context, .stderr)]
+    Stderr {
+        context: Option<&'static str>,
+        stderr: String,
     },
 
     /// An error ocurred reading the directory name
