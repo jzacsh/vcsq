@@ -67,9 +67,6 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
 
 ### TODOs
 
-- [ ] ci/cd clippy: get gitlab ci to run clippy (and _error out_ if changes
-   presented) in both vcst/ and lib/: `cargo clippy --allow-no-vcs --fix` is the
-   run I use and want to be warned if I haven't run.
 - [x] install jj VCS to $PATH of gitlab ci/cd
 
   - [ ] move `git --version && hg --version && jj --version` frmo ci/cd yml into
@@ -77,8 +74,6 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
 
 - [ ] feature: run a dump of what VCS we find in path, as part of `--version`
       output, or some place of the sort.
-- [ ] address clippy::pedantic, then roll it into above ci/cd stage:
-      `cargo clippy --all -- -W clippy::pedantic`
 - [ ] cleanup all the CLI string handling (the `String::from_utf8` and
       `expect(.*utf8` references) to use `String::from_utf8_lossy`
 - [ ] feature: add ["list tracked files" concept][vcsListUsecase]
@@ -86,8 +81,15 @@ instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs
   that default to map_err() to `Unknown`-fallbackish variants). This is because
   some of the better alternatives were only added _later_ (eg:
   `RepoLoadError::Stderr`) which could fix some
-- [ ] before releasing, setup a Github mirror [via gitlab's mechanism for
-  this][gLabToGhubMirror]
+- [ ] before releasing....
+  - [ ] flag-guard `todo!()`/`unimplemented!()` blocks for dev/tests only; eg:
+  via `#[cfg(debug_assertions)]`
+  - [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
+  - [ ] ci/cd clippy: get gitlab ci to run clippy (and _error out_ if changes
+  presented) in both vcst/ and lib/: `cargo clippy --allow-no-vcs --fix` is the
+  run I use and want to be warned if I haven't run.
+  - [ ] address clippy::pedantic, then roll it into above ci/cd stage:
+  `cargo clippy --all -- -W clippy::pedantic`
 
 [vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
