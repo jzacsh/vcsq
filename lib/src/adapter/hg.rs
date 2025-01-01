@@ -1,4 +1,4 @@
-use crate::repo::{DirPath, Repo, RepoLoadError};
+use crate::repo::{DirPath, Repo, RepoLoadError, ERROR_REPO_NOT_DIRTY};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -56,21 +56,29 @@ impl RepoHg {
 impl Repo for RepoHg {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
         let output =
-            RepoLoadError::expect_cmd_lossy("hg cli".to_string(), self.hg_root().output())?;
+            RepoLoadError::expect_cmd_lossy("hg cli: exec".to_string(), self.hg_root().output())?;
         Ok(PathBuf::from(RepoLoadError::expect_cmd_line(
             "hg cli".to_string(),
             output,
         )?))
     }
 
-    fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {
-        let output =
-            RepoLoadError::expect_cmd_lossy("hg cli".to_string(), self.dirty_files().output())?;
-        Ok(output
-            .stdout
-            .lines()
-            .filter(|ln| !ln.is_empty())
-            .map(PathBuf::from)
-            .collect())
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
+        let output = RepoLoadError::expect_cmd_lossy(
+            "hg cli: exec".to_string(),
+            self.dirty_files().output(),
+        )?;
+        let dirty_files = output.stdout_strings();
+        if dirty_files.is_empty() {
+            if clean_ok {
+                return Ok(vec![]);
+            }
+            return Err(RepoLoadError::Unknown(format!(
+                "hg cli: {}",
+                ERROR_REPO_NOT_DIRTY
+            )));
+        }
+        let dirty_files = dirty_files.into_iter().map(PathBuf::from).collect();
+        Ok(dirty_files)
     }
 }

@@ -6,6 +6,8 @@ use thiserror::Error;
 
 pub type DirPath = PathBuf;
 
+pub const ERROR_REPO_NOT_DIRTY: &str = "repo not dirty";
+
 #[derive(Error, Debug)]
 pub enum RepoLoadError {
     /// A system-level error, not necessarily related to any VCS, eg: the directory doesn't exist,
@@ -118,14 +120,36 @@ impl RepoLoadError {
     // above to be less all-in-one (they should accept the Utf8*Output* APIs, not generate them
     // internally).
     pub fn expect_cmd_line(context: String, output: Utf8CmdOutputLossy) -> Result<String, Self> {
-        Ok(output
-            .stdout
-            .lines()
+        let lines = output.stdout_strings();
+        if lines.len() > 1 {
+            return Err(RepoLoadError::Unknown(format!(
+                "unexpectedly got multiple ({}) lines: {}:\n'''\n{:?}\n'''\n'''",
+                lines.len(),
+                context,
+                lines
+            )));
+        }
+        Ok(lines
             .last()
             .ok_or_else(|| {
                 RepoLoadError::Unknown(format!("unexpectedly returned empty output: {}", context))
             })?
             .to_string())
+    }
+
+    // TODO: (rust) idiomatic api is probably Iter<> of String, not Vec? try to fix that here
+    pub fn expect_cmd_lines(
+        context: String,
+        output: Utf8CmdOutputLossy,
+    ) -> Result<Vec<String>, Self> {
+        let lines = output.stdout_strings();
+        if lines.is_empty() {
+            return Err(RepoLoadError::Unknown(format!(
+                "{}: unexpectedly returned no lines",
+                context
+            )));
+        }
+        Ok(lines)
     }
 }
 
@@ -170,7 +194,9 @@ where
     /// Prints the root dir of the repo.
     fn root(&self) -> Result<DirPath, RepoLoadError>;
 
-    /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output is
+    /// Lists filepaths touched that are the cause of the repo being dirty, or (assuming `clean_ok`) simply lists no output is
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
-    fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError>;
+    ///
+    /// Should return an error if repo isn't dirty and not `clean_ok`
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError>;
 }

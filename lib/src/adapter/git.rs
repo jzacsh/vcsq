@@ -59,7 +59,7 @@ impl Repo for RepoGit {
         )?))
     }
 
-    fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
         todo!();
     }
 }

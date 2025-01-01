@@ -102,7 +102,11 @@ pub enum VcstQuery {
     /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output if
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
     #[command(arg_required_else_help = true)]
-    DirtyFiles { dir: DirPath },
+    DirtyFiles {
+        dir: DirPath,
+        #[arg(long, default_value_t = false)]
+        clean_ok: bool,
+    },
 
     /// Prints what files were touched by the CurrentId
     CurrentFiles {
@@ -141,7 +145,7 @@ impl VcstQuery {
             VcstQuery::IsClean { dir } => dir,
             VcstQuery::CurrentId { dir, dirty_ok: _ } => dir,
             VcstQuery::CurrentName { dir, dirty_ok: _ } => dir,
-            VcstQuery::DirtyFiles { dir } => dir,
+            VcstQuery::DirtyFiles { dir, clean_ok: _ } => dir,
             VcstQuery::CurrentFiles { dir, dirty_ok: _ } => dir,
         }
     }
@@ -154,10 +158,7 @@ struct PlexerQuery<'a> {
 }
 
 impl PlexerQuery<'_> {
-    fn new(
-        args: VcstArgs,
-        stdout: &mut dyn io::Write,
-    ) -> Result<PlexerQuery<'_>, VcstError> {
+    fn new(args: VcstArgs, stdout: &mut dyn io::Write) -> Result<PlexerQuery<'_>, VcstError> {
         let query = args.reduce()?;
         let dir: String = query.dir()?;
         let dir: DirPath = PathBuf::from(dir);
@@ -206,13 +207,15 @@ impl PlexerQuery<'_> {
                 dir: _,
                 dirty_ok: _,
             } => todo!(),
-            VcstQuery::DirtyFiles { dir: _ } => {
+            VcstQuery::DirtyFiles { dir: _, clean_ok } => {
                 let dirty_files = self
                     .plexer
-                    .dirty_files()
+                    .dirty_files(clean_ok)
                     .map_err(VcstError::Plexing)?;
                 for dirty_file in dirty_files {
-                    writeln!(self.stdout, "{}", dirty_file.display()).unwrap_or_else(|_| panic!("failed stdout write of: {}", dirty_file.display()));
+                    writeln!(self.stdout, "{}", dirty_file.display()).unwrap_or_else(|_| {
+                        panic!("failed stdout write of: {}", dirty_file.display())
+                    });
                 }
             }
             VcstQuery::CurrentFiles {

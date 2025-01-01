@@ -26,6 +26,16 @@ impl From<Output> for Utf8CmdOutputLossy {
     }
 }
 
+impl Utf8CmdOutputLossy {
+    pub fn stdout_strings(&self) -> Vec<String> {
+        tty_strings(self.stdout.clone())
+    }
+
+    pub fn stderr_strings(&self) -> Vec<String> {
+        tty_strings(self.stderr.clone())
+    }
+}
+
 /// Provides a wrapper for `std::process:Output` useful for CLIs you're only ever expecting
 /// utf8-text output from.
 ///
@@ -50,4 +60,23 @@ impl From<Output> for Utf8CmdOutput {
             stdout_lossy: lossy.stdout.clone(),
         }
     }
+}
+
+impl Utf8CmdOutput {
+    pub fn stdout_strings(&self) -> Result<Vec<String>, FromUtf8Error> {
+        let stdout = <Result<String, FromUtf8Error> as Clone>::clone(&self.stdout)?;
+        Ok(tty_strings(stdout.clone()))
+    }
+
+    pub fn stderr_strings(&self) -> Result<Vec<String>, FromUtf8Error> {
+        let stderr = <Result<String, FromUtf8Error> as Clone>::clone(&self.stderr)?;
+        Ok(tty_strings(stderr.clone()))
+    }
+}
+
+fn tty_strings(tty_out: String) -> Vec<String> {
+    tty_out
+        .lines()
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>()
 }
