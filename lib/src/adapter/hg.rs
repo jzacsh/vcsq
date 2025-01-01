@@ -57,14 +57,10 @@ impl Repo for RepoHg {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
         let output =
             RepoLoadError::expect_cmd_lossy("hg cli".to_string(), self.hg_root().output())?;
-        output
-            .stdout
-            .lines()
-            .last()
-            .map(PathBuf::from)
-            .ok_or_else(|| {
-                RepoLoadError::Unknown("hg cli unexpectedly returned empty output".to_string())
-            })
+        Ok(PathBuf::from(RepoLoadError::expect_cmd_line(
+            "hg cli".to_string(),
+            output,
+        )?))
     }
 
     fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {

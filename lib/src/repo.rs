@@ -38,6 +38,8 @@ impl RepoLoadError {
     /// underlying CLI produces valid utf8 cntent.
     ///
     /// For a lossy versin of this function see `unwrap_cmd_lossy(...)`.
+    // TODO: (cleanup) switch all callers to strict handling: use {unwrap,expect}_cmd instead of
+    // their lossy counterparts.
     pub fn unwrap_cmd(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -105,6 +107,24 @@ impl RepoLoadError {
             });
         }
         Ok(utf8_output)
+    }
+
+    /// Like `expect_cmd_lossy(...)`  but adds the expectation that one stdout line will have been
+    /// printed.
+    ///
+    // DO NOT SUBMIT factor out logic from the existing Repo#root() implementations
+    // DO NOT SUBMIT migrate all callers to use this new func
+    // TODO: (rust) how to make this take _either_ (Utf8CmdOutputLossy, Utf8CmdOutput)? can we
+    // reorganize one struct to be a subset of the other?
+    pub fn expect_cmd_line(context: String, output: Utf8CmdOutputLossy) -> Result<String, Self> {
+        Ok(output
+            .stdout
+            .lines()
+            .last()
+            .ok_or_else(|| {
+                RepoLoadError::Unknown(format!("unexpectedly returned empty output: {}", context))
+            })?
+            .to_string())
     }
 }
 

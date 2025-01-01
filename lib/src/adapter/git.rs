@@ -53,14 +53,10 @@ impl Repo for RepoGit {
             "git cli".to_string(),
             self.git_show_top_level().output(),
         )?;
-        output
-            .stdout
-            .lines()
-            .last()
-            .map(PathBuf::from)
-            .ok_or_else(|| {
-                RepoLoadError::Unknown("git cli unexpectedly returned empty output".to_string())
-            })
+        Ok(PathBuf::from(RepoLoadError::expect_cmd_line(
+            "git cli".to_string(),
+            output,
+        )?))
     }
 
     fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {

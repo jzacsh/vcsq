@@ -45,14 +45,10 @@ impl Repo for RepoJj {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
         let output =
             RepoLoadError::expect_cmd_lossy("jj cli".to_string(), self.jj_root().output())?;
-        output
-            .stdout
-            .lines()
-            .last()
-            .map(PathBuf::from)
-            .ok_or_else(|| {
-                RepoLoadError::Unknown("jj cli unexpectedly returned empty output".to_string())
-            })
+        Ok(PathBuf::from(RepoLoadError::expect_cmd_line(
+            "jj cli".to_string(),
+            output,
+        )?))
     }
 
     fn dirty_files(&self) -> Result<Vec<DirPath>, RepoLoadError> {
