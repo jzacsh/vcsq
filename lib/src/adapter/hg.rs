@@ -64,7 +64,8 @@ impl Repo for RepoHg {
     }
 
     fn is_clean(&self) -> Result<bool, RepoLoadError> {
-        todo!();
+        let dirty_files = self.dirty_files(true /*clean_ok*/)?;
+        Ok(dirty_files.is_empty())
     }
 
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
