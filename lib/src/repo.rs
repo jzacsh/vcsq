@@ -153,6 +153,9 @@ impl RepoLoadError {
     }
 
     /// Helper for common pattern that `Repo#dirty_files()` will have to deal with.
+    // TODO: (rust) consider moving `context` out to a a const generic param of `Repo`, and then
+    // making this the default impl of the Repo trait (instead of a static function on this Error
+    // struct, as we have now).
     pub fn dirty_files(
         context: String,
         output: std::io::Result<Output>,
