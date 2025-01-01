@@ -100,8 +100,20 @@ TODO: (test infra) consider either/both:
   - [ ] flag-guard `todo!()`/`unimplemented!()` blocks for dev/tests only; eg:
   via `#[cfg(debug_assertions)]`
   - [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
-  - [ ] ci/cd clippy: get gitlab ci to run clippy (and _error out_ if changes
-  presented) in both vcst/ and lib/: `cargo clippy --allow-no-vcs --fix` is the
+  - [ ] centralize/codify standards I'm trying to follow, so all "preferences"
+  are automated:
+    - [ ] get local test/build/watch command that will error when clippy isn't
+    happy (and document that in the Development instructions above with another
+    `-x ...` on the recommended watch line); ie: something that will _error out_
+    when either vcst/ or lib/ cause any output from `cargo clippy` (and then
+    codify the tip: "maybe just run `cargo clippy --allow-no-vcs --fix`" into readme)
+      - [ ] ci/cd clippy: get gitlab ci to do the above and rport on failures.
+    - [ ] get local test/build/watch command that will _report_ coverage status
+      - [ ] ci/cd: get gitlab ci to do the above and report on a health-status
+      on this. find out what the SLA is for this reporting (do you need to save
+      it locally somehwo to have good guarantees? or will it be around for a
+      longtime in the gitlab CI pipeline? are their generic solutions for
+      updating this sort of history directly into the repo periodically?)
   run I use and want to be warned if I haven't run.
   - [ ] address clippy::pedantic, then roll it into above ci/cd stage:
   `cargo clippy --all -- -W clippy::pedantic`
