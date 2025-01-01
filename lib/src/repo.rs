@@ -112,10 +112,11 @@ impl RepoLoadError {
     /// Like `expect_cmd_lossy(...)`  but adds the expectation that one stdout line will have been
     /// printed.
     ///
-    // DO NOT SUBMIT factor out logic from the existing Repo#root() implementations
-    // DO NOT SUBMIT migrate all callers to use this new func
     // TODO: (rust) how to make this take _either_ (Utf8CmdOutputLossy, Utf8CmdOutput)? can we
     // reorganize one struct to be a subset of the other?
+    // TODO: (codehealth) once the above TODO on type-cleanup is fixed, then redesign other APIs
+    // above to be less all-in-one (they should accept the Utf8*Output* APIs, not generate them
+    // internally).
     pub fn expect_cmd_line(context: String, output: Utf8CmdOutputLossy) -> Result<String, Self> {
         Ok(output
             .stdout
