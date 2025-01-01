@@ -194,6 +194,9 @@ where
     /// Prints the root dir of the repo.
     fn root(&self) -> Result<DirPath, RepoLoadError>;
 
+    /// Whether repo is in a clean state.
+    fn is_clean(&self) -> Result<bool, RepoLoadError>;
+
     /// Lists filepaths touched that are the cause of the repo being dirty, or (assuming `clean_ok`) simply lists no output is
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
     ///

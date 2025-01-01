@@ -175,7 +175,7 @@ impl PlexerQuery<'_> {
         })
     }
 
-    pub fn handle_query(&mut self) -> Result<(), VcstError> {
+    pub fn handle_query(&mut self) -> Result<u8, VcstError> {
         match self.cli {
             VcstQuery::Brand { dir: _ } => {
                 writeln!(self.stdout, "{:?}", self.plexer.brand)
@@ -198,7 +198,10 @@ impl PlexerQuery<'_> {
                     }
                 };
             }
-            VcstQuery::IsClean { dir: _ } => todo!(),
+            VcstQuery::IsClean { dir: _ } => {
+                let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
+                return Ok(if is_clean { 0 } else { 1 });
+            }
             VcstQuery::CurrentId {
                 dir: _,
                 dirty_ok: _,
@@ -223,7 +226,7 @@ impl PlexerQuery<'_> {
                 dirty_ok: _,
             } => todo!(),
         }
-        Ok(())
+        Ok(0)
     }
 }
 

@@ -51,6 +51,10 @@ impl Repo for RepoJj {
         )?))
     }
 
+    fn is_clean(&self) -> Result<bool, RepoLoadError> {
+        todo!();
+    }
+
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
         todo!();
     }

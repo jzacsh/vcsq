@@ -69,6 +69,10 @@ impl Repo for RepoPlexer {
         self.adapter.root()
     }
 
+    fn is_clean(&self) -> Result<bool, RepoLoadError> {
+        self.adapter.is_clean()
+    }
+
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
         self.adapter.dirty_files(clean_ok)
     }
