@@ -63,10 +63,6 @@ impl Repo for RepoHg {
         )?))
     }
 
-    fn is_clean(&self) -> Result<bool, RepoLoadError> {
-        RepoLoadError::is_clean(self)
-    }
-
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
         RepoLoadError::dirty_files(
             "hg cli: exec".to_string(),

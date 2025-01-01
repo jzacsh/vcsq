@@ -152,12 +152,6 @@ impl RepoLoadError {
         Ok(lines)
     }
 
-    /// Helper for common pattern that `Repo#is_clean()` will have to implement.
-    pub fn is_clean(repo: &dyn Repo) -> Result<bool, Self> {
-        let dirty_files = repo.dirty_files(true /*clean_ok*/)?;
-        Ok(dirty_files.is_empty())
-    }
-
     /// Helper for common pattern that `Repo#dirty_files()` will have to deal with.
     pub fn dirty_files(
         context: String,
@@ -222,7 +216,10 @@ where
     fn root(&self) -> Result<DirPath, RepoLoadError>;
 
     /// Whether repo is in a clean state.
-    fn is_clean(&self) -> Result<bool, RepoLoadError>;
+    fn is_clean(&self) -> Result<bool, RepoLoadError> {
+        let dirty_files = self.dirty_files(true /*clean_ok*/)?;
+        Ok(dirty_files.is_empty())
+    }
 
     /// Lists filepaths touched that are the cause of the repo being dirty, or (assuming `clean_ok`) simply lists no output is
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
