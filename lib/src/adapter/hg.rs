@@ -40,7 +40,7 @@ impl RepoHg {
         cmd
     }
 
-    fn dirty_files(&self) -> Command {
+    fn hg_dirty_files(&self) -> Command {
         let mut cmd = self.start_shellout();
         cmd.env("HGPLAIN", "1")
             .arg("status")
@@ -70,7 +70,7 @@ impl Repo for RepoHg {
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
         let output = RepoLoadError::expect_cmd_lossy(
             "hg cli: exec".to_string(),
-            self.dirty_files().output(),
+            self.hg_dirty_files().output(),
         )?;
         let dirty_files = output.stdout_strings();
         if dirty_files.is_empty() {
