@@ -46,7 +46,7 @@ impl RepoLoadError {
         context: String,
         cmd_output: std::io::Result<Output>,
     ) -> Result<Utf8CmdOutput, Self> {
-        let output = cmd_output.map_err(|e| RepoLoadError::Command {
+        let output = cmd_output.map_err(|e| Self::Command {
             context: context.clone(),
             source: e,
         })?;
@@ -63,7 +63,7 @@ impl RepoLoadError {
     ) -> Result<Utf8CmdOutput, Self> {
         let utf8_output = Self::unwrap_cmd(context.clone(), cmd_output)?;
         if !utf8_output.status.success() {
-            return Err(RepoLoadError::Stderr {
+            return Err(Self::Stderr {
                 context: context.clone(),
                 stderr: utf8_output.stderr.map_err(|e| {
                     format!(
@@ -85,7 +85,7 @@ impl RepoLoadError {
         context: String,
         cmd_output: std::io::Result<Output>,
     ) -> Result<Utf8CmdOutputLossy, Self> {
-        let output = cmd_output.map_err(|e| RepoLoadError::Command {
+        let output = cmd_output.map_err(|e| Self::Command {
             context: context.clone(),
             source: e,
         })?;
@@ -103,7 +103,7 @@ impl RepoLoadError {
     ) -> Result<Utf8CmdOutputLossy, Self> {
         let utf8_output = Self::unwrap_cmd_lossy(context.clone(), cmd_output)?;
         if !utf8_output.status.success() {
-            return Err(RepoLoadError::Stderr {
+            return Err(Self::Stderr {
                 context: context.clone(),
                 stderr: utf8_output.stderr,
             });
@@ -122,7 +122,7 @@ impl RepoLoadError {
     pub fn expect_cmd_line(context: String, output: Utf8CmdOutputLossy) -> Result<String, Self> {
         let lines = output.stdout_strings();
         if lines.len() > 1 {
-            return Err(RepoLoadError::Unknown(format!(
+            return Err(Self::Unknown(format!(
                 "unexpectedly got multiple ({}) lines: {}:\n'''\n{:?}\n'''\n'''",
                 lines.len(),
                 context,
@@ -132,7 +132,7 @@ impl RepoLoadError {
         Ok(lines
             .last()
             .ok_or_else(|| {
-                RepoLoadError::Unknown(format!("unexpectedly returned empty output: {}", context))
+                Self::Unknown(format!("unexpectedly returned empty output: {}", context))
             })?
             .to_string())
     }
@@ -144,7 +144,7 @@ impl RepoLoadError {
     ) -> Result<Vec<String>, Self> {
         let lines = output.stdout_strings();
         if lines.is_empty() {
-            return Err(RepoLoadError::Unknown(format!(
+            return Err(Self::Unknown(format!(
                 "{}: unexpectedly returned no lines",
                 context
             )));
@@ -161,13 +161,13 @@ impl RepoLoadError {
         output: std::io::Result<Output>,
         clean_ok: bool,
     ) -> Result<Vec<DirPath>, Self> {
-        let output = RepoLoadError::expect_cmd_lossy(context.clone(), output)?;
+        let output = Self::expect_cmd_lossy(context.clone(), output)?;
         let dirty_files = output.stdout_strings();
         if dirty_files.is_empty() {
             if clean_ok {
                 return Ok(vec![]);
             }
-            return Err(RepoLoadError::Unknown(format!(
+            return Err(Self::Unknown(format!(
                 "{}: {}",
                 context, ERROR_REPO_NOT_DIRTY
             )));
