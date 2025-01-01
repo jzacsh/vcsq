@@ -39,7 +39,9 @@ Ultimately this is just like a shell script: it's relying on the CLI of the VCS
 actually being in your `$PATH`, and interacting with it as such. I think it'd be
 fun to explore calling the VCS's own libraries at some point, and I tried to
 write the library with that in mind from the start. _But_ that's a whole nother
-of wax and very unlikely to happen any time soon.
+ball of wax and very unlikely to happen before major TODOs are completed
+(feature completeness, and repo-setup TODOs below, like local/remote ci/cd
+steps).
 
 ## Development
 
