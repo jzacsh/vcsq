@@ -151,6 +151,27 @@ impl RepoLoadError {
         }
         Ok(lines)
     }
+
+    /// Helper for common pattern that `Repo#dirty_files()` will have to deal with.
+    pub fn dirty_files(
+        context: String,
+        output: std::io::Result<Output>,
+        clean_ok: bool,
+    ) -> Result<Vec<DirPath>, Self> {
+        let output = RepoLoadError::expect_cmd_lossy(context.clone(), output)?;
+        let dirty_files = output.stdout_strings();
+        if dirty_files.is_empty() {
+            if clean_ok {
+                return Ok(vec![]);
+            }
+            return Err(RepoLoadError::Unknown(format!(
+                "{}: {}",
+                context, ERROR_REPO_NOT_DIRTY
+            )));
+        }
+        let dirty_files = dirty_files.into_iter().map(PathBuf::from).collect();
+        Ok(dirty_files)
+    }
 }
 
 impl From<String> for RepoLoadError {

@@ -69,21 +69,10 @@ impl Repo for RepoHg {
     }
 
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
-        let output = RepoLoadError::expect_cmd_lossy(
+        RepoLoadError::dirty_files(
             "hg cli: exec".to_string(),
             self.hg_dirty_files().output(),
-        )?;
-        let dirty_files = output.stdout_strings();
-        if dirty_files.is_empty() {
-            if clean_ok {
-                return Ok(vec![]);
-            }
-            return Err(RepoLoadError::Unknown(format!(
-                "hg cli: {}",
-                ERROR_REPO_NOT_DIRTY
-            )));
-        }
-        let dirty_files = dirty_files.into_iter().map(PathBuf::from).collect();
-        Ok(dirty_files)
+            clean_ok,
+        )
     }
 }
