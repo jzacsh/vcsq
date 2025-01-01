@@ -64,10 +64,26 @@ impl Repo for RepoHg {
     }
 
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
-        RepoLoadError::dirty_files(
-            "hg cli: exec".to_string(),
+        let min_lines = if clean_ok { 0 } else { 1 };
+        let lines = RepoLoadError::expect_cmd_lines(
             self.hg_dirty_files().output(),
-            clean_ok,
-        )
+            min_lines,
+            "hg cli: exec".to_string(),
+            Some(ERROR_REPO_NOT_DIRTY.to_string()),
+        )?;
+        let dirty_files = lines
+            .into_iter()
+            .map(|ln| {
+                // first 2 chars are modification-indicators like "?? " to indicate the file is
+                // untracked.
+                ln.chars()
+                    .into_iter()
+                    .skip(2)
+                    .into_iter()
+                    .collect::<String>()
+            })
+            .map(PathBuf::from)
+            .collect();
+        Ok(dirty_files)
     }
 }

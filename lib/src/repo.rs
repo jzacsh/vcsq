@@ -7,6 +7,7 @@ use thiserror::Error;
 pub type DirPath = PathBuf;
 
 pub const ERROR_REPO_NOT_DIRTY: &str = "repo not dirty";
+pub const ERROR_REPO_NONEMPTY_OUTPUT: &str = "unexpectedly returned no lines";
 
 #[derive(Error, Debug)]
 pub enum RepoLoadError {
@@ -139,41 +140,20 @@ impl RepoLoadError {
 
     // TODO: (rust) idiomatic api is probably Iter<> of String, not Vec? try to fix that here
     pub fn expect_cmd_lines(
+        output: std::io::Result<Output>,
+        min_lines: u8,
         context: String,
-        output: Utf8CmdOutputLossy,
+        expect_msg: Option<String>,
     ) -> Result<Vec<String>, Self> {
-        let lines = output.stdout_strings();
-        if lines.is_empty() {
+        let lines = Self::expect_cmd_lossy(context.clone(), output)?.stdout_strings();
+        if lines.len() < min_lines.into() {
             return Err(Self::Unknown(format!(
-                "{}: unexpectedly returned no lines",
-                context
+                "{}: {}",
+                context,
+                expect_msg.unwrap_or(ERROR_REPO_NONEMPTY_OUTPUT.to_string()),
             )));
         }
         Ok(lines)
-    }
-
-    /// Helper for common pattern that `Repo#dirty_files()` will have to deal with.
-    // TODO: (rust) consider moving `context` out to a a const generic param of `Repo`, and then
-    // making this the default impl of the Repo trait (instead of a static function on this Error
-    // struct, as we have now).
-    pub fn dirty_files(
-        context: String,
-        output: std::io::Result<Output>,
-        clean_ok: bool,
-    ) -> Result<Vec<DirPath>, Self> {
-        let output = Self::expect_cmd_lossy(context.clone(), output)?;
-        let dirty_files = output.stdout_strings();
-        if dirty_files.is_empty() {
-            if clean_ok {
-                return Ok(vec![]);
-            }
-            return Err(Self::Unknown(format!(
-                "{}: {}",
-                context, ERROR_REPO_NOT_DIRTY
-            )));
-        }
-        let dirty_files = dirty_files.into_iter().map(PathBuf::from).collect();
-        Ok(dirty_files)
     }
 }
 

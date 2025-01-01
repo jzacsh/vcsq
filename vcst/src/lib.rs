@@ -106,6 +106,8 @@ pub enum VcstQuery {
         dir: DirPath,
         #[arg(long, default_value_t = false)]
         clean_ok: bool,
+        // TODO: (feature) add flag like "--exists" to only show files that are currently present
+        // (eg: so this can be piped right to an editor's args).
     },
 
     /// Prints what files were touched by the CurrentId

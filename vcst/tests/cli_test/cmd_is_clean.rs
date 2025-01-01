@@ -1,6 +1,5 @@
 use crate::common::setup::{make_test_temp, TestDirs, TestScope};
 use assert_cmd::Command;
-use libvcst::repo::ERROR_REPO_NOT_DIRTY;
 use predicates::prelude::*;
 
 mod cmd_is_clean {

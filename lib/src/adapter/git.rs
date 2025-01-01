@@ -1,4 +1,4 @@
-use crate::repo::{DirPath, Repo, RepoLoadError};
+use crate::repo::{DirPath, Repo, RepoLoadError, ERROR_REPO_NOT_DIRTY};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -45,6 +45,12 @@ impl RepoGit {
         cmd.arg("rev-parse").arg("--show-toplevel");
         cmd
     }
+
+    fn git_dirty_files(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("status").arg("--porcelain");
+        cmd
+    }
 }
 
 impl Repo for RepoGit {
@@ -59,11 +65,27 @@ impl Repo for RepoGit {
         )?))
     }
 
-    fn is_clean(&self) -> Result<bool, RepoLoadError> {
-        todo!();
-    }
-
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
-        todo!();
+        let min_lines = if clean_ok { 0 } else { 1 };
+        let lines = RepoLoadError::expect_cmd_lines(
+            self.git_dirty_files().output(),
+            min_lines,
+            "git cli: exec".to_string(),
+            Some(ERROR_REPO_NOT_DIRTY.to_string()),
+        )?;
+        let dirty_files = lines
+            .into_iter()
+            .map(|ln| {
+                // first 3 chars are modification-indicators like "?? " to indicate the file is
+                // untracked.
+                ln.chars()
+                    .into_iter()
+                    .skip(3)
+                    .into_iter()
+                    .collect::<String>()
+            })
+            .map(PathBuf::from)
+            .collect();
+        Ok(dirty_files)
     }
 }
