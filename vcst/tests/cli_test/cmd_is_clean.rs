@@ -3,9 +3,9 @@ use assert_cmd::Command;
 use libvcst::repo::ERROR_REPO_NOT_DIRTY;
 use predicates::prelude::*;
 
-mod cmd_dirty {
+mod cmd_is_clean {
     use super::*;
-    static TEST_SCOPE: TestScope = TestScope::new("cmd_dirty.rs");
+    static TEST_SCOPE: TestScope = TestScope::new("cmd_is_clean.rs");
 
     #[test]
     fn git() {
@@ -21,31 +21,17 @@ mod cmd_dirty {
         // Arrange+Assert: clean repo lists nothing dirty
         //
         let mut cmd = Command::cargo_bin("vcst").unwrap();
-        let assert = cmd
-            .arg("dirty-files")
-            .arg("--clean-ok")
-            .arg(&test_dir)
-            .assert();
+        let assert = cmd.arg("is-clean").arg(&test_dir).assert();
         assert
             .success()
             .stdout(predicate::str::is_empty())
             .stderr(predicate::str::is_empty());
 
         //
-        // Arrange+Assert: clean repo lists complains without --clean-ok
-        //
-        let mut cmd = Command::cargo_bin("vcst").unwrap();
-        let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
-        assert
-            .failure()
-            .stdout(predicate::str::is_empty())
-            .stderr(predicate::str::contains(ERROR_REPO_NOT_DIRTY));
-
-        //
         // Arrange: make the repo dirty
         //
         let mut untracked_file = test_dir.clone();
-        untracked_file.push("MY_DOC.md");
+        untracked_file.push("quick-start.md");
 
         make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
 
@@ -53,10 +39,10 @@ mod cmd_dirty {
         // Assert: dirty repo now has report of what's dirty
         //
         let mut cmd = Command::cargo_bin("vcst").unwrap();
-        let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
+        let assert = cmd.arg("is-clean").arg(&test_dir).assert();
         assert
-            .success()
-            .stdout(predicate::str::diff("? MY_DOC.md\n"))
+            .failure()
+            .stdout(predicate::str::is_empty())
             .stderr(predicate::str::is_empty());
     }
 

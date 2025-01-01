@@ -3,13 +3,12 @@ use std::string::FromUtf8Error;
 use std::sync::Once;
 use thiserror::Error;
 
-static ONCE_TESTDIRS_SETUP: Once = Once::new();
-
 pub static TEST_VCS_BASENAME_GIT: &str = "test-git-repo";
 pub static TEST_VCS_BASENAME_HG: &str = "test-hg-repo";
 pub static TEST_VCS_BASENAME_JJ: &str = "test-jj-on-git-repo";
 pub static TEST_VCS_BASENAME_NONVCS: &str = "test-not-vcs";
 pub static TEST_VCS_BASENAME_NONDIR: &str = "test-not-dir";
+pub static TEST_SUBDIR_NAME_SUFFIX: &str = "testscope";
 
 // TODO: (rust) how much of this file do the following two crates make obsolete/deletable?
 // - https://docs.rs/assert_cmd/latest/assert_cmd
@@ -46,28 +45,47 @@ pub struct TestDirs {
     pub not_dir: PathBuf,
 }
 
+pub struct TestScope {
+    pub setup_idempotence: Once,
+    pub test_name: &'static str,
+}
+
+impl TestScope {
+    pub const fn new(test_name: &'static str) -> Self {
+        Self {
+            test_name,
+            setup_idempotence: Once::new(),
+        }
+    }
+}
+
 impl TestDirs {
     /// Reads from disk to find the latest temp directory tree.
     ///
     /// WARNING: will fail if `create_once()` hasn't been called at least once.
-    fn new(testdir_bname: &str) -> Result<Self, TestSetupError> {
-        let root_dir = Self::list_temp_repos(testdir_bname)?;
+    fn new(testdir_bname: &str, scope: &TestScope) -> Result<Self, TestSetupError> {
+        use std::path::Path;
+
+        let root_dir = Self::list_temp_repos(testdir_bname, &scope)?;
         let mut git_repo = root_dir.clone();
         git_repo.push(TEST_VCS_BASENAME_GIT);
+        assert!(Path::exists(&git_repo), "git_repo missing: {:?}", &git_repo);
+
         let mut hg_repo = root_dir.clone();
         hg_repo.push(TEST_VCS_BASENAME_HG);
+        assert!(Path::exists(&hg_repo), "hg_repo missing: {:?}", &hg_repo);
+
         let mut jj_repo = root_dir.clone();
         jj_repo.push(TEST_VCS_BASENAME_JJ);
+        assert!(Path::exists(&jj_repo), "jj_repo missing: {:?}", &jj_repo);
 
         let mut not_vcs = root_dir.clone();
         not_vcs.push(TEST_VCS_BASENAME_NONVCS);
+        assert!(Path::exists(&not_vcs), "not_vcs missing: {:?}", &not_vcs);
 
         let mut not_dir = root_dir.clone();
         not_dir.push(TEST_VCS_BASENAME_NONDIR);
-
-        not_dir /* DO NOT SUBMIT - do this for all of the above cases */
-            .try_exists()
-            .map_err(|e| format!("not_dir try_exists;{}", e))?;
+        assert!(Path::exists(&not_dir), "not_dir missing: {:?}", &not_dir);
 
         Ok(TestDirs {
             root_dir,
@@ -86,7 +104,7 @@ impl TestDirs {
     }
 
     /// Finds the latest tempdir on disk given setup_temp_repos() was called with `testdir_bname`
-    fn list_temp_repos(testdir_bname: &str) -> Result<PathBuf, TestSetupError> {
+    fn list_temp_repos(testdir_bname: &str, scope: &TestScope) -> Result<PathBuf, TestSetupError> {
         use std::fs;
 
         let generic_root = make_test_temp::get_mktemp_root(testdir_bname)?;
@@ -102,6 +120,11 @@ impl TestDirs {
             .filter_map(|r| r.ok())
             .into_iter()
             .filter(|p| p.is_dir())
+            .filter(|p| {
+                p.to_string_lossy()
+                    .trim_end()
+                    .ends_with(&make_test_temp::testname_subdir_suffix(&scope.test_name))
+            })
             .collect::<Vec<_>>();
         test_run_dirs.sort();
         let newest_test_dir = test_run_dirs.into_iter().last().ok_or(format!(
@@ -140,13 +163,13 @@ impl TestDirs {
     /// ```
     ///
     /// `Self.new()` can be called endlessly to check the filesystem for the last run's result.
-    pub fn create_once() -> TestDirs {
+    pub fn create_once(test_scope: &TestScope) -> TestDirs {
         use make_test_temp::mktemp;
         use std::process::exit;
 
         let testdir_basename = "vcst-e2e-testdirs";
-        ONCE_TESTDIRS_SETUP.call_once(|| {
-            let tmpdir_root = mktemp(testdir_basename).expect("setting up test dir");
+        test_scope.setup_idempotence.call_once(|| {
+            let tmpdir_root = mktemp(testdir_basename, &test_scope).expect("setting up test dir");
             eprintln!("SETUP: {:?}", tmpdir_root.clone());
             match TestDirs::create(&tmpdir_root) {
                 Ok(_) => {}
@@ -160,9 +183,20 @@ impl TestDirs {
         // TODO: (rust) how to capture the mktemp root out of this? we basically need
         // create() to return all three tempdirs it made (one PathBuf for each VCS repo
         // path).
-        Self::new(testdir_basename).expect("failed listing tempdirs")
+        Self::new(testdir_basename, &test_scope).expect("failed listing tempdirs")
     }
 }
+
+/* // TODO: (cleanup) consider this:
+impl Drop for TestDirs {
+    fn drop(&mut self) {
+        use log::debug;
+        use std::fs;
+        debug!("Dropping TestDirs root: {:?}", &self.root_dir);
+        let _ = fs::remove_dir_all(&self.root_dir);
+    }
+}
+*/
 
 pub mod vcs_test_setup {
     use super::TestSetupError;
@@ -217,7 +251,10 @@ pub mod vcs_test_setup {
         use std::fs::create_dir;
         tmpdir_root.push(TEST_VCS_BASENAME_NONVCS);
         create_dir(&tmpdir_root).map_err(|source| TestSetupError::System {
-            context: format!("create_dir({})", tmpdir_root.to_string_lossy()),
+            context: format!(
+                "temp_nonvcs_dir({}): create_dir",
+                tmpdir_root.to_string_lossy()
+            ),
             source,
         })?;
         Ok(())
@@ -242,7 +279,7 @@ pub mod vcs_test_setup {
 }
 
 pub mod make_test_temp {
-    use super::TestSetupError;
+    use super::{TestScope, TestSetupError, TEST_SUBDIR_NAME_SUFFIX};
     use std::path::{Path, PathBuf};
 
     pub fn get_mktemp_root(basename: &str) -> Result<PathBuf, TestSetupError> {
@@ -284,13 +321,21 @@ pub mod make_test_temp {
     }
 
     /// How the hell is there no stdlib-esque functino for this??
-    pub fn mktemp(basename: &str) -> Result<PathBuf, TestSetupError> {
+    pub fn mktemp(basename: &str, test_scope: &TestScope) -> Result<PathBuf, TestSetupError> {
         use std::fs::create_dir;
+        use uuid::Uuid;
 
         let mut root_dir: PathBuf = get_mktemp_root(&basename)?;
 
         let iso_str = now_stamp("%F-at-%s");
-        root_dir.push(iso_str);
+        let test_name = test_scope.test_name.to_string();
+        let dir_str = format!(
+            "{}_{}_{}",
+            iso_str,
+            Uuid::new_v4().simple().to_string(),
+            testname_subdir_suffix(&test_name),
+        );
+        root_dir.push(dir_str);
         create_dir(&root_dir).map_err(|source| TestSetupError::System {
             context: format!(
                 "mktemp({}): create_dir({})",
@@ -306,6 +351,10 @@ pub mod make_test_temp {
             root_dir
         );
         Ok(root_dir)
+    }
+
+    pub fn testname_subdir_suffix(scope_name: &str) -> String {
+        format!("{}-{}", TEST_SUBDIR_NAME_SUFFIX, scope_name)
     }
 
     pub fn touch(path: &Path) -> Result<(), TestSetupError> {

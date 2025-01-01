@@ -245,13 +245,12 @@ pub fn vcst_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn i
         }
     };
     match plexerq.handle_query() {
-        Ok(_) => {}
+        Ok(ret) => ret,
         Err(e) => {
             writeln!(stderr, "{}", e).unwrap_or_else(|_| panic!("failed stderr write of: {}", e));
-            return 1;
+            1
         }
-    };
-    0
+    }
 }
 
 // NOTE: lack of unit tests here, is purely because of the coverage via e2e tests ./tests/

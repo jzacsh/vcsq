@@ -493,6 +493,7 @@ dependencies = [
  "chrono",
  "clap",
  "libvcst",
+ "log",
  "predicates",
  "thiserror",
  "uuid",
