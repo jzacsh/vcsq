@@ -25,19 +25,38 @@ image: "rust:latest"
 stages:
   - build
   - test
+  - coverage
 
 build:cargo:
   stage: build
   script:
     - cd vcst && cargo build
 
+test:cov:
+  stage: coverage
+  #coverage: kjkjkj # DO NOT SUBMIT
+  script:
+    - rustc --version  # Print version info for debugging
+    - cargo --version  # Print version info for debugging
+    # install jj VCS, per 20241231 instructions at
+    # https://jj-vcs.github.io/jj/latest/install-and-setup/#cargo-binstall
+    - cargo install cargo-binstall # dep of jj VCS's isntallation
+    - cargo install cargo-llvm-cov
+    - cargo cargo-llvm-cov --version  # Print version info for debugging
+    - cargo binstall --strategies crate-meta-data jj-cli # install jj VCS
+    - git --version && hg --version && jj --version  # vcst/domain-specific debug info
+    # Same as test's steps, but run via code coverage instrumentor:
+    - cd vcst && RUSTFLAGS='-D deprecated' cargo llvm-cov --all-features --workspace --codecov --output-path codecov.json
+    - bash <(curl -s https://codecov.io/bash)
+
 test:cargo:
   stage: test
   script:
+    - rustc --version  # Print version info for debugging
+    - cargo --version  # Print version info for debugging
     # install jj VCS, per 20241231 instructions at
     # https://jj-vcs.github.io/jj/latest/install-and-setup/#cargo-binstall
-    - cargo install cargo-binstall
-    - cargo binstall --strategies crate-meta-data jj-cli
-    - rustc --version && cargo --version  # Print version info for debugging
+    - cargo install cargo-binstall # dep of jj VCS's isntallation
+    - cargo binstall --strategies crate-meta-data jj-cli # install jj VCS
     - git --version && hg --version && jj --version  # vcst/domain-specific debug info
     - cd vcst && RUSTFLAGS='-D deprecated' cargo test --locked --all-features --all-targets --workspace --verbose -- --nocapture
