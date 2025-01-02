@@ -108,7 +108,9 @@ TODO: (test infra) consider either/both:
     happy (and document that in the Development instructions above with another
     `-x ...` on the recommended watch line); ie: something that will _error out_
     when either vcst/ or lib/ cause any output from `cargo clippy` (and then
-    codify the tip: "maybe just run `cargo clippy --allow-no-vcs --fix`" into readme)
+    codify the tip: "maybe just run `cargo clippy --allow-no-vcs --fix`" into readme).
+      - [ ] eval options:
+        - `cargo fmt --check` seems to be a thing
       - [ ] ci/cd clippy: get gitlab ci to do the above and rport on failures.
     - [ ] get local test/build/watch command that will _report_ coverage status
       - [ ] ci/cd: get gitlab ci to do the above and report on a health-status
@@ -116,9 +118,12 @@ TODO: (test infra) consider either/both:
       it locally somehwo to have good guarantees? or will it be around for a
       longtime in the gitlab CI pipeline? are their generic solutions for
       updating this sort of history directly into the repo periodically?)
-  run I use and want to be warned if I haven't run.
-  - [ ] address clippy::pedantic, then roll it into above ci/cd stage:
-  `cargo clippy --all -- -W clippy::pedantic`
+    - [ ] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
+    `--no-deps --all-features` for that)
+  - [ ] get to clippy:pedantic level:
+    - [ ] address clippy::pedantic output `cargo clippy --all -- -W
+    clippy::pedantic`
+    - [ ] roll it into above stages (both doc and ci/cd)
 
 [vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
