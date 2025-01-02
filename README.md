@@ -85,6 +85,22 @@ TODO: (test infra) consider either/both:
 2. root-less container setup to easily run our e2e tests (so we can contain any
    potentially buggy teardown(), and not delte our own root directory).
 
+#### Test Coverage
+
+`cargo-llvm-cov` is used to instrument the e2e tests, and the results are simply
+dumped as text (for now), which can be read in the ci/cd output. To understand
+the output, according to [llvm-cov][manLlvmCovDesc]:
+
+> The basic content of an .gcov output file is a copy of the source file with an
+> **execution count and line number prepended to every line**. The execution
+> count is shown as - if a line does not contain any executable code. If a line
+> contains code but that code was never executed, the count is displayed as
+> `#####`
+
+So to see untested lines, just `^F` for " |0" in the output.
+
+[manLlvmCovDesc]: https://manpages.debian.org/bookworm/llvm/llvm-cov.1.en.html#GCOV_COMMAND
+
 ### TODOs
 
 - [x] install jj VCS to $PATH of gitlab ci/cd
