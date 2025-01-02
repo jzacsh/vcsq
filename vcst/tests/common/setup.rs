@@ -142,8 +142,7 @@ impl TestDirs {
                 source,
             })?
             .map(|res| res.map(|p| p.path()))
-            .filter_map(|r| r.ok())
-            .into_iter()
+            .filter_map(std::result::Result::ok)
             .filter(|p| p.is_dir())
             .filter(|p| {
                 p.to_string_lossy()
@@ -155,7 +154,7 @@ impl TestDirs {
         let newest_test_dir = test_run_dirs.into_iter().last().ok_or(format!(
             "list_temp_repos({}) no dirs found under: {}",
             testdir_bname,
-            generic_root.to_string_lossy().to_string()
+            generic_root.to_string_lossy()
         ))?;
         Ok(newest_test_dir)
     }
@@ -196,7 +195,7 @@ impl TestDirs {
                 mktemp(TESTDIR_TMPDIR_ROOT, &test_scope).expect("setting up test dir");
             eprintln!("SETUP: {:?}", tmpdir_root.clone());
             match TestDirs::create(&tmpdir_root) {
-                Ok(_) => {}
+                Ok(()) => {}
                 Err(e) => {
                     eprintln!("test harness fail: {e}");
                     exit(1);
@@ -313,7 +312,7 @@ fn env_dir_or_tmp(env_var: &str) -> Result<PathBuf, String> {
         Ok(d) => Ok(PathBuf::from(d)),
         Err(e) => match e {
             VarError::NotUnicode(source) => {
-                return Err(source.to_string_lossy().to_string());
+                Err(source.to_string_lossy().to_string())
             }
             VarError::NotPresent => Ok(env::temp_dir()),
         },
@@ -377,7 +376,7 @@ pub mod make_test_temp {
         let dir_str = format!(
             "{}_{}_{}",
             iso_str,
-            Uuid::new_v4().simple().to_string(),
+            Uuid::new_v4().simple(),
             testname_subdir_suffix(&test_name),
         );
         root_dir.push(dir_str);
