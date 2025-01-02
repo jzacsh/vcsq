@@ -201,21 +201,12 @@ impl PlexerQuery<'_> {
                     .unwrap_or_else(|_| panic!("failed stdout write of: {:?}", self.plexer.brand));
             }
             VcstQuery::Root { dir: _ } => {
-                match self.plexer.root() {
-                    Ok(root_path) => {
-                        let dir_path = root_path.as_path().to_str().ok_or_else(|| {
-                            VcstError::Unknown(format!(
-                                "vcs generated invalid unicode: {:?}",
-                                root_path
-                            ))
-                        })?;
-                        writeln!(self.stdout, "{}", dir_path)
-                            .unwrap_or_else(|_| panic!("failed stdout write of: {}", dir_path));
-                    }
-                    Err(e) => {
-                        return Err(VcstError::Unknown(format!("root dir: {:?}", e)));
-                    }
-                };
+                let root_path = self.plexer.root()?;
+                let dir_path = root_path.as_path().to_str().ok_or_else(|| {
+                    VcstError::Unknown(format!("vcs generated invalid unicode: {:?}", root_path))
+                })?;
+                writeln!(self.stdout, "{}", dir_path)
+                    .unwrap_or_else(|_| panic!("failed stdout write of: {}", dir_path));
             }
             VcstQuery::IsClean { dir: _ } => {
                 let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
