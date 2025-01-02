@@ -128,7 +128,7 @@ impl TestDirs {
         setup_temp_repos(testdir_bname)
     }
 
-    /// Finds the latest tempdir on disk given setup_temp_repos() was called with `testdir_bname`
+    /// Finds the latest tempdir on disk given `setup_temp_repos()` was called with `testdir_bname`
     fn list_temp_repos(testdir_bname: &str, scope: &TestScope) -> Result<PathBuf, TestSetupError> {
         use std::fs;
 
@@ -161,7 +161,7 @@ impl TestDirs {
     }
 
     /// Generate a filepath we're pretty sure weon't exist (but in case some SUT tries to touch
-    /// it, contain its path within TestDirs).
+    /// it, contain its path within `TestDirs`).
     pub fn non_extant(&self) -> PathBuf {
         use uuid::Uuid;
         let mut path = self.root_dir.clone();

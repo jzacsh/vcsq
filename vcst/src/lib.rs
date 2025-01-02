@@ -85,7 +85,7 @@ pub enum VcstQuery {
     CurrentId {
         dir: DirPath,
 
-        /// Whether to be silent about any answers being flawed, in the event IsClean is false.
+        /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
         dirty_ok: bool,
     },
 
@@ -95,7 +95,7 @@ pub enum VcstQuery {
     CurrentName {
         dir: DirPath,
 
-        /// Whether to be silent about any answers being flawed, in the event IsClean is false.
+        /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
         dirty_ok: bool,
     },
 
@@ -115,7 +115,7 @@ pub enum VcstQuery {
     },
 
     /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output if
-    /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
+    /// the repo isn't dirty (thus can be used as a 1:1 proxy for `IsClean`'s behavior).
     #[command(arg_required_else_help = true)]
     DirtyFiles {
         dir: DirPath,
@@ -125,11 +125,11 @@ pub enum VcstQuery {
         // (eg: so this can be piped right to an editor's args).
     },
 
-    /// Prints what files were touched by the CurrentId
+    /// Prints what files were touched by the `CurrentId`
     CurrentFiles {
         dir: DirPath,
 
-        /// Whether to be silent about any answers being flawed, in the event IsClean is false.
+        /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
         dirty_ok: bool,
         // TODO: (feature) allow an optional Id or Name  (ref or bookmark) of which to compare
         // (instead of just the default which is "parent commit").
@@ -245,7 +245,7 @@ impl PlexerQuery<'_> {
 /// Core logic the CLI binary runs, but with injectable deps.
 ///
 /// NOTE: this is separate from main purely so we can e2e (ie: so we can dependency-inject
-/// stdio/stderr, etc. into PlexerQuery). For more on e2e testing a rust CLI, see:
+/// stdio/stderr, etc. into `PlexerQuery`). For more on e2e testing a rust CLI, see:
 /// - <https://doc.rust-lang.org/book/ch11-03-test-organization.html#integration-tests-for-binary-crates>
 /// - <https://rust-cli.github.io/book/tutorial/testing.html#testing-cli-applications-by-running-them>
 pub fn vcst_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn io::Write) -> u8 {
