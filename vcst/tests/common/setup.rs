@@ -79,7 +79,7 @@ impl Drop for TestScope {
         let testrun_rootdir = self
             .find_rootdir(TESTDIR_TMPDIR_ROOT)
             .expect("test cleanup: failed dropping latest testdirs");
-        eprintln!("dropping TestDirs root: {:?}", testrun_rootdir);
+        eprintln!("dropping TestDirs root: {testrun_rootdir:?}");
         let _ = std::fs::remove_dir_all(testrun_rootdir);
     }
 }
@@ -173,8 +173,7 @@ impl TestDirs {
         path.push(uuidv4.simple().to_string());
         assert!(
             !path.exists(),
-            "test-harness bug: tried to gen rando flie, but got real one: {:?}",
-            path
+            "test-harness bug: tried to gen rando flie, but got real one: {path:?}"
         );
         path
     }
@@ -199,7 +198,7 @@ impl TestDirs {
             match TestDirs::create(&tmpdir_root) {
                 Ok(_) => {}
                 Err(e) => {
-                    eprintln!("test harness fail: {}", e);
+                    eprintln!("test harness fail: {e}");
                     exit(1);
                 }
             }
@@ -256,7 +255,7 @@ pub mod vcs_test_setup {
             .to_string();
         Err(TestSetupError::RequiredCmd {
             context: context_map(),
-            source: Box::from(format!("stderr: {}", stderr)),
+            source: Box::from(format!("stderr: {stderr}")),
         })
     }
 
@@ -333,7 +332,7 @@ pub mod make_test_temp {
 
         let mut root_dir = env_dir_or_tmp(ENVVAR_OVERRIDE_TESTDIR_ROOT).map_err(|source| {
             TestSetupError::RequiredCmd {
-                context: format!("env var ${}: bad utf8", ENVVAR_OVERRIDE_TESTDIR_ROOT),
+                context: format!("env var ${ENVVAR_OVERRIDE_TESTDIR_ROOT}: bad utf8"),
                 source: Box::from(source),
             }
         })?;
@@ -345,21 +344,21 @@ pub mod make_test_temp {
         root_dir
             .exists()
             .then_some(())
-            .ok_or_else(|| format!("expect temp root_dir exists: {:?}", root_dir))?;
+            .ok_or_else(|| format!("expect temp root_dir exists: {root_dir:?}"))?;
 
         root_dir
             .is_dir()
             .then_some(())
-            .ok_or_else(|| format!("expect temp root_dir is dir: {:?}", root_dir))?;
+            .ok_or_else(|| format!("expect temp root_dir is dir: {root_dir:?}"))?;
 
         (root_dir != PathBuf::from("/"))
             .then_some(())
-            .ok_or_else(|| format!("expect temp root_dir is not root: {:?}", root_dir))?;
+            .ok_or_else(|| format!("expect temp root_dir is not root: {root_dir:?}"))?;
 
         root_dir.push(basename);
         if !root_dir.exists() {
             create_dir(&root_dir).map_err(|source| TestSetupError::System {
-                context: format!("get_mktemp_root({})", basename),
+                context: format!("get_mktemp_root({basename})"),
                 source,
             })?
         }
@@ -393,14 +392,13 @@ pub mod make_test_temp {
 
         assert!(
             root_dir.exists(),
-            "bug: root_dir doesn't exist after creation: {:?}",
-            root_dir
+            "bug: root_dir doesn't exist after creation: {root_dir:?}"
         );
         Ok(root_dir)
     }
 
     pub fn testname_subdir_suffix(scope_name: &str) -> String {
-        format!("{}-{}", TEST_SUBDIR_NAME_SUFFIX, scope_name)
+        format!("{TEST_SUBDIR_NAME_SUFFIX}-{scope_name}")
     }
 
     pub fn touch(path: &Path) -> Result<(), TestSetupError> {

@@ -203,10 +203,10 @@ impl PlexerQuery<'_> {
             VcstQuery::Root { dir: _ } => {
                 let root_path = self.plexer.root()?;
                 let dir_path = root_path.as_path().to_str().ok_or_else(|| {
-                    VcstError::Unknown(format!("vcs generated invalid unicode: {:?}", root_path))
+                    VcstError::Unknown(format!("vcs generated invalid unicode: {root_path:?}"))
                 })?;
-                writeln!(self.stdout, "{}", dir_path)
-                    .unwrap_or_else(|_| panic!("failed stdout write of: {}", dir_path));
+                writeln!(self.stdout, "{dir_path}")
+                    .unwrap_or_else(|_| panic!("failed stdout write of: {dir_path}"));
             }
             VcstQuery::IsClean { dir: _ } => {
                 let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
@@ -252,14 +252,14 @@ pub fn vcst_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn i
     let mut plexerq = match PlexerQuery::new(args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
-            writeln!(stderr, "{}", e).unwrap_or_else(|_| panic!("failed stderr write of: {}", e));
+            writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
             return 1;
         }
     };
     match plexerq.handle_query() {
         Ok(ret) => ret,
         Err(e) => {
-            writeln!(stderr, "{}", e).unwrap_or_else(|_| panic!("failed stderr write of: {}", e));
+            writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
             1
         }
     }
