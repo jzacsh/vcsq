@@ -40,21 +40,17 @@ impl VcstArgs {
     // TODO: (feature,clap) fix this clunkiness: somehow allow lone positional arg of a
     // directory for the case that no subcommand is passed. IDK how to do that in clap.
     pub(self) fn reduce(&self) -> Result<VcstQuery, VcstError> {
-        match &self.query {
-            // TODO: (rust) is there an "Option, else default" pattern that lets errors bubble out
-            // of the closure? eg: can we self.query.unwrap_or_else() but that can accept errors
-            // (as in the error-cases in the None match-arm below)?
-            Some(q) => Ok(q.clone()),
-            None => {
-                let dir = self
-                    .dir
-                    .clone()
-                    .ok_or(VcstError::Usage(
-                        "require either subcmd with a query or a direct --dir".into(),
-                    ))?
-                    .clone();
-                Ok(VcstQuery::Brand { dir })
-            }
+        if let Some(q) = &self.query {
+            Ok(q.clone())
+        } else {
+            let dir = self
+                .dir
+                .clone()
+                .ok_or(VcstError::Usage(
+                    "require either subcmd with a query or a direct --dir".into(),
+                ))?
+                .clone();
+            Ok(VcstQuery::Brand { dir })
         }
     }
 }
