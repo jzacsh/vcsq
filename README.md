@@ -59,7 +59,10 @@ $ cd vcst && cargo watch test  --color=always -- --nocapture
 In a second terminal I ensure the binary is being continuously rebuilt:
 
 ```sh
-$ cd vcst && cargo watch -x build
+$ cd vcst && cargo watch \
+    -x build \
+    -x 'doc --all-features' \
+    -s 'cd ../lib && cargo doc --all-features'
 # ...
 # can also be tacked onto the previous command via another '-x build' arg at the
 # before the test args, but then you get the issue of too-many-lines-output when
