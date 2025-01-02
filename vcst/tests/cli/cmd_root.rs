@@ -26,7 +26,7 @@ fn hg() {
 
     let expected_root = test_dir.display().to_string();
 
-    let assert = cmd.arg("root").arg(&test_dir).assert();
+    let assert = cmd.arg("root").arg(test_dir).assert();
     assert
         .success()
         .stderr(predicate::str::is_empty())
@@ -40,7 +40,7 @@ fn jj() {
 
     let expected_root = test_dir.display().to_string();
 
-    let assert = cmd.arg("root").arg(&test_dir).assert();
+    let assert = cmd.arg("root").arg(test_dir).assert();
     assert
         .success()
         .stderr(predicate::str::is_empty())
@@ -51,7 +51,7 @@ fn novcs() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_vcs;
     let mut cmd = Command::cargo_bin("vcst").unwrap();
 
-    let assert = cmd.arg("root").arg(&test_dir).assert();
+    let assert = cmd.arg("root").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -63,7 +63,7 @@ fn non_dir() {
     let not_dir = &TestDirs::create_once(&TEST_SCOPE).not_dir;
     let mut cmd = Command::cargo_bin("vcst").unwrap();
 
-    let assert = cmd.arg("root").arg(&not_dir).assert();
+    let assert = cmd.arg("root").arg(not_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())

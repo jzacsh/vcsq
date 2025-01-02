@@ -14,7 +14,7 @@ fn git() {
     // Arrange+Assert: clean repo lists nothing dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("is-clean").arg(&test_dir).assert();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::is_empty())
@@ -32,7 +32,7 @@ fn git() {
     // Assert: dirty repo now has report of what's dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("is-clean").arg(&test_dir).assert();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -48,7 +48,7 @@ fn hg() {
     // Arrange+Assert: clean repo lists nothing dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("is-clean").arg(&test_dir).assert();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::is_empty())
@@ -66,7 +66,7 @@ fn hg() {
     // Assert: dirty repo now has report of what's dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("is-clean").arg(&test_dir).assert();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -82,7 +82,7 @@ fn jj() {
     // Arrange+Assert: clean repo lists nothing dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("is-clean").arg(&test_dir).assert();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::is_empty())
@@ -100,7 +100,7 @@ fn jj() {
     // Assert: dirty repo now has report of what's dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("is-clean").arg(&test_dir).assert();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())

@@ -18,7 +18,7 @@ fn git() {
     let assert = cmd
         .arg("dirty-files")
         .arg("--clean-ok")
-        .arg(&test_dir)
+        .arg(test_dir)
         .assert();
     assert
         .success()
@@ -29,7 +29,7 @@ fn git() {
     // Arrange+Assert: clean repo lists complains without --clean-ok
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
+    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -47,7 +47,7 @@ fn git() {
     // Assert: dirty repo now has report of what's dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
+    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::diff("git-docs.md\n"))
@@ -66,7 +66,7 @@ fn hg() {
     let assert = cmd
         .arg("dirty-files")
         .arg("--clean-ok")
-        .arg(&test_dir)
+        .arg(test_dir)
         .assert();
     assert
         .success()
@@ -77,7 +77,7 @@ fn hg() {
     // Arrange+Assert: clean repo lists complains without --clean-ok
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
+    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -95,7 +95,7 @@ fn hg() {
     // Assert: dirty repo now has report of what's dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
+    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::diff("mercurial.md\n"))
@@ -114,7 +114,7 @@ fn jj() {
     let assert = cmd
         .arg("dirty-files")
         .arg("--clean-ok")
-        .arg(&test_dir)
+        .arg(test_dir)
         .assert();
     assert
         .success()
@@ -125,7 +125,7 @@ fn jj() {
     // Arrange+Assert: clean repo lists complains without --clean-ok
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
+    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -143,7 +143,7 @@ fn jj() {
     // Assert: dirty repo now has report of what's dirty
     //
     let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(&test_dir).assert();
+    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::diff("jj-vcs-docs.md\n"))

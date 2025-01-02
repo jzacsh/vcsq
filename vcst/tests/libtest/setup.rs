@@ -68,7 +68,7 @@ impl TestScope {
         }
     }
     pub fn find_rootdir(&self, testdir_bname: &str) -> Result<PathBuf, TestSetupError> {
-        TestDirs::list_temp_repos(testdir_bname, &self)
+        TestDirs::list_temp_repos(testdir_bname, self)
     }
 }
 
@@ -147,7 +147,7 @@ impl TestDirs {
             .filter(|p| {
                 p.to_string_lossy()
                     .trim_end()
-                    .ends_with(&make_test_temp::testname_subdir_suffix(&scope.test_name))
+                    .ends_with(&make_test_temp::testname_subdir_suffix(scope.test_name))
             })
             .collect::<Vec<_>>();
         test_run_dirs.sort();
@@ -192,7 +192,7 @@ impl TestDirs {
 
         test_scope.setup_idempotence.call_once(|| {
             let tmpdir_root =
-                mktemp(TESTDIR_TMPDIR_ROOT, &test_scope).expect("setting up test dir");
+                mktemp(TESTDIR_TMPDIR_ROOT, test_scope).expect("setting up test dir");
             eprintln!("SETUP: {:?}", tmpdir_root.clone());
             match TestDirs::create(&tmpdir_root) {
                 Ok(()) => {}
@@ -206,7 +206,7 @@ impl TestDirs {
         // TODO: (rust) how to capture the mktemp root out of this? we basically need
         // create() to return all three tempdirs it made (one PathBuf for each VCS repo
         // path).
-        Self::new(TESTDIR_TMPDIR_ROOT, &test_scope).expect("failed listing tempdirs")
+        Self::new(TESTDIR_TMPDIR_ROOT, test_scope).expect("failed listing tempdirs")
     }
 }
 
@@ -369,7 +369,7 @@ pub mod make_test_temp {
         use std::fs::create_dir;
         use uuid::Uuid;
 
-        let mut root_dir: PathBuf = get_mktemp_root(&basename)?;
+        let mut root_dir: PathBuf = get_mktemp_root(basename)?;
 
         let iso_str = now_stamp("%F-at-%s");
         let test_name = test_scope.test_name.to_string();
