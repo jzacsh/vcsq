@@ -114,22 +114,25 @@ TODO: (test infra) consider either/both:
     codify the tip: "maybe just run `cargo clippy --allow-no-vcs --fix`" into readme).
       - [ ] eval options:
         - `cargo fmt --check` seems to be a thing
-      - [ ] ci/cd clippy: get gitlab ci to do the above and rport on failures.
+      - [ ] ci/cd clippy: get [gitlab ci][rustGitlabCiTempl] to do the above and
+      report on failures.
     - [ ] get local test/build/watch command that will _report_ coverage status
-      - [ ] ci/cd: get gitlab ci to do the above and report on a health-status
-      on this. find out what the SLA is for this reporting (do you need to save
-      it locally somehwo to have good guarantees? or will it be around for a
-      longtime in the gitlab CI pipeline? are their generic solutions for
-      updating this sort of history directly into the repo periodically?)
+      - [ ] ci/cd: get [gitlab ci][rustGitlabCiTempl] to do the above and report
+      on a health-status on this. find out what the SLA is for this reporting
+      (do you need to save it locally somehwo to have good guarantees? or will
+      it be around for a longtime in the gitlab CI pipeline? are their generic
+      solutions for updating this sort of history directly into the repo
+      periodically?)
     - [ ] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
     `--no-deps --all-features` for that)
   - [ ] get to clippy:pedantic level:
     - [ ] address clippy::pedantic output `cargo clippy --all -- -W
     clippy::pedantic`
-    - [ ] roll it into above stages (both doc and ci/cd)
+    - [ ] roll it into above stages (both doc and [ci/cd][rustGitlabCiTempl])
 
 [vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
+[rustGitlabCiTempl]: https://gitlab.com/rust-automation/rust-gitlab-ci/-/tree/master
 
 [^freq]:
     See the three predecessors/mini-libs that inspired this one, at:
