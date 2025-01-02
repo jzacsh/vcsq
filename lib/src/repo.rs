@@ -163,17 +163,6 @@ impl From<String> for RepoLoadError {
     }
 }
 
-impl From<std::io::Error> for RepoLoadError {
-    // TODO: (cleanup) findout if this is getting called anywhere, anad maybe delete/improve this
-    // case
-    fn from(source: std::io::Error) -> Self {
-        RepoLoadError::Command {
-            context: "bug: unexpected io error".to_string(),
-            source,
-        }
-    }
-}
-
 /// VCS repo's canonical, machine-generated identifier describing a reference-point in its history
 /// (eg: branch or tag in git, bookmark in jj).
 ///
