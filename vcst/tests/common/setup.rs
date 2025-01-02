@@ -359,7 +359,7 @@ pub mod make_test_temp {
             create_dir(&root_dir).map_err(|source| TestSetupError::System {
                 context: format!("get_mktemp_root({basename})"),
                 source,
-            })?
+            })?;
         }
         Ok(root_dir)
     }
