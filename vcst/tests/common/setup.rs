@@ -47,7 +47,7 @@ impl From<String> for TestSetupError {
 
 #[derive(Debug)]
 pub struct TestDirs {
-    root_dir: PathBuf,
+    pub root_dir: PathBuf,
     pub git_repo: PathBuf,
     pub hg_repo: PathBuf,
     pub jj_repo: PathBuf,
@@ -67,6 +67,21 @@ impl TestScope {
             setup_idempotence: Once::new(),
         }
     }
+    pub fn find_rootdir(&self, testdir_bname: &str) -> Result<PathBuf, TestSetupError> {
+        TestDirs::list_temp_repos(testdir_bname, &self)
+    }
+}
+
+// TODO: (rust) figure out why this isn't actually dropping (neither stderr debug lines nor the
+// actual directory cleanup appear to be happening.
+impl Drop for TestScope {
+    fn drop(&mut self) {
+        let testrun_rootdir = self
+            .find_rootdir(TESTDIR_TMPDIR_ROOT)
+            .expect("test cleanup: failed dropping latest testdirs");
+        eprintln!("dropping TestDirs root: {:?}", testrun_rootdir);
+        let _ = std::fs::remove_dir_all(testrun_rootdir);
+    }
 }
 
 impl TestDirs {
@@ -76,7 +91,7 @@ impl TestDirs {
     fn new(testdir_bname: &str, scope: &TestScope) -> Result<Self, TestSetupError> {
         use std::path::Path;
 
-        let root_dir = Self::list_temp_repos(testdir_bname, &scope)?;
+        let root_dir = scope.find_rootdir(testdir_bname)?;
         let mut git_repo = root_dir.clone();
         git_repo.push(TEST_VCS_BASENAME_GIT);
         assert!(Path::exists(&git_repo), "git_repo missing: {:?}", &git_repo);
@@ -196,16 +211,6 @@ impl TestDirs {
         Self::new(TESTDIR_TMPDIR_ROOT, &test_scope).expect("failed listing tempdirs")
     }
 }
-
-/* // TODO: consider this:
-impl Drop for TestScope {
-    fn drop(&mut self) {
-        use log::debug;
-        use std::fs;
-        debug!("Dropping TestDirs root: {:?}", &self.root_dir);
-        let _ = fs::remove_dir_all(&self.root_dir);
-    }
-} */
 
 pub mod vcs_test_setup {
     use super::TestSetupError;
