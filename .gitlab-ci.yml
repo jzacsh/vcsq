@@ -34,7 +34,6 @@ build:cargo:
 
 test:cov:
   stage: coverage
-  #coverage: kjkjkj # DO NOT SUBMIT
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
