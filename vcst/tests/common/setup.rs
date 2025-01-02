@@ -1,5 +1,4 @@
 use std::path::{Path, PathBuf};
-use std::string::FromUtf8Error;
 use std::sync::Once;
 use thiserror::Error;
 
@@ -10,28 +9,39 @@ pub static TEST_VCS_BASENAME_NONVCS: &str = "test-not-vcs";
 pub static TEST_VCS_BASENAME_NONDIR: &str = "test-not-dir";
 pub static TEST_SUBDIR_NAME_SUFFIX: &str = "testscope";
 
+/// environment variable to optionally override the root (standard `$TMPDIR` or /tmp/) under which
+/// the tests' temp directory tree is created/destroyed.
+static ENVVAR_OVERRIDE_TESTDIR_ROOT: &str = "VCST_TESTDIR";
+
+/// Directory under which all files are managed. This directory may itself be sub-contained (say in
+/// /tmp/foo, depending on `ENVVAR_OVERRIDE_TESTDIR_ROOT` being present).
+static TESTDIR_TMPDIR_ROOT: &str = "vcst-e2e-testdirs";
+
 // TODO: (rust) how much of this file do the following two crates make obsolete/deletable?
 // - https://docs.rs/assert_cmd/latest/assert_cmd
 // - https://docs.rs/predicates/latest/predicates
 
 #[derive(Error, Debug)]
 pub enum TestSetupError {
-    #[error("system failed {}: {}", .context, .source)]
+    #[error("test harness: {}: {}", .context, .source)]
+    RequiredCmd {
+        context: String,
+        source: Box<dyn std::error::Error>,
+    },
+
+    #[error("test harness: system err: {}: {}", .context, .source)]
     System {
         context: String,
         source: std::io::Error,
     },
 
-    #[error("cli failed and stderr had unicode problem: {0}")]
-    CliFail(#[from] FromUtf8Error),
-
-    #[error("vcs: {0}")]
-    Command(String),
+    #[error("test harness: {0}")]
+    Generic(String),
 }
 
 impl From<String> for TestSetupError {
     fn from(item: String) -> Self {
-        TestSetupError::Command(item)
+        TestSetupError::Generic(item)
     }
 }
 
@@ -167,9 +177,9 @@ impl TestDirs {
         use make_test_temp::mktemp;
         use std::process::exit;
 
-        let testdir_basename = "vcst-e2e-testdirs";
         test_scope.setup_idempotence.call_once(|| {
-            let tmpdir_root = mktemp(testdir_basename, &test_scope).expect("setting up test dir");
+            let tmpdir_root =
+                mktemp(TESTDIR_TMPDIR_ROOT, &test_scope).expect("setting up test dir");
             eprintln!("SETUP: {:?}", tmpdir_root.clone());
             match TestDirs::create(&tmpdir_root) {
                 Ok(_) => {}
@@ -183,20 +193,19 @@ impl TestDirs {
         // TODO: (rust) how to capture the mktemp root out of this? we basically need
         // create() to return all three tempdirs it made (one PathBuf for each VCS repo
         // path).
-        Self::new(testdir_basename, &test_scope).expect("failed listing tempdirs")
+        Self::new(TESTDIR_TMPDIR_ROOT, &test_scope).expect("failed listing tempdirs")
     }
 }
 
-/* // TODO: (cleanup) consider this:
-impl Drop for TestDirs {
+/* // TODO: consider this:
+impl Drop for TestScope {
     fn drop(&mut self) {
         use log::debug;
         use std::fs;
         debug!("Dropping TestDirs root: {:?}", &self.root_dir);
         let _ = fs::remove_dir_all(&self.root_dir);
     }
-}
-*/
+} */
 
 pub mod vcs_test_setup {
     use super::TestSetupError;
@@ -213,26 +222,37 @@ pub mod vcs_test_setup {
         args: Vec<&str>,
         tmpdir_root: PathBuf,
     ) -> Result<(), TestSetupError> {
+        let context_map = || {
+            format!(
+                "`{} {:?}` at {}",
+                &cmd,
+                &args,
+                &tmpdir_root.to_string_lossy()
+            )
+        };
         let cli_output = Command::new(cmd)
             .args(&args)
             .stdout(Stdio::null())
             .current_dir(&tmpdir_root)
             .output()
             .map_err(|source| TestSetupError::System {
-                context: format!(
-                    "`{} {:?}` at {}",
-                    &cmd,
-                    &args,
-                    &tmpdir_root.to_string_lossy()
-                ),
+                context: context_map(),
                 source,
             })?;
         if cli_output.status.success() {
-            Ok(())
-        } else {
-            let stderr = String::from_utf8(cli_output.stderr)?.trim().to_string();
-            Err(stderr.into())
+            return Ok(());
         }
+        let stderr = String::from_utf8(cli_output.stderr)
+            .map_err(|source| TestSetupError::RequiredCmd {
+                context: context_map(),
+                source: Box::from(source),
+            })?
+            .trim()
+            .to_string();
+        Err(TestSetupError::RequiredCmd {
+            context: context_map(),
+            source: Box::from(format!("stderr: {}", stderr)),
+        })
     }
 
     fn setup_temp_repo_git(tmpdir_root: PathBuf) -> Result<(), TestSetupError> {
@@ -278,37 +298,58 @@ pub mod vcs_test_setup {
     }
 }
 
+/// Produce a directory path as defined by the set environment variable value by the name
+/// `env_var`, or fallack to a safe system temporary directory.
+/// TODO: cordon this off to a local "not stdlib", somewhere else.
+fn env_dir_or_tmp(env_var: &str) -> Result<PathBuf, String> {
+    use env::VarError;
+    use std::env;
+
+    match env::var(env_var) {
+        Ok(d) => Ok(PathBuf::from(d)),
+        Err(e) => match e {
+            VarError::NotUnicode(source) => {
+                return Err(source.to_string_lossy().to_string());
+            }
+            VarError::NotPresent => Ok(env::temp_dir()),
+        },
+    }
+}
+
 pub mod make_test_temp {
-    use super::{TestScope, TestSetupError, TEST_SUBDIR_NAME_SUFFIX};
+    use super::{
+        env_dir_or_tmp, TestScope, TestSetupError, ENVVAR_OVERRIDE_TESTDIR_ROOT,
+        TEST_SUBDIR_NAME_SUFFIX,
+    };
     use std::path::{Path, PathBuf};
 
     pub fn get_mktemp_root(basename: &str) -> Result<PathBuf, TestSetupError> {
-        use env::VarError;
-        use std::env;
         use std::fs::create_dir;
 
-        let mut root_dir: PathBuf = match env::var("VCST_TESTDIR") {
-            Ok(d) => PathBuf::from(d),
-            Err(e) => match e {
-                VarError::NotUnicode(s) => panic!("VCST_TESTDIR had non-unicode value: {:?}", s),
-                VarError::NotPresent => env::temp_dir(),
-            },
-        };
-        assert!(
-            root_dir.exists(),
-            "expect temp root_dir exists: {:?}",
-            root_dir
-        );
-        assert!(
-            root_dir.is_dir(),
-            "expect temp root_dir is dir: {:?}",
-            root_dir
-        );
-        assert!(
-            root_dir.to_str().expect("bad unicode in root_dir") != "/",
-            "expect temp root_dir is not root: {:?}",
-            root_dir
-        );
+        let mut root_dir = env_dir_or_tmp(ENVVAR_OVERRIDE_TESTDIR_ROOT).map_err(|source| {
+            TestSetupError::RequiredCmd {
+                context: format!("env var ${}: bad utf8", ENVVAR_OVERRIDE_TESTDIR_ROOT),
+                source: Box::from(source),
+            }
+        })?;
+
+        // TODO: (rust) this feels ugly; is there a better way? what we're doing in the
+        // ok_or_else() lines below: these are like assert!()'s, but don't panic, and allow
+        // Rust to From<String> into my own error type
+
+        root_dir
+            .exists()
+            .then_some(())
+            .ok_or_else(|| format!("expect temp root_dir exists: {:?}", root_dir))?;
+
+        root_dir
+            .is_dir()
+            .then_some(())
+            .ok_or_else(|| format!("expect temp root_dir is dir: {:?}", root_dir))?;
+
+        (root_dir != PathBuf::from("/"))
+            .then_some(())
+            .ok_or_else(|| format!("expect temp root_dir is not root: {:?}", root_dir))?;
 
         root_dir.push(basename);
         if !root_dir.exists() {
