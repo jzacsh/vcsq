@@ -1,5 +1,5 @@
-use crate::common::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
-use crate::common::setup::{make_test_temp, TestDirs, TestScope};
+use crate::libtest::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
+use crate::libtest::setup::{make_test_temp, TestDirs, TestScope};
 use assert_cmd::Command;
 use libvcst::repo::ERROR_REPO_NOT_DIRTY;
 use predicates::prelude::*;

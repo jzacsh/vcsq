@@ -1,5 +1,5 @@
-use crate::common::consts::ERROR_DIR_MISSING;
-use crate::common::setup::{TestDirs, TestScope};
+use crate::libtest::consts::ERROR_DIR_MISSING;
+use crate::libtest::setup::{TestDirs, TestScope};
 use assert_cmd::Command;
 use predicates::prelude::*;
 

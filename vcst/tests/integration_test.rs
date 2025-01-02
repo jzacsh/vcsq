@@ -1,2 +1,2 @@
-mod cli_test;
-mod common;
+mod cli;
+mod libtest;
