@@ -1,7 +1,7 @@
 use crate::adapter::git::RepoGit;
 use crate::adapter::hg::RepoHg;
 use crate::adapter::jj::RepoJj;
-use crate::repo::{DirPath, Repo, RepoLoadError};
+use crate::repo::{AncestorRef, DirPath, Repo, RepoLoadError, RepoRef, RepoRefId, RepoRefName};
 
 /// The particular brands of VCS this library supports.
 #[derive(Debug, Clone)]
@@ -75,6 +75,33 @@ impl Repo for RepoPlexer {
 
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
         self.adapter.dirty_files(clean_ok)
+    }
+
+    fn parent_ref(&self) -> Result<RepoRef, RepoLoadError> {
+        self.adapter.parent_ref()
+    }
+
+    fn parent_ref_id(&self) -> Result<RepoRefId, RepoLoadError> {
+        self.adapter.parent_ref_id()
+    }
+
+    fn parent_ref_name(&self) -> Result<RepoRefName, RepoLoadError> {
+        self.adapter.parent_ref_name()
+    }
+
+    // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
+    fn first_ancestor_ref_name(&self, limit: Option<u64>) -> Result<AncestorRef, RepoLoadError> {
+        self.adapter.first_ancestor_ref_name(limit)
+    }
+
+    fn current_ref(&self, dirty_ok: bool) -> Result<RepoRef, RepoLoadError> {
+        self.adapter.current_ref(dirty_ok)
+    }
+    fn current_ref_id(&self, dirty_ok: bool) -> Result<RepoRefId, RepoLoadError> {
+        self.adapter.current_ref_id(dirty_ok)
+    }
+    fn current_ref_name(&self, dirty_ok: bool) -> Result<RepoRefName, RepoLoadError> {
+        self.adapter.current_ref_name(dirty_ok)
     }
 }
 
