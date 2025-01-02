@@ -43,6 +43,7 @@ mod cmd_brand {
             .stdout(predicate::eq("Jujutsu\n"))
             .stderr(predicate::str::is_empty());
     }
+
     #[test]
     fn novcs() {
         let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_vcs;

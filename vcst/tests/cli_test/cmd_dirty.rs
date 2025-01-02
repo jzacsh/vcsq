@@ -1,3 +1,4 @@
+use crate::common::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
 use crate::common::setup::{make_test_temp, TestDirs, TestScope};
 use assert_cmd::Command;
 use libvcst::repo::ERROR_REPO_NOT_DIRTY;
@@ -152,12 +153,39 @@ mod cmd_dirty {
     }
 
     #[test]
-    fn no_vcs() {
-        assert_eq!(42, 42); // TODO: write test ERROR_NO_KNOWN_VCS
+    fn novcs() {
+        let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_vcs;
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let assert = cmd.arg("dirty-files").arg(test_dir).assert();
+        assert
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::str::diff(ERROR_NO_KNOWN_VCS.to_string() + "\n"));
     }
 
     #[test]
-    fn no_dir() {
-        assert_eq!(42, 42); // TODO: write test ERROR_NOT_VALID_DIR
+    fn non_dir() {
+        let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_dir;
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let assert = cmd.arg("dirty-files").arg(test_dir).assert();
+        assert
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR.to_string() + "\n"));
+    }
+
+    #[test]
+    fn non_extant() {
+        let test_dirs = &TestDirs::create_once(&TEST_SCOPE);
+        let non_extant_path = test_dirs.non_extant();
+        let mut cmd = Command::cargo_bin("vcst").unwrap();
+
+        let assert = cmd.arg("dirty-files").arg(non_extant_path).assert();
+        assert
+            .failure()
+            .stdout(predicate::str::is_empty())
+            .stderr(predicate::str::diff(ERROR_NOT_VALID_DIR.to_string() + "\n"));
     }
 }
