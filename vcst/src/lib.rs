@@ -99,6 +99,21 @@ pub enum VcstQuery {
         dirty_ok: bool,
     },
 
+    /// Print the VCS repo's current revision ID (eg: rev in Mercurial, ref in git, etc).
+    #[command(arg_required_else_help = true)]
+    ParentId { dir: DirPath },
+
+    /// Print the VCS repo's current human-readable revision name for the first parent it finds
+    /// with one, or until it has stepped --max steps.
+    #[command(arg_required_else_help = true)]
+    ParentName {
+        dir: DirPath,
+
+        /// Max number of parents back to walk when seeking a parent with a hand-written ref name.
+        // TODO: (rust) there's a type-way to express positive natural numbers, yeah?
+        max: u64,
+    },
+
     /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output if
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
     #[command(arg_required_else_help = true)]
@@ -147,6 +162,8 @@ impl VcstQuery {
             VcstQuery::IsClean { dir } => dir,
             VcstQuery::CurrentId { dir, dirty_ok: _ } => dir,
             VcstQuery::CurrentName { dir, dirty_ok: _ } => dir,
+            VcstQuery::ParentId { dir } => dir,
+            VcstQuery::ParentName { dir, max: _ } => dir,
             VcstQuery::DirtyFiles { dir, clean_ok: _ } => dir,
             VcstQuery::CurrentFiles { dir, dirty_ok: _ } => dir,
         }
@@ -212,6 +229,8 @@ impl PlexerQuery<'_> {
                 dir: _,
                 dirty_ok: _,
             } => todo!(),
+            VcstQuery::ParentId { dir: _ } => todo!(),
+            VcstQuery::ParentName { dir: _, max: _ } => todo!(),
             VcstQuery::DirtyFiles { dir: _, clean_ok } => {
                 let dirty_files = self
                     .plexer
