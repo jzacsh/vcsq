@@ -41,7 +41,7 @@ test:cov:
     # https://jj-vcs.github.io/jj/latest/install-and-setup/#cargo-binstall
     - cargo install cargo-binstall # dep of jj VCS's isntallation
     - cargo install cargo-llvm-cov
-    - cargo cargo-llvm-cov --version  # Print version info for debugging
+    - cargo llvm-cov --version  # Print version info for debugging
     - cargo binstall --strategies crate-meta-data jj-cli # install jj VCS
     - git --version && hg --version && jj --version  # vcst/domain-specific debug info
     # Same as test's steps, but run via code coverage instrumentor:
