@@ -45,8 +45,12 @@ test:cov:
     - cargo llvm-cov --version  # Print version info for debugging
     - git --version && hg --version && jj --version  # vcst/domain-specific debug info
     # Same as test's steps, but run via code coverage instrumentor:
-    - cd vcst && RUSTFLAGS='-D deprecated' cargo llvm-cov --all-features --workspace --codecov --output-path codecov.json
-    - bash <(curl -s https://codecov.io/bash)
+    - cd vcst && RUSTFLAGS='-D deprecated' cargo llvm-cov --all-features --workspace --codecov # --output-path codecov.json
+    # TODO: uncomment below and uncomment --output-path above, once we're
+    # public. Until then, this will always fail per
+    # https://github.com/codecov/codecov-action/issues/1671#issuecomment-2486953810
+    # (and I don't feel like messing with tokens just for the interim).
+    # - bash <(curl -s https://codecov.io/bash)
 
 test:cargo:
   stage: test
