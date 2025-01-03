@@ -41,7 +41,7 @@ build:cargo:
 
 test:doc:
   stage: build
-  needs: ["build:cargo"]
+  needs: ["test:e2e"]
   interruptible: true
   script:
     - rustc --version  # Print version info for debugging
@@ -65,7 +65,7 @@ test:e2e:
 
 test:lint:
   stage: test
-  needs: ["build:cargo"]
+  needs: ["test:e2e"]
   interruptible: true
   script:
     - rustc --version  # Print version info for debugging
