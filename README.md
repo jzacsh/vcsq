@@ -110,16 +110,16 @@ So to see untested lines, just `^F` for " |0" in the output.
   - try `cargo build --release` to turn these back off
   - in the meantime: dbug build via: `cargo run --` to run,  `cargo build`
   build (because they just `todo!()`), via `#[cfg(debug_assertions)]`
+- [ ] **feature**: add ["list tracked files" concept][vcsListUsecase]
 - [x] install jj VCS to $PATH of gitlab ci/cd
 
   - [ ] move `git --version && hg --version && jj --version` from ci/cd yml into
   test harness startup as a sanity-check _anywhere_ the test runs.
 
-- [ ] feature: run a dump of what VCS we find in path, as part of `--version`
+- [ ] **feature**: run a dump of what VCS we find in path, as part of `--version`
       output, or some place of the sort.
 - [x] cleanup all the CLI string handling (the `String::from_utf8` and
       `expect(.*utf8` references) to use `String::from_utf8_lossy`
-- [ ] feature: add ["list tracked files" concept][vcsListUsecase]
 - [ ] cleanup some of the error enums that aren't being fully utilized (eg: some
   that default to map_err() to `Unknown`-fallbackish variants). This is because
   some of the better alternatives were only added _later_ (eg:
