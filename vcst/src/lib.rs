@@ -172,8 +172,11 @@ struct PlexerQuery<'a> {
     stdout: &'a mut dyn io::Write,
 }
 
-impl PlexerQuery<'_> {
-    fn new(args: VcstArgs, stdout: &mut dyn io::Write) -> Result<PlexerQuery<'_>, VcstError> {
+impl<'a> PlexerQuery<'a> {
+    fn new(
+        args: &'a VcstArgs,
+        stdout: &'a mut dyn io::Write,
+    ) -> Result<PlexerQuery<'a>, VcstError> {
         let query = args.reduce()?;
         let dir: String = query.dir()?;
         let dir: DirPath = PathBuf::from(dir);
@@ -245,7 +248,7 @@ impl PlexerQuery<'_> {
 /// - <https://doc.rust-lang.org/book/ch11-03-test-organization.html#integration-tests-for-binary-crates>
 /// - <https://rust-cli.github.io/book/tutorial/testing.html#testing-cli-applications-by-running-them>
 pub fn vcst_query(args: VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn io::Write) -> u8 {
-    let mut plexerq = match PlexerQuery::new(args, stdout) {
+    let mut plexerq = match PlexerQuery::new(&args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
             writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
