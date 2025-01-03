@@ -7,6 +7,7 @@ use std::string::FromUtf8Error;
 ///
 /// Only useful if the comamnd's utf8-failure modes are not critical to your applciation, otherwise
 /// use `Utf8CmdOutput`.
+#[derive(Debug)]
 pub struct Utf8CmdOutputLossy {
     pub status: ExitStatus,
     pub stdout: String,
@@ -41,6 +42,7 @@ impl Utf8CmdOutputLossy {
 ///
 /// Only useful if you want to be defensive (say `expect()` on any conversion errors), otherwise
 /// use `Utf8CmdOutputLossy`.
+#[derive(Debug)]
 pub struct Utf8CmdOutput {
     pub status: ExitStatus,
     pub stdout: Result<String, FromUtf8Error>,

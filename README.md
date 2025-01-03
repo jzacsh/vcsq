@@ -61,7 +61,7 @@ In a second terminal I ensure the binary is being continuously rebuilt:
 ```sh
 $ cd vcst && cargo watch \
   -x build \
-  -x 'clippy --all --  -W clippy::pedantic -Dwarnings -Ddeprecated' \
+  -x 'clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
   -s 'cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
   -x 'doc --all-features' \
   -s 'cd ../lib && cargo doc --all-features'
@@ -113,7 +113,7 @@ So to see untested lines, just `^F` for " |0" in the output.
 - [ ] **feature**: add ["list tracked files" concept][vcsListUsecase]
 - [x] install jj VCS to $PATH of gitlab ci/cd
 
-  - [ ] move `git --version && hg --version && jj --version` from ci/cd yml into
+  - [x] copy `git --version && hg --version && jj --version` from ci/cd yml into
   test harness startup as a sanity-check _anywhere_ the test runs.
 
 - [ ] **feature**: run a dump of what VCS we find in path, as part of `--version`

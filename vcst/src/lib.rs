@@ -140,27 +140,32 @@ pub enum VcstQuery {
         // TODO: (feature) implement subcommand here, eg: enum {diffstat, diff, files} (unified
         // with IsClean)
     },
+
+    /// Prints any system/$PATH info that mgiht be useful for debugging issues this binary might
+    /// have onyour system.
+    CheckHealth,
 }
 
 impl VcstQuery {
-    fn dir(&self) -> DirPath {
-        self.dir_path().clone()
+    fn dir(&self) -> Option<DirPath> {
+        self.dir_path().map(|d| d.clone())
     }
 
     // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
     // we can rely on its presence?
-    fn dir_path(&self) -> &DirPath {
+    fn dir_path(&self) -> Option<&DirPath> {
         match self {
             VcstQuery::Brand { dir }
             | VcstQuery::Root { dir }
             | VcstQuery::IsClean { dir }
-            | VcstQuery::DirtyFiles { dir, clean_ok: _ } => dir,
+            | VcstQuery::DirtyFiles { dir, clean_ok: _ } => Some(dir),
+            VcstQuery::CheckHealth => None,
             #[cfg(debug_assertions)]
             VcstQuery::CurrentId { dir, dirty_ok: _ }
             | VcstQuery::CurrentName { dir, dirty_ok: _ }
             | VcstQuery::ParentId { dir }
             | VcstQuery::ParentName { dir, max: _ }
-            | VcstQuery::CurrentFiles { dir, dirty_ok: _ } => dir,
+            | VcstQuery::CurrentFiles { dir, dirty_ok: _ } => Some(dir),
         }
     }
 }
@@ -175,20 +180,25 @@ impl<'a> PlexerQuery<'a> {
     fn new(
         args: &'a VcstArgs,
         stdout: &'a mut dyn io::Write,
-    ) -> Result<PlexerQuery<'a>, VcstError> {
+    ) -> Result<Option<PlexerQuery<'a>>, VcstError> {
         let query = args.reduce()?;
-        let dir = query.dir();
+        let dir = match query.dir() {
+            Some(d) => d,
+            None => {
+                return Ok(None);
+            }
+        };
         if !dir.is_dir() {
             return Err(VcstError::Usage(
                 "dir must be a readable directory".to_string(),
             ));
         }
         let plexer = plexer::Repo::new(&dir)?;
-        Ok(PlexerQuery {
+        Ok(Some(PlexerQuery {
             plexer,
             cli: query,
             stdout,
-        })
+        }))
     }
 
     pub fn handle_query(&mut self) -> Result<u8, VcstError> {
@@ -209,6 +219,7 @@ impl<'a> PlexerQuery<'a> {
                 let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
                 return Ok(u8::from(!is_clean));
             }
+            VcstQuery::CheckHealth => panic!("bug: PlexerQuery() should not be constructed for the generalized CheckHealth query"),
             #[cfg(debug_assertions)]
             VcstQuery::CurrentId {
                 dir: _,
@@ -257,11 +268,32 @@ pub fn vcst_query(args: &VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn 
             return 1;
         }
     };
-    match plexerq.handle_query() {
-        Ok(ret) => ret,
-        Err(e) => {
-            writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
-            1
+    match plexerq {
+        Some(mut pq) => match pq.handle_query() {
+            Ok(ret) => ret,
+            Err(e) => {
+                writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
+                1
+            }
+        },
+        None => {
+            let mut has_fail = false;
+            let reports = plexer::check_health();
+            for report in reports.into_iter() {
+                let message = match &report.health {
+                    Ok(h) => h.stdout.clone(),
+                    Err(e) => e.to_string(),
+                };
+                if report.health.is_err() {
+                    writeln!(stderr, "FAIL: check for {:?}:\n{}", report.brand, message)
+                        .unwrap_or_else(|e| panic!("failed stderr write: {e}"));
+                    has_fail = true;
+                } else {
+                    writeln!(stdout, "PASS: check for {:?}:\n{}", report.brand, message)
+                        .unwrap_or_else(|e| panic!("failed stderr write: {e}"));
+                }
+            }
+            u8::from(has_fail)
         }
     }
 }

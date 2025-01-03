@@ -2,10 +2,11 @@ use crate::adapter::git;
 use crate::adapter::hg;
 use crate::adapter::jj;
 use crate::repo;
-use crate::repo::{AncestorRef, DirPath, Driver, DriverError};
+use crate::repo::{AncestorRef, DirPath, Driver, DriverError, Validator, VcsAvailable};
+use strum::{EnumIter, IntoEnumIterator};
 
 /// The particular brands of VCS this library supports.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, EnumIter, PartialEq)]
 pub enum VcsBrand {
     Git,
     Mercurial,
@@ -37,6 +38,8 @@ impl Repo {
         // error.
         //    if let NotFound = e.kind() { ... }
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
+
+        // TODO: (rust) turn this core body into a for loop over VcsBrand::iter()
 
         let current_attempt = VcsBrand::Git;
         attempts.push(current_attempt.clone());
@@ -72,6 +75,31 @@ impl Repo {
         )
         .into())
     }
+}
+
+pub struct VcsHealth {
+    pub brand: VcsBrand,
+    pub health: Result<VcsAvailable, DriverError>,
+}
+
+pub fn check_health() -> Vec<VcsHealth> {
+    VcsBrand::iter()
+        .map(|brand| match brand {
+            VcsBrand::Git => {
+                let validator: Box<dyn Validator> = Box::from(git::Loader {});
+                (brand, validator.check_health())
+            }
+            VcsBrand::Mercurial => {
+                let validator: Box<dyn Validator> = Box::from(hg::Loader {});
+                (brand, validator.check_health())
+            }
+            VcsBrand::Jujutsu => {
+                let validator: Box<dyn Validator> = Box::from(jj::Loader {});
+                (brand, validator.check_health())
+            }
+        })
+        .map(|(brand, health)| VcsHealth { brand, health })
+        .collect::<Vec<VcsHealth>>()
 }
 
 impl Driver for Repo {

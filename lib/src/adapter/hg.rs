@@ -1,11 +1,24 @@
-use crate::repo::{DirPath, Driver, DriverError, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{DirPath, Driver, DriverError, Validator, VcsAvailable, ERROR_REPO_NOT_DIRTY};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+
+#[derive(Debug)]
+pub struct Loader;
+
+impl Validator for Loader {
+    fn check_health(&self) -> Result<VcsAvailable, DriverError> {
+        let mut cmd = Command::new(VCS_BIN_NAME);
+        cmd.arg("--version");
+        DriverError::expect_cmd_lossy("hg cli: exec".to_string(), cmd.output())
+    }
+}
 
 #[derive(Debug)]
 pub struct Repo {
     dir: DirPath,
 }
+
+static VCS_BIN_NAME: &str = "hg";
 
 impl Repo {
     pub fn new(dir: DirPath) -> Result<Option<Self>, DriverError> {
@@ -29,7 +42,7 @@ impl Repo {
     }
 
     fn start_shellout(&self) -> Command {
-        let mut cmd = Command::new("hg");
+        let mut cmd = Command::new(VCS_BIN_NAME);
         cmd.current_dir(self.dir.clone());
         cmd
     }

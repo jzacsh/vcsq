@@ -217,6 +217,20 @@ pub struct AncestorRef {
     pub distance: u64,
 }
 
+pub type VcsAvailable = Utf8CmdOutputLossy;
+
+/// Operations a VCS driver should be able to answer: is the VCS program even abailel on this
+/// system? Does a directory even look like a valid VCS?.
+pub trait Validator
+where
+    Self: std::fmt::Debug,
+{
+    /// Returns basic info from the underlying VCS, proving its presence on the system, or an error
+    /// if the attempt failed.
+    // TODO: (cleanup) move new() impls here, and delete relevant TODO from Driver
+    fn check_health(&self) -> Result<VcsAvailable, DriverError>;
+}
+
 /// Operations any VCS should be able to answer about a repo, so any proprietary/brand-specific
 /// implementations must implement this driver.
 pub trait Driver
