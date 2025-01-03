@@ -23,6 +23,12 @@ pub struct Repo {
 impl Repo {
     /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
     /// returns a Repo object that can answer further questions about said repo.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DriverError`] if either no VCS driver is present that recognizes the directory,
+    /// or if some critical error happened (like one of the drivers hit an access error to the
+    /// directory, or found something silly like the directory is actually a plain file).
     pub fn new(dir: &DirPath) -> Result<Self, DriverError> {
         let mut attempts = Vec::with_capacity(5);
 

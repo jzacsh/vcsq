@@ -41,6 +41,10 @@ impl DriverError {
     /// underlying CLI produces valid utf8 cntent.
     ///
     /// For a lossy versin of this function see `unwrap_cmd_lossy(...)`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`].
     // TODO: (cleanup) switch all callers to strict handling: use {unwrap,expect}_cmd instead of
     // their lossy counterparts.
     pub fn unwrap_cmd(
@@ -109,6 +113,9 @@ impl DriverError {
     /// Like `expect_cmd_lossy(...)`  but adds the expectation that one stdout line will have been
     /// printed.
     ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if `output` didn't have exactly 1 line of stdout.
     // TODO: (rust) how to make this take _either_ (Utf8CmdOutputLossy, Utf8CmdOutput)? can we
     // reorganize one struct to be a subset of the other?
     // TODO: (codehealth) once the above TODO on type-cleanup is fixed, then redesign other APIs
