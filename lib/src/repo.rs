@@ -132,9 +132,7 @@ impl RepoLoadError {
         }
         Ok(lines
             .last()
-            .ok_or_else(|| {
-                Self::Unknown(format!("unexpectedly returned empty output: {context}"))
-            })?
+            .ok_or_else(|| Self::Unknown(format!("unexpectedly returned empty output: {context}")))?
             .to_string())
     }
 
