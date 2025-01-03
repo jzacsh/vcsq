@@ -29,7 +29,7 @@ workflow:
 stages:
   - build
   - test
-  - coverage
+  - lints
 
 build:cargo:
   stage: build
@@ -38,16 +38,6 @@ build:cargo:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
     - cd vcst && cargo build
-
-test:doc:
-  stage: build
-  needs: ["test:e2e"]
-  interruptible: true
-  script:
-    - rustc --version  # Print version info for debugging
-    - cargo --version  # Print version info for debugging
-    - cd vcst && RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features
-    - cd ../lib && RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features
 
 test:e2e:
   stage: test
@@ -63,8 +53,18 @@ test:e2e:
     - git --version && hg --version && jj --version  # vcst/domain-specific debug info
     - cd vcst && RUSTFLAGS='-D deprecated' cargo test --locked --all-features --all-targets --workspace --verbose -- --nocapture
 
+test:doc:
+  stage: lints
+  needs: ["test:e2e"]
+  interruptible: true
+  script:
+    - rustc --version  # Print version info for debugging
+    - cargo --version  # Print version info for debugging
+    - cd vcst && RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features
+    - cd ../lib && RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features
+
 test:lint:
-  stage: test
+  stage: lints
   needs: ["test:e2e"]
   interruptible: true
   script:
@@ -76,7 +76,7 @@ test:lint:
     - cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
 
 test:cov:
-  stage: coverage
+  stage: lints
   needs: ["test:e2e"]
   interruptible: true
   script:
