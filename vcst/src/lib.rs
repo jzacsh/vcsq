@@ -78,6 +78,7 @@ pub enum VcstQuery {
 
     /// Print the VCS repo's current revision ID (eg: rev in Mercurial, ref in git, etc).
     #[command(arg_required_else_help = true)]
+    #[cfg(debug_assertions)]
     CurrentId {
         dir: DirPath,
 
@@ -88,6 +89,7 @@ pub enum VcstQuery {
     /// Print the VCS repo's current human-readable revision (eg: branch or tag in git, bookmark in
     /// jj)
     #[command(arg_required_else_help = true)]
+    #[cfg(debug_assertions)]
     CurrentName {
         dir: DirPath,
 
@@ -98,12 +100,14 @@ pub enum VcstQuery {
     /// Print the VCS repo's parent revision ID to the current point in history (eg: rev in
     /// Mercurial, ref in git, etc).
     #[command(arg_required_else_help = true)]
+    #[cfg(debug_assertions)]
     ParentId { dir: DirPath },
 
     /// Print the VCS repo's parent revision's human-readable revision name for the first parent it
     /// finds with one, or until it has stepped --max steps. Non-zero exit with no stderr output
     /// indicates one wasn't found.
     #[command(arg_required_else_help = true)]
+    #[cfg(debug_assertions)]
     ParentName {
         dir: DirPath,
 
@@ -124,6 +128,8 @@ pub enum VcstQuery {
     },
 
     /// Prints what files were touched by the `CurrentId`
+    #[command(arg_required_else_help = true)]
+    #[cfg(debug_assertions)]
     CurrentFiles {
         dir: DirPath,
 
@@ -158,11 +164,12 @@ impl VcstQuery {
             VcstQuery::Brand { dir }
             | VcstQuery::Root { dir }
             | VcstQuery::IsClean { dir }
-            | VcstQuery::CurrentId { dir, dirty_ok: _ }
+            | VcstQuery::DirtyFiles { dir, clean_ok: _ } => dir,
+            #[cfg(debug_assertions)]
+            VcstQuery::CurrentId { dir, dirty_ok: _ }
             | VcstQuery::CurrentName { dir, dirty_ok: _ }
             | VcstQuery::ParentId { dir }
             | VcstQuery::ParentName { dir, max: _ }
-            | VcstQuery::DirtyFiles { dir, clean_ok: _ }
             | VcstQuery::CurrentFiles { dir, dirty_ok: _ } => dir,
         }
     }
@@ -213,6 +220,7 @@ impl<'a> PlexerQuery<'a> {
                 let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
                 return Ok(u8::from(!is_clean));
             }
+            #[cfg(debug_assertions)]
             VcstQuery::CurrentId {
                 dir: _,
                 dirty_ok: _,

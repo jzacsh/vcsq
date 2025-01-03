@@ -106,6 +106,10 @@ So to see untested lines, just `^F` for " |0" in the output.
 
 ### TODOs
 
+- [ ] **finish initial features**: see lines in vcst/src/lib.rs disabled in release
+  - try `cargo build --release` to turn these back off
+  - in the meantime: dbug build via: `cargo run --` to run,  `cargo build`
+  build (because they just `todo!()`), via `#[cfg(debug_assertions)]`
 - [x] install jj VCS to $PATH of gitlab ci/cd
 
   - [ ] move `git --version && hg --version && jj --version` from ci/cd yml into
@@ -121,7 +125,7 @@ So to see untested lines, just `^F` for " |0" in the output.
   some of the better alternatives were only added _later_ (eg:
   `RepoLoadError::Stderr`) which could fix some
 - [ ] before releasing....
-  - [ ] flag-guard `todo!()`/`unimplemented!()` blocks for dev/tests only; eg:
+  - [x] flag-guard `todo!()`/`unimplemented!()` blocks for dev/tests only; eg:
   via `#[cfg(debug_assertions)]`
   - [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
   - [x] centralize/codify standards I'm trying to follow, so all "preferences"
