@@ -32,26 +32,29 @@ impl Repo {
         //    if let NotFound = e.kind() { ... }
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
-        attempts.push(VcsBrand::Git);
+        let current_attempt = VcsBrand::Git;
+        attempts.push(current_attempt.clone());
         if let Some(git) = git::Repo::new(dir.clone())? {
             return Ok(Self {
-                brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
+                brand: current_attempt,
                 adapter: Box::from(git),
             });
         }
 
-        attempts.push(VcsBrand::Mercurial);
+        let current_attempt = VcsBrand::Mercurial;
+        attempts.push(current_attempt.clone());
         if let Some(hg) = hg::Repo::new(dir.clone())? {
             return Ok(Self {
-                brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
+                brand: current_attempt,
                 adapter: Box::from(hg),
             });
         }
 
-        attempts.push(VcsBrand::Jujutsu);
+        let current_attempt = VcsBrand::Jujutsu;
+        attempts.push(current_attempt.clone());
         if let Some(jj) = jj::Repo::new(dir.clone())? {
             return Ok(Self {
-                brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
+                brand: current_attempt,
                 adapter: Box::from(jj),
             });
         }
