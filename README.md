@@ -152,6 +152,7 @@ So to see untested lines, just `^F` for " |0" in the output.
     - [x] roll it into above stages (both doc and [ci/cd][rustGitlabCiTempl])
       - [x] in `vcst/` dir
       - [x] in `lib/` dir
+  - [ ] reconsider the version number in Cargo.toml's
 
 [vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github

@@ -95,12 +95,14 @@ pub enum VcstQuery {
         dirty_ok: bool,
     },
 
-    /// Print the VCS repo's current revision ID (eg: rev in Mercurial, ref in git, etc).
+    /// Print the VCS repo's parent revision ID to the current point in history (eg: rev in
+    /// Mercurial, ref in git, etc).
     #[command(arg_required_else_help = true)]
     ParentId { dir: DirPath },
 
-    /// Print the VCS repo's current human-readable revision name for the first parent it finds
-    /// with one, or until it has stepped --max steps.
+    /// Print the VCS repo's parent revision's human-readable revision name for the first parent it
+    /// finds with one, or until it has stepped --max steps. Non-zero exit with no stderr output
+    /// indicates one wasn't found.
     #[command(arg_required_else_help = true)]
     ParentName {
         dir: DirPath,
