@@ -165,21 +165,21 @@ impl From<String> for DriverError {
 /// (eg: branch or tag in git, bookmark in jj).
 ///
 /// These always exist, regardless of the point in history.
-pub type RepoRefId = String;
+pub type HistoryRefId = String;
 
 /// VCS repo's human-readable identifier describing a reference-point in its history (eg: branch or
 /// tag in git, bookmark in jj).
 ///
 /// These generally are sparse in a repo's history, unlike `RepoRefId`.
-pub type RepoRefName = String;
+pub type HistoryRefName = String;
 
 /// Single point in time
-pub struct RepoRef {
+pub struct HistoryRef {
     /// VCS's canonical identifier for this point in the repo's history.
-    pub id: RepoRefId,
+    pub id: HistoryRefId,
 
     /// Hand-written, human-readable name of this point in history, if a human made one.
-    pub name: Option<RepoRefName>,
+    pub name: Option<HistoryRefName>,
 
     /// Whether the repo was dirty when this result was generated (and therefore this isn't a
     /// hermetic description of the repo).
@@ -187,8 +187,8 @@ pub struct RepoRef {
 }
 
 pub struct AncestorRef {
-    pub id: RepoRefId,
-    pub name: RepoRefName,
+    pub id: HistoryRefId,
+    pub name: HistoryRefName,
 
     /// How far back of an ancestor is this (will always be 1 or more).
     // TODO: (rust) there's a type-way to express positive natural numbers, yeah?
@@ -232,15 +232,15 @@ where
     /// Should return an error if repo isn't dirty and not `clean_ok`
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError>;
 
-    fn parent_ref(&self) -> Result<RepoRef, DriverError> {
+    fn parent_ref(&self) -> Result<HistoryRef, DriverError> {
         todo!(); // TODO: default implementation based on implementor's own impls of {parent_ref_id, parent_ref_name}
     }
 
-    fn parent_ref_id(&self) -> Result<RepoRefId, DriverError> {
+    fn parent_ref_id(&self) -> Result<HistoryRefId, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
-    fn parent_ref_name(&self) -> Result<RepoRefName, DriverError> {
+    fn parent_ref_name(&self) -> Result<HistoryRefName, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
@@ -249,13 +249,13 @@ where
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
-    fn current_ref(&self, _dirty_ok: bool) -> Result<RepoRef, DriverError> {
+    fn current_ref(&self, _dirty_ok: bool) -> Result<HistoryRef, DriverError> {
         todo!(); // TODO: default implementation based on implementor's own impls of {current_ref_id, current_ref_name}
     }
-    fn current_ref_id(&self, _dirty_ok: bool) -> Result<RepoRefId, DriverError> {
+    fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
-    fn current_ref_name(&self, _dirty_ok: bool) -> Result<RepoRefName, DriverError> {
+    fn current_ref_name(&self, _dirty_ok: bool) -> Result<HistoryRefName, DriverError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
 }

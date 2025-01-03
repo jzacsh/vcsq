@@ -78,15 +78,15 @@ impl Driver for Repo {
         self.adapter.dirty_files(clean_ok)
     }
 
-    fn parent_ref(&self) -> Result<repo::RepoRef, DriverError> {
+    fn parent_ref(&self) -> Result<repo::HistoryRef, DriverError> {
         self.adapter.parent_ref()
     }
 
-    fn parent_ref_id(&self) -> Result<repo::RepoRefId, DriverError> {
+    fn parent_ref_id(&self) -> Result<repo::HistoryRefId, DriverError> {
         self.adapter.parent_ref_id()
     }
 
-    fn parent_ref_name(&self) -> Result<repo::RepoRefName, DriverError> {
+    fn parent_ref_name(&self) -> Result<repo::HistoryRefName, DriverError> {
         self.adapter.parent_ref_name()
     }
 
@@ -95,13 +95,13 @@ impl Driver for Repo {
         self.adapter.first_ancestor_ref_name(limit)
     }
 
-    fn current_ref(&self, dirty_ok: bool) -> Result<repo::RepoRef, DriverError> {
+    fn current_ref(&self, dirty_ok: bool) -> Result<repo::HistoryRef, DriverError> {
         self.adapter.current_ref(dirty_ok)
     }
-    fn current_ref_id(&self, dirty_ok: bool) -> Result<repo::RepoRefId, DriverError> {
+    fn current_ref_id(&self, dirty_ok: bool) -> Result<repo::HistoryRefId, DriverError> {
         self.adapter.current_ref_id(dirty_ok)
     }
-    fn current_ref_name(&self, dirty_ok: bool) -> Result<repo::RepoRefName, DriverError> {
+    fn current_ref_name(&self, dirty_ok: bool) -> Result<repo::HistoryRefName, DriverError> {
         self.adapter.current_ref_name(dirty_ok)
     }
 }
