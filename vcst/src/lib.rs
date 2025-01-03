@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
-use libvcst::repo::{DirPath, Driver, RepoLoadError};
+use libvcst::repo::{DirPath, Driver, DriverError};
 use std::io;
 use std::path::PathBuf;
 use thiserror::Error;
@@ -28,7 +28,7 @@ enum VcstError {
     Usage(String),
 
     #[error("vcs error: {0}")]
-    Plexing(#[from] RepoLoadError),
+    Plexing(#[from] DriverError),
 
     #[error("{0}")]
     Unknown(String),

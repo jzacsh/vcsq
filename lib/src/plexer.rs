@@ -1,7 +1,7 @@
 use crate::adapter::git::RepoGit;
 use crate::adapter::hg::RepoHg;
 use crate::adapter::jj::RepoJj;
-use crate::repo::{AncestorRef, DirPath, Driver, RepoLoadError, RepoRef, RepoRefId, RepoRefName};
+use crate::repo::{AncestorRef, DirPath, Driver, DriverError, RepoRef, RepoRefId, RepoRefName};
 
 /// The particular brands of VCS this library supports.
 #[derive(Debug, Clone)]
@@ -22,7 +22,7 @@ pub struct RepoPlexer {
 impl RepoPlexer {
     /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
     /// returns a Repo object that can answer further questions about said repo.
-    pub fn new(dir: DirPath) -> Result<RepoPlexer, RepoLoadError> {
+    pub fn new(dir: DirPath) -> Result<RepoPlexer, DriverError> {
         let mut attempts = Vec::with_capacity(5);
 
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
@@ -65,42 +65,42 @@ impl RepoPlexer {
 }
 
 impl Driver for RepoPlexer {
-    fn root(&self) -> Result<DirPath, RepoLoadError> {
+    fn root(&self) -> Result<DirPath, DriverError> {
         self.adapter.root()
     }
 
-    fn is_clean(&self) -> Result<bool, RepoLoadError> {
+    fn is_clean(&self) -> Result<bool, DriverError> {
         self.adapter.is_clean()
     }
 
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError> {
         self.adapter.dirty_files(clean_ok)
     }
 
-    fn parent_ref(&self) -> Result<RepoRef, RepoLoadError> {
+    fn parent_ref(&self) -> Result<RepoRef, DriverError> {
         self.adapter.parent_ref()
     }
 
-    fn parent_ref_id(&self) -> Result<RepoRefId, RepoLoadError> {
+    fn parent_ref_id(&self) -> Result<RepoRefId, DriverError> {
         self.adapter.parent_ref_id()
     }
 
-    fn parent_ref_name(&self) -> Result<RepoRefName, RepoLoadError> {
+    fn parent_ref_name(&self) -> Result<RepoRefName, DriverError> {
         self.adapter.parent_ref_name()
     }
 
     // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
-    fn first_ancestor_ref_name(&self, limit: Option<u64>) -> Result<AncestorRef, RepoLoadError> {
+    fn first_ancestor_ref_name(&self, limit: Option<u64>) -> Result<AncestorRef, DriverError> {
         self.adapter.first_ancestor_ref_name(limit)
     }
 
-    fn current_ref(&self, dirty_ok: bool) -> Result<RepoRef, RepoLoadError> {
+    fn current_ref(&self, dirty_ok: bool) -> Result<RepoRef, DriverError> {
         self.adapter.current_ref(dirty_ok)
     }
-    fn current_ref_id(&self, dirty_ok: bool) -> Result<RepoRefId, RepoLoadError> {
+    fn current_ref_id(&self, dirty_ok: bool) -> Result<RepoRefId, DriverError> {
         self.adapter.current_ref_id(dirty_ok)
     }
-    fn current_ref_name(&self, dirty_ok: bool) -> Result<RepoRefName, RepoLoadError> {
+    fn current_ref_name(&self, dirty_ok: bool) -> Result<RepoRefName, DriverError> {
         self.adapter.current_ref_name(dirty_ok)
     }
 }

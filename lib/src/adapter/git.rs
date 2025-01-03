@@ -1,4 +1,4 @@
-use crate::repo::{DirPath, Driver, RepoLoadError, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{DirPath, Driver, DriverError, ERROR_REPO_NOT_DIRTY};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -15,9 +15,9 @@ impl RepoGit {
     /// ```sh
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
-    pub fn new(dir: DirPath) -> Result<Option<Self>, RepoLoadError> {
+    pub fn new(dir: DirPath) -> Result<Option<Self>, DriverError> {
         let repo = RepoGit { dir };
-        let is_ok = RepoLoadError::unwrap_cmd_lossy(
+        let is_ok = DriverError::unwrap_cmd_lossy(
             "git cli".to_string(),
             repo.git_show_top_level()
                 // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
@@ -54,20 +54,20 @@ impl RepoGit {
 }
 
 impl Driver for RepoGit {
-    fn root(&self) -> Result<DirPath, RepoLoadError> {
-        let output = RepoLoadError::expect_cmd_lossy(
+    fn root(&self) -> Result<DirPath, DriverError> {
+        let output = DriverError::expect_cmd_lossy(
             "git cli".to_string(),
             self.git_show_top_level().output(),
         )?;
-        Ok(PathBuf::from(RepoLoadError::expect_cmd_line(
+        Ok(PathBuf::from(DriverError::expect_cmd_line(
             "git cli".to_string(),
             output,
         )?))
     }
 
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError> {
         let min_lines = if clean_ok { 0 } else { 1 };
-        let lines = RepoLoadError::expect_cmd_lines(
+        let lines = DriverError::expect_cmd_lines(
             self.git_dirty_files().output(),
             min_lines,
             "git cli: exec".to_string(),

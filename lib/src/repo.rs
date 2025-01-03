@@ -10,7 +10,7 @@ pub const ERROR_REPO_NOT_DIRTY: &str = "repo not dirty";
 pub const ERROR_REPO_NONEMPTY_OUTPUT: &str = "unexpectedly returned no lines";
 
 #[derive(Error, Debug)]
-pub enum RepoLoadError {
+pub enum DriverError {
     /// A system-level error, not necessarily related to any VCS, eg: the directory doesn't exist,
     /// or we don't have access to it, etc.
     #[error("directory access issue: {0}")]
@@ -36,7 +36,7 @@ pub enum RepoLoadError {
     Unknown(String),
 }
 
-impl RepoLoadError {
+impl DriverError {
     /// Low-level unwrapping of a command that's strict about its expectations that the
     /// underlying CLI produces valid utf8 cntent.
     ///
@@ -155,9 +155,9 @@ impl RepoLoadError {
     }
 }
 
-impl From<String> for RepoLoadError {
+impl From<String> for DriverError {
     fn from(item: String) -> Self {
-        RepoLoadError::Unknown(item)
+        DriverError::Unknown(item)
     }
 }
 
@@ -217,10 +217,10 @@ where
     // types has lead to fights against object-size knowledge rustc complains about.
 
     /// Prints the root dir of the repo.
-    fn root(&self) -> Result<DirPath, RepoLoadError>;
+    fn root(&self) -> Result<DirPath, DriverError>;
 
     /// Whether repo is in a clean state.
-    fn is_clean(&self) -> Result<bool, RepoLoadError> {
+    fn is_clean(&self) -> Result<bool, DriverError> {
         let dirty_files = self.dirty_files(true /*clean_ok*/)?;
         Ok(dirty_files.is_empty())
     }
@@ -229,32 +229,32 @@ where
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for `IsClean`'s behavior).
     ///
     /// Should return an error if repo isn't dirty and not `clean_ok`
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError>;
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError>;
 
-    fn parent_ref(&self) -> Result<RepoRef, RepoLoadError> {
+    fn parent_ref(&self) -> Result<RepoRef, DriverError> {
         todo!(); // TODO: default implementation based on implementor's own impls of {parent_ref_id, parent_ref_name}
     }
 
-    fn parent_ref_id(&self) -> Result<RepoRefId, RepoLoadError> {
+    fn parent_ref_id(&self) -> Result<RepoRefId, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
-    fn parent_ref_name(&self) -> Result<RepoRefName, RepoLoadError> {
+    fn parent_ref_name(&self) -> Result<RepoRefName, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
     // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
-    fn first_ancestor_ref_name(&self, _limit: Option<u64>) -> Result<AncestorRef, RepoLoadError> {
+    fn first_ancestor_ref_name(&self, _limit: Option<u64>) -> Result<AncestorRef, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
-    fn current_ref(&self, _dirty_ok: bool) -> Result<RepoRef, RepoLoadError> {
+    fn current_ref(&self, _dirty_ok: bool) -> Result<RepoRef, DriverError> {
         todo!(); // TODO: default implementation based on implementor's own impls of {current_ref_id, current_ref_name}
     }
-    fn current_ref_id(&self, _dirty_ok: bool) -> Result<RepoRefId, RepoLoadError> {
+    fn current_ref_id(&self, _dirty_ok: bool) -> Result<RepoRefId, DriverError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
-    fn current_ref_name(&self, _dirty_ok: bool) -> Result<RepoRefName, RepoLoadError> {
+    fn current_ref_name(&self, _dirty_ok: bool) -> Result<RepoRefName, DriverError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
 }

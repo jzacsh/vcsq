@@ -1,4 +1,4 @@
-use crate::repo::{DirPath, Driver, RepoLoadError, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{DirPath, Driver, DriverError, ERROR_REPO_NOT_DIRTY};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -8,10 +8,10 @@ pub struct RepoHg {
 }
 
 impl RepoHg {
-    pub fn new(dir: DirPath) -> Result<Option<Self>, RepoLoadError> {
+    pub fn new(dir: DirPath) -> Result<Option<Self>, DriverError> {
         let repo = RepoHg { dir };
 
-        let is_ok = RepoLoadError::unwrap_cmd_lossy(
+        let is_ok = DriverError::unwrap_cmd_lossy(
             "hg cli".to_string(),
             repo.hg_root()
                 // TODO: (feature) check 'output.stdout' is a non-empty substr of 'dir'
@@ -54,18 +54,18 @@ impl RepoHg {
 }
 
 impl Driver for RepoHg {
-    fn root(&self) -> Result<DirPath, RepoLoadError> {
+    fn root(&self) -> Result<DirPath, DriverError> {
         let output =
-            RepoLoadError::expect_cmd_lossy("hg cli: exec".to_string(), self.hg_root().output())?;
-        Ok(PathBuf::from(RepoLoadError::expect_cmd_line(
+            DriverError::expect_cmd_lossy("hg cli: exec".to_string(), self.hg_root().output())?;
+        Ok(PathBuf::from(DriverError::expect_cmd_line(
             "hg cli".to_string(),
             output,
         )?))
     }
 
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError> {
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError> {
         let min_lines = if clean_ok { 0 } else { 1 };
-        let lines = RepoLoadError::expect_cmd_lines(
+        let lines = DriverError::expect_cmd_lines(
             self.hg_dirty_files().output(),
             min_lines,
             "hg cli: exec".to_string(),
