@@ -52,7 +52,17 @@ test:cov:
     # (and I don't feel like messing with tokens just for the interim).
     # - bash <(curl -s https://codecov.io/bash)
 
-test:cargo:
+test:lint:
+  stage: test
+  script:
+    - rustc --version  # Print version info for debugging
+    - cargo --version  # Print version info for debugging
+    - cargo clippy --version  # Print version info for debugging
+    - cd vcst && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
+    # TODO: uncomment the below
+    # - cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
+
+test:e2e:
   stage: test
   script:
     - rustc --version  # Print version info for debugging

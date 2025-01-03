@@ -241,14 +241,17 @@ impl<'a> PlexerQuery<'a> {
     }
 }
 
-/// Core logic the CLI binary runs, but with injectable deps.
+/// Core logic the CLI binary runs, but with injectable deps; designed fr `main()`'s use-case.
 ///
 /// NOTE: this is separate from main purely so we can e2e (ie: so we can dependency-inject
 /// stdio/stderr, etc. into `PlexerQuery`). For more on e2e testing a rust CLI, see:
 /// - <https://doc.rust-lang.org/book/ch11-03-test-organization.html#integration-tests-for-binary-crates>
 /// - <https://rust-cli.github.io/book/tutorial/testing.html#testing-cli-applications-by-running-them>
+///
+/// # Panics
+/// Should only panic if stderr or stdout writes fail.
 pub fn vcst_query(args: &VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn io::Write) -> u8 {
-    let mut plexerq = match PlexerQuery::new(&args, stdout) {
+    let mut plexerq = match PlexerQuery::new(args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
             writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
