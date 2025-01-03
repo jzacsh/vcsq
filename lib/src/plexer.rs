@@ -82,6 +82,8 @@ pub struct VcsHealth {
     pub health: Result<VcsAvailable, DriverError>,
 }
 
+/// Returns a single all VCS driver's health reports.
+#[must_use]
 pub fn check_health() -> Vec<VcsHealth> {
     VcsBrand::iter()
         .map(|brand| match brand {

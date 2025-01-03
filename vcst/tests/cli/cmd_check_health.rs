@@ -1,4 +1,3 @@
-use crate::libtest::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
 use assert_cmd::Command;
 use predicates::prelude::*;
 

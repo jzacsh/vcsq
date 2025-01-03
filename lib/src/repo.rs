@@ -227,6 +227,10 @@ where
 {
     /// Returns basic info from the underlying VCS, proving its presence on the system, or an error
     /// if the attempt failed.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] in the event the underlying VCS APIs failed
     // TODO: (cleanup) move new() impls here, and delete relevant TODO from Driver
     fn check_health(&self) -> Result<VcsAvailable, DriverError>;
 }

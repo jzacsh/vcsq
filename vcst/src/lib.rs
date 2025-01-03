@@ -148,7 +148,7 @@ pub enum VcstQuery {
 
 impl VcstQuery {
     fn dir(&self) -> Option<DirPath> {
-        self.dir_path().map(|d| d.clone())
+        self.dir_path().cloned()
     }
 
     // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
@@ -182,11 +182,8 @@ impl<'a> PlexerQuery<'a> {
         stdout: &'a mut dyn io::Write,
     ) -> Result<Option<PlexerQuery<'a>>, VcstError> {
         let query = args.reduce()?;
-        let dir = match query.dir() {
-            Some(d) => d,
-            None => {
-                return Ok(None);
-            }
+        let Some(dir) = query.dir() else {
+            return Ok(None);
         };
         if !dir.is_dir() {
             return Err(VcstError::Usage(
@@ -261,41 +258,39 @@ impl<'a> PlexerQuery<'a> {
 /// # Panics
 /// Should only panic if stderr or stdout writes fail.
 pub fn vcst_query(args: &VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn io::Write) -> u8 {
-    let mut plexerq = match PlexerQuery::new(args, stdout) {
+    let plexerq = match PlexerQuery::new(args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
             writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
             return 1;
         }
     };
-    match plexerq {
-        Some(mut pq) => match pq.handle_query() {
+    if let Some(mut pq) = plexerq {
+        return match pq.handle_query() {
             Ok(ret) => ret,
             Err(e) => {
                 writeln!(stderr, "{e}").unwrap_or_else(|_| panic!("failed stderr write of: {e}"));
                 1
             }
-        },
-        None => {
-            let mut has_fail = false;
-            let reports = plexer::check_health();
-            for report in reports.into_iter() {
-                let message = match &report.health {
-                    Ok(h) => h.stdout.clone(),
-                    Err(e) => e.to_string(),
-                };
-                if report.health.is_err() {
-                    writeln!(stderr, "FAIL: check for {:?}:\n{}", report.brand, message)
-                        .unwrap_or_else(|e| panic!("failed stderr write: {e}"));
-                    has_fail = true;
-                } else {
-                    writeln!(stdout, "PASS: check for {:?}:\n{}", report.brand, message)
-                        .unwrap_or_else(|e| panic!("failed stderr write: {e}"));
-                }
-            }
-            u8::from(has_fail)
+        };
+    }
+
+    let mut has_fail = false;
+    for report in plexer::check_health() {
+        let message = match &report.health {
+            Ok(h) => h.stdout.clone(),
+            Err(e) => e.to_string(),
+        };
+        if report.health.is_err() {
+            writeln!(stderr, "FAIL: check for {:?}:\n{}", report.brand, message)
+                .unwrap_or_else(|e| panic!("failed stderr write: {e}"));
+            has_fail = true;
+        } else {
+            writeln!(stdout, "PASS: check for {:?}:\n{}", report.brand, message)
+                .unwrap_or_else(|e| panic!("failed stderr write: {e}"));
         }
     }
+    u8::from(has_fail)
 }
 
 // NOTE: lack of unit tests here, is purely because of the coverage via e2e tests ./tests/
