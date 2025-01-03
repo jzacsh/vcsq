@@ -18,17 +18,21 @@ impl From<Output> for Utf8CmdOutputLossy {
         let status = output.status;
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
         let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-        Self { status, stdout, stderr }
+        Self {
+            status,
+            stdout,
+            stderr,
+        }
     }
 }
 
 impl Utf8CmdOutputLossy {
     pub fn stdout_strings(&self) -> Vec<String> {
-        tty_strings(self.stdout.clone())
+        tty_strings(&self.stdout)
     }
 
     pub fn stderr_strings(&self) -> Vec<String> {
-        tty_strings(self.stderr.clone())
+        tty_strings(&self.stderr)
     }
 }
 
@@ -61,16 +65,16 @@ impl From<Output> for Utf8CmdOutput {
 impl Utf8CmdOutput {
     pub fn stdout_strings(&self) -> Result<Vec<String>, FromUtf8Error> {
         let stdout = <Result<String, FromUtf8Error> as Clone>::clone(&self.stdout)?;
-        Ok(tty_strings(stdout.clone()))
+        Ok(tty_strings(&stdout))
     }
 
     pub fn stderr_strings(&self) -> Result<Vec<String>, FromUtf8Error> {
         let stderr = <Result<String, FromUtf8Error> as Clone>::clone(&self.stderr)?;
-        Ok(tty_strings(stderr.clone()))
+        Ok(tty_strings(&stderr))
     }
 }
 
-fn tty_strings(tty_out: String) -> Vec<String> {
+fn tty_strings(tty_out: &str) -> Vec<String> {
     tty_out
         .lines()
         .map(std::string::ToString::to_string)
