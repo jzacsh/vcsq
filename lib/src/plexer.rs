@@ -1,7 +1,7 @@
 use crate::adapter::git::RepoGit;
 use crate::adapter::hg::RepoHg;
 use crate::adapter::jj::RepoJj;
-use crate::repo::{AncestorRef, DirPath, Repo, RepoLoadError, RepoRef, RepoRefId, RepoRefName};
+use crate::repo::{AncestorRef, DirPath, Driver, RepoLoadError, RepoRef, RepoRefId, RepoRefName};
 
 /// The particular brands of VCS this library supports.
 #[derive(Debug, Clone)]
@@ -16,7 +16,7 @@ pub enum VcsBrand {
 #[derive(Debug)]
 pub struct RepoPlexer {
     pub brand: VcsBrand,
-    adapter: Box<dyn Repo>,
+    adapter: Box<dyn Driver>,
 }
 
 impl RepoPlexer {
@@ -64,7 +64,7 @@ impl RepoPlexer {
     }
 }
 
-impl Repo for RepoPlexer {
+impl Driver for RepoPlexer {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
         self.adapter.root()
     }

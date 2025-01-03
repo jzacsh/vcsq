@@ -1,4 +1,4 @@
-use crate::repo::{DirPath, Repo, RepoLoadError, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{DirPath, Driver, RepoLoadError, ERROR_REPO_NOT_DIRTY};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -47,7 +47,7 @@ impl RepoJj {
     }
 }
 
-impl Repo for RepoJj {
+impl Driver for RepoJj {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
         let output =
             RepoLoadError::expect_cmd_lossy("jj cli".to_string(), self.jj_root().output())?;

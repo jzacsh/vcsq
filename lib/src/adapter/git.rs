@@ -1,4 +1,4 @@
-use crate::repo::{DirPath, Repo, RepoLoadError, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{DirPath, Driver, RepoLoadError, ERROR_REPO_NOT_DIRTY};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -53,7 +53,7 @@ impl RepoGit {
     }
 }
 
-impl Repo for RepoGit {
+impl Driver for RepoGit {
     fn root(&self) -> Result<DirPath, RepoLoadError> {
         let output = RepoLoadError::expect_cmd_lossy(
             "git cli".to_string(),

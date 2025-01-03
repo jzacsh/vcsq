@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer::RepoPlexer;
-use libvcst::repo::{DirPath, Repo, RepoLoadError};
+use libvcst::repo::{DirPath, Driver, RepoLoadError};
 use std::io;
 use std::path::PathBuf;
 use thiserror::Error;

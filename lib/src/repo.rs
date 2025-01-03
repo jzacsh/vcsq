@@ -198,7 +198,7 @@ pub struct AncestorRef {
 }
 
 /// Operations any VCS should be able to answer about a repo.
-pub trait Repo
+pub trait Driver
 where
     Self: std::fmt::Debug,
 {
