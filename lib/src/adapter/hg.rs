@@ -64,7 +64,7 @@ impl Driver for Repo {
     }
 
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError> {
-        let min_lines = if clean_ok { 0 } else { 1 };
+        let min_lines = u8::from(!clean_ok);
         let lines = DriverError::expect_cmd_lines(
             self.hg_dirty_files().output(),
             min_lines,
