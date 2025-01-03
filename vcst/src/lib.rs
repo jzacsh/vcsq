@@ -153,15 +153,15 @@ impl VcstQuery {
     // we can rely on its presence?
     fn dir_path(&self) -> &DirPath {
         match self {
-            VcstQuery::Brand { dir } => dir,
-            VcstQuery::Root { dir } => dir,
-            VcstQuery::IsClean { dir } => dir,
-            VcstQuery::CurrentId { dir, dirty_ok: _ } => dir,
-            VcstQuery::CurrentName { dir, dirty_ok: _ } => dir,
-            VcstQuery::ParentId { dir } => dir,
-            VcstQuery::ParentName { dir, max: _ } => dir,
-            VcstQuery::DirtyFiles { dir, clean_ok: _ } => dir,
-            VcstQuery::CurrentFiles { dir, dirty_ok: _ } => dir,
+            VcstQuery::Brand { dir }
+            | VcstQuery::Root { dir }
+            | VcstQuery::IsClean { dir }
+            | VcstQuery::CurrentId { dir, dirty_ok: _ }
+            | VcstQuery::CurrentName { dir, dirty_ok: _ }
+            | VcstQuery::ParentId { dir }
+            | VcstQuery::ParentName { dir, max: _ }
+            | VcstQuery::DirtyFiles { dir, clean_ok: _ }
+            | VcstQuery::CurrentFiles { dir, dirty_ok: _ } => dir,
         }
     }
 }
@@ -211,13 +211,17 @@ impl PlexerQuery<'_> {
             VcstQuery::CurrentId {
                 dir: _,
                 dirty_ok: _,
-            } => todo!(),
-            VcstQuery::CurrentName {
+            }
+            | VcstQuery::CurrentName {
+                dir: _,
+                dirty_ok: _,
+            }
+            | VcstQuery::ParentId { dir: _ }
+            | VcstQuery::ParentName { dir: _, max: _ }
+            | VcstQuery::CurrentFiles {
                 dir: _,
                 dirty_ok: _,
             } => todo!(),
-            VcstQuery::ParentId { dir: _ } => todo!(),
-            VcstQuery::ParentName { dir: _, max: _ } => todo!(),
             VcstQuery::DirtyFiles { dir: _, clean_ok } => {
                 let dirty_files = self
                     .plexer
@@ -229,10 +233,6 @@ impl PlexerQuery<'_> {
                     });
                 }
             }
-            VcstQuery::CurrentFiles {
-                dir: _,
-                dirty_ok: _,
-            } => todo!(),
         }
         Ok(0)
     }
