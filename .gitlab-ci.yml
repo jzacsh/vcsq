@@ -59,8 +59,7 @@ test:lint:
     - cargo --version  # Print version info for debugging
     - cargo clippy --version  # Print version info for debugging
     - cd vcst && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
-    # TODO: uncomment the below
-    # - cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
+    - cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
 
 test:e2e:
   stage: test

@@ -60,11 +60,11 @@ In a second terminal I ensure the binary is being continuously rebuilt:
 
 ```sh
 $ cd vcst && cargo watch \
-    -x build \
-    -x 'clippy --all --  -W clippy::pedantic -Dwarnings -Ddeprecated' \
-    -s 'cd ../lib && cargo clippy --all --  -W clippy::pedantic -Dwarnings -Ddeprecated' \
-    -x 'doc --all-features' \
-    -s 'cd ../lib && cargo doc --all-features'
+  -x build \
+  -x 'clippy --all --  -W clippy::pedantic -Dwarnings -Ddeprecated' \
+  -s 'cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
+  -x 'doc --all-features' \
+  -s 'cd ../lib && cargo doc --all-features'
 
 # ...
 # can also be tacked onto the previous command via another '-x build' arg at the
@@ -144,14 +144,14 @@ So to see untested lines, just `^F` for " |0" in the output.
       periodically?)
     - [ ] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
     `--no-deps --all-features` for that)
-  - [ ] get to clippy:pedantic level:
-    - [ ] address clippy::pedantic output `cargo clippy --all -- -W
+  - [x] get to clippy:pedantic level:
+    - [x] address clippy::pedantic output `cargo clippy --all -- -W
     clippy::pedantic`
       - [x] in `vcst/` dir
-      - [ ] in `lib/` dir
-    - [ ] roll it into above stages (both doc and [ci/cd][rustGitlabCiTempl])
+      - [x] in `lib/` dir
+    - [x] roll it into above stages (both doc and [ci/cd][rustGitlabCiTempl])
       - [x] in `vcst/` dir
-      - [ ] in `lib/` dir
+      - [x] in `lib/` dir
 
 [vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
