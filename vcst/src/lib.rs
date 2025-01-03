@@ -209,7 +209,7 @@ impl<'a> PlexerQuery<'a> {
             }
             VcstQuery::IsClean { dir: _ } => {
                 let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
-                return Ok(if is_clean { 0 } else { 1 });
+                return Ok(u8::from(!is_clean));
             }
             VcstQuery::CurrentId {
                 dir: _,
