@@ -185,7 +185,7 @@ impl<'a> PlexerQuery<'a> {
                 "dir must be a readable directory".to_string(),
             ));
         }
-        let plexer = plexer::Repo::new(dir)?;
+        let plexer = plexer::Repo::new(&dir)?;
         Ok(PlexerQuery {
             plexer,
             cli: query,
