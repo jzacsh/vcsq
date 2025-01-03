@@ -3,13 +3,13 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 #[derive(Debug)]
-pub struct RepoJj {
+pub struct Repo {
     dir: DirPath,
 }
 
-impl RepoJj {
+impl Repo {
     pub fn new(dir: DirPath) -> Result<Option<Self>, DriverError> {
-        let repo = RepoJj { dir };
+        let repo = Repo { dir };
 
         let is_ok = DriverError::unwrap_cmd_lossy(
             "jj cli".to_string(),
@@ -47,7 +47,7 @@ impl RepoJj {
     }
 }
 
-impl Driver for RepoJj {
+impl Driver for Repo {
     fn root(&self) -> Result<DirPath, DriverError> {
         let output = DriverError::expect_cmd_lossy("jj cli".to_string(), self.jj_root().output())?;
         Ok(PathBuf::from(DriverError::expect_cmd_line(

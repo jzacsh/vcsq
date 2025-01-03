@@ -48,7 +48,7 @@ impl RepoPlexer {
         }
 
         attempts.push(VcsBrand::Jujutsu);
-        if let Some(jj) = jj::RepoJj::new(dir.clone())? {
+        if let Some(jj) = jj::Repo::new(dir.clone())? {
             return Ok(Self {
                 brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(jj),
