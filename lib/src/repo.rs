@@ -195,7 +195,8 @@ pub struct AncestorRef {
     pub distance: u64,
 }
 
-/// Operations any VCS should be able to answer about a repo.
+/// Operations any VCS should be able to answer about a repo, so any proprietary/brand-specific
+/// implementations must implement this driver.
 pub trait Driver
 where
     Self: std::fmt::Debug,
