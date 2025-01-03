@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use libvcst::plexer::RepoPlexer;
+use libvcst::plexer;
 use libvcst::repo::{DirPath, Driver, DriverError};
 use std::io;
 use std::path::PathBuf;
@@ -167,7 +167,7 @@ impl VcstQuery {
 }
 
 struct PlexerQuery<'a> {
-    plexer: RepoPlexer,
+    plexer: plexer::RepoPlexer,
     cli: VcstQuery,
     stdout: &'a mut dyn io::Write,
 }
@@ -185,7 +185,7 @@ impl<'a> PlexerQuery<'a> {
                 "dir must be a readable directory".to_string(),
             ));
         }
-        let plexer = RepoPlexer::new(dir)?;
+        let plexer = plexer::RepoPlexer::new(dir)?;
         Ok(PlexerQuery {
             plexer,
             cli: query,
