@@ -1,7 +1,8 @@
 use crate::adapter::git;
 use crate::adapter::hg;
 use crate::adapter::jj;
-use crate::repo::{AncestorRef, DirPath, Driver, DriverError, RepoRef, RepoRefId, RepoRefName};
+use crate::repo;
+use crate::repo::{AncestorRef, DirPath, Driver, DriverError};
 
 /// The particular brands of VCS this library supports.
 #[derive(Debug, Clone)]
@@ -77,15 +78,15 @@ impl Driver for Repo {
         self.adapter.dirty_files(clean_ok)
     }
 
-    fn parent_ref(&self) -> Result<RepoRef, DriverError> {
+    fn parent_ref(&self) -> Result<repo::RepoRef, DriverError> {
         self.adapter.parent_ref()
     }
 
-    fn parent_ref_id(&self) -> Result<RepoRefId, DriverError> {
+    fn parent_ref_id(&self) -> Result<repo::RepoRefId, DriverError> {
         self.adapter.parent_ref_id()
     }
 
-    fn parent_ref_name(&self) -> Result<RepoRefName, DriverError> {
+    fn parent_ref_name(&self) -> Result<repo::RepoRefName, DriverError> {
         self.adapter.parent_ref_name()
     }
 
@@ -94,13 +95,13 @@ impl Driver for Repo {
         self.adapter.first_ancestor_ref_name(limit)
     }
 
-    fn current_ref(&self, dirty_ok: bool) -> Result<RepoRef, DriverError> {
+    fn current_ref(&self, dirty_ok: bool) -> Result<repo::RepoRef, DriverError> {
         self.adapter.current_ref(dirty_ok)
     }
-    fn current_ref_id(&self, dirty_ok: bool) -> Result<RepoRefId, DriverError> {
+    fn current_ref_id(&self, dirty_ok: bool) -> Result<repo::RepoRefId, DriverError> {
         self.adapter.current_ref_id(dirty_ok)
     }
-    fn current_ref_name(&self, dirty_ok: bool) -> Result<RepoRefName, DriverError> {
+    fn current_ref_name(&self, dirty_ok: bool) -> Result<repo::RepoRefName, DriverError> {
         self.adapter.current_ref_name(dirty_ok)
     }
 }
