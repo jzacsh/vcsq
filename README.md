@@ -116,7 +116,7 @@ So to see untested lines, just `^F` for " |0" in the output.
   - [x] copy `git --version && hg --version && jj --version` from ci/cd yml into
   test harness startup as a sanity-check _anywhere_ the test runs.
 
-- [ ] **feature**: run a dump of what VCS we find in path, as part of `--version`
+- [x] **feature**: run a dump of what VCS we find in path, as part of `--version`
       output, or some place of the sort.
 - [x] cleanup all the CLI string handling (the `String::from_utf8` and
       `expect(.*utf8` references) to use `String::from_utf8_lossy`
