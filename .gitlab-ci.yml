@@ -15,13 +15,16 @@
 # A pipeline is composed of independent jobs that run scripts, grouped into stages.
 # Stages run in sequential order, but jobs within stages run in parallel.
 #
-# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
-
+# Reference for this YAML file: https://docs.gitlab.com/ee/ci/yaml
 
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/rust/tags/
 # https://doc.rust-lang.org/nightly/clippy/continuous_integration/gitlab.html
 image: "rust:latest"
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
 
 stages:
   - build
@@ -30,6 +33,7 @@ stages:
 
 build:cargo:
   stage: build
+  interruptible: true
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
@@ -37,6 +41,8 @@ build:cargo:
 
 test:doc:
   stage: build
+  needs: ["build:cargo"]
+  interruptible: true
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
@@ -45,6 +51,8 @@ test:doc:
 
 test:e2e:
   stage: test
+  needs: ["build:cargo"]
+  interruptible: true
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
@@ -57,6 +65,8 @@ test:e2e:
 
 test:lint:
   stage: test
+  needs: ["build:cargo"]
+  interruptible: true
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
@@ -67,6 +77,8 @@ test:lint:
 
 test:cov:
   stage: coverage
+  needs: ["test:e2e"]
+  interruptible: true
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
