@@ -3,13 +3,13 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 #[derive(Debug)]
-pub struct RepoHg {
+pub struct Repo {
     dir: DirPath,
 }
 
-impl RepoHg {
+impl Repo {
     pub fn new(dir: DirPath) -> Result<Option<Self>, DriverError> {
-        let repo = RepoHg { dir };
+        let repo = Repo { dir };
 
         let is_ok = DriverError::unwrap_cmd_lossy(
             "hg cli".to_string(),
@@ -53,7 +53,7 @@ impl RepoHg {
     }
 }
 
-impl Driver for RepoHg {
+impl Driver for Repo {
     fn root(&self) -> Result<DirPath, DriverError> {
         let output =
             DriverError::expect_cmd_lossy("hg cli: exec".to_string(), self.hg_root().output())?;

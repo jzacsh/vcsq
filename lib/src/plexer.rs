@@ -40,7 +40,7 @@ impl RepoPlexer {
         }
 
         attempts.push(VcsBrand::Mercurial);
-        if let Some(hg) = hg::RepoHg::new(dir.clone())? {
+        if let Some(hg) = hg::Repo::new(dir.clone())? {
             return Ok(Self {
                 brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(hg),
