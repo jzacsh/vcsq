@@ -235,7 +235,7 @@ mod vcs_test_setup {
         let cli_output = Command::new(cmd)
             .args(&args)
             .stdout(Stdio::null())
-            .current_dir(&tmpdir_root)
+            .current_dir(tmpdir_root)
             .output()
             .map_err(|source| TestSetupError::System {
                 context: context_map(),
