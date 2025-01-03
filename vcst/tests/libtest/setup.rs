@@ -191,8 +191,7 @@ impl TestDirs {
         use std::process::exit;
 
         test_scope.setup_idempotence.call_once(|| {
-            let tmpdir_root =
-                mktemp(TESTDIR_TMPDIR_ROOT, test_scope).expect("setting up test dir");
+            let tmpdir_root = mktemp(TESTDIR_TMPDIR_ROOT, test_scope).expect("setting up test dir");
             eprintln!("SETUP: {:?}", tmpdir_root.clone());
             match TestDirs::create(&tmpdir_root) {
                 Ok(()) => {}
@@ -210,7 +209,7 @@ impl TestDirs {
     }
 }
 
-pub mod vcs_test_setup {
+mod vcs_test_setup {
     use super::TestSetupError;
     use super::{
         TEST_VCS_BASENAME_GIT, TEST_VCS_BASENAME_HG, TEST_VCS_BASENAME_JJ,
@@ -311,9 +310,7 @@ fn env_dir_or_tmp(env_var: &str) -> Result<PathBuf, String> {
     match env::var(env_var) {
         Ok(d) => Ok(PathBuf::from(d)),
         Err(e) => match e {
-            VarError::NotUnicode(source) => {
-                Err(source.to_string_lossy().to_string())
-            }
+            VarError::NotUnicode(source) => Err(source.to_string_lossy().to_string()),
             VarError::NotPresent => Ok(env::temp_dir()),
         },
     }
