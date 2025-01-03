@@ -1,6 +1,6 @@
-use crate::adapter::git::RepoGit;
-use crate::adapter::hg::RepoHg;
-use crate::adapter::jj::RepoJj;
+use crate::adapter::git;
+use crate::adapter::hg;
+use crate::adapter::jj;
 use crate::repo::{AncestorRef, DirPath, Driver, DriverError, RepoRef, RepoRefId, RepoRefName};
 
 /// The particular brands of VCS this library supports.
@@ -32,7 +32,7 @@ impl RepoPlexer {
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
         attempts.push(VcsBrand::Git);
-        if let Some(git) = RepoGit::new(dir.clone())? {
+        if let Some(git) = git::RepoGit::new(dir.clone())? {
             return Ok(Self {
                 brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(git),
@@ -40,7 +40,7 @@ impl RepoPlexer {
         }
 
         attempts.push(VcsBrand::Mercurial);
-        if let Some(hg) = RepoHg::new(dir.clone())? {
+        if let Some(hg) = hg::RepoHg::new(dir.clone())? {
             return Ok(Self {
                 brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(hg),
@@ -48,7 +48,7 @@ impl RepoPlexer {
         }
 
         attempts.push(VcsBrand::Jujutsu);
-        if let Some(jj) = RepoJj::new(dir.clone())? {
+        if let Some(jj) = jj::RepoJj::new(dir.clone())? {
             return Ok(Self {
                 brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(jj),
