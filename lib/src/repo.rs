@@ -246,17 +246,17 @@ where
     }
 
     // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
-    fn first_ancestor_ref_name(&self, limit: Option<u64>) -> Result<AncestorRef, RepoLoadError> {
+    fn first_ancestor_ref_name(&self, _limit: Option<u64>) -> Result<AncestorRef, RepoLoadError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
-    fn current_ref(&self, dirty_ok: bool) -> Result<RepoRef, RepoLoadError> {
+    fn current_ref(&self, _dirty_ok: bool) -> Result<RepoRef, RepoLoadError> {
         todo!(); // TODO: default implementation based on implementor's own impls of {current_ref_id, current_ref_name}
     }
-    fn current_ref_id(&self, dirty_ok: bool) -> Result<RepoRefId, RepoLoadError> {
+    fn current_ref_id(&self, _dirty_ok: bool) -> Result<RepoRefId, RepoLoadError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
-    fn current_ref_name(&self, dirty_ok: bool) -> Result<RepoRefName, RepoLoadError> {
+    fn current_ref_name(&self, _dirty_ok: bool) -> Result<RepoRefName, RepoLoadError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
 }
