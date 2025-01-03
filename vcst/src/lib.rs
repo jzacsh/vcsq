@@ -167,7 +167,7 @@ impl VcstQuery {
 }
 
 struct PlexerQuery<'a> {
-    plexer: plexer::RepoPlexer,
+    plexer: plexer::Repo,
     cli: VcstQuery,
     stdout: &'a mut dyn io::Write,
 }
@@ -185,7 +185,7 @@ impl<'a> PlexerQuery<'a> {
                 "dir must be a readable directory".to_string(),
             ));
         }
-        let plexer = plexer::RepoPlexer::new(dir)?;
+        let plexer = plexer::Repo::new(dir)?;
         Ok(PlexerQuery {
             plexer,
             cli: query,

@@ -14,15 +14,15 @@ pub enum VcsBrand {
 /// Multiplexes all available VCS adapters into one interface so you don't have to figure out which
 /// VCS you're interacting with in order to start asking `repo::Repo` questions.
 #[derive(Debug)]
-pub struct RepoPlexer {
+pub struct Repo {
     pub brand: VcsBrand,
     adapter: Box<dyn Driver>,
 }
 
-impl RepoPlexer {
+impl Repo {
     /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
     /// returns a Repo object that can answer further questions about said repo.
-    pub fn new(dir: DirPath) -> Result<RepoPlexer, DriverError> {
+    pub fn new(dir: DirPath) -> Result<Repo, DriverError> {
         let mut attempts = Vec::with_capacity(5);
 
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
@@ -64,7 +64,7 @@ impl RepoPlexer {
     }
 }
 
-impl Driver for RepoPlexer {
+impl Driver for Repo {
     fn root(&self) -> Result<DirPath, DriverError> {
         self.adapter.root()
     }
