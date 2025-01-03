@@ -59,6 +59,11 @@ impl DriverError {
     /// unpacks the stderr into an `Err()` case for you.
     ///
     /// For a lossy version of this function see `expect_cmd_lossy(...)`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the the
+    /// stderr of `cmd_output` if the command actually exited non-zero.
     pub fn expect_cmd(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -83,6 +88,11 @@ impl DriverError {
     ///
     /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
     /// `unwrap_cmd(...)`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`]. Does not check
+    /// error state of the command thoguh (ese `expect_` variatns of this API for that)..
     pub fn unwrap_cmd_lossy(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -96,6 +106,11 @@ impl DriverError {
     ///
     /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
     /// `expect_cmd(...)`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the the
+    /// stderr of `cmd_output` if the command actually exited non-zero.
     pub fn expect_cmd_lossy(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -137,6 +152,12 @@ impl DriverError {
             .to_string())
     }
 
+    /// Like `expect_cmd_line(...)`  but might expect lines depeneding on `min_lines`, and doesn't
+    /// care about the command's exit status.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if `output` had less than `min_lines` to stdout.
     // TODO: (rust) idiomatic api is probably Iter<> of String, not Vec? try to fix that here
     pub fn expect_cmd_lines(
         output: std::io::Result<Output>,
@@ -174,7 +195,7 @@ pub type HistoryRefId = String;
 /// These generally are sparse in a repo's history, unlike `RepoRefId`.
 pub type HistoryRefName = String;
 
-/// Single point in time
+/// Single point in time in the Repo's history.
 pub struct HistoryRef {
     /// VCS's canonical identifier for this point in the repo's history.
     pub id: HistoryRefId,
@@ -219,44 +240,111 @@ where
     // types has lead to fights against object-size knowledge rustc complains about.
 
     /// Prints the root dir of the repo.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed.
     fn root(&self) -> Result<DirPath, DriverError>;
 
     /// Whether repo is in a clean state.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed.
     fn is_clean(&self) -> Result<bool, DriverError> {
         let dirty_files = self.dirty_files(true /*clean_ok*/)?;
         Ok(dirty_files.is_empty())
     }
 
-    /// Lists filepaths touched that are the cause of the repo being dirty, or (assuming `clean_ok`) simply lists no output is
-    /// the repo isn't dirty (thus can be used as a 1:1 proxy for `IsClean`'s behavior).
+    /// Lists filepaths touched that are the cause of the repo being dirty, or (assuming
+    /// `clean_ok`) simply lists no output is the repo isn't dirty (thus can be used as a 1:1 proxy
+    /// for `IsClean`'s behavior).
     ///
-    /// Should return an error if repo isn't dirty and not `clean_ok`
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed. Will also return this error if repo wasn't even dirty (unless `clean_ok`
+    /// in which case an empty vector will be returned).
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError>;
 
+    /// Returns the historical reference of the direct ancestor of the current state.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed.
     fn parent_ref(&self) -> Result<HistoryRef, DriverError> {
         todo!(); // TODO: default implementation based on implementor's own impls of {parent_ref_id, parent_ref_name}
     }
 
+    /// Thin wrapper for `parent_ref` that just unpacks the ID.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed.
     fn parent_ref_id(&self) -> Result<HistoryRefId, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
-    fn parent_ref_name(&self) -> Result<HistoryRefName, DriverError> {
+    /// Thin wrapper for `parent_ref()` that just unpacks the name if there is one.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed.
+    fn parent_ref_name(&self) -> Result<Option<HistoryRefName>, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
+    /// Walks up the ancestor history and returns the first encountered ref that has a
+    /// human-made name. None return indicates a name doesn't exist on any of the ancestor refs, or
+    /// none were seen before `limit` was steps-back were taken in history.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed.
     // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
-    fn first_ancestor_ref_name(&self, _limit: Option<u64>) -> Result<AncestorRef, DriverError> {
+    fn first_ancestor_ref_name(
+        &self,
+        _limit: Option<u64>,
+    ) -> Result<Option<AncestorRef>, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }
 
+    /// Returns the VCS ref for the current point in history.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed. Unless `dirty_ok`, then an error is returned when the repo is in a dirty
+    /// state (as a reference for the current state is inherently not a reliable identifier).
     fn current_ref(&self, _dirty_ok: bool) -> Result<HistoryRef, DriverError> {
         todo!(); // TODO: default implementation based on implementor's own impls of {current_ref_id, current_ref_name}
     }
+
+    /// Thin wrapper for `current_ref()` that just unpacks the name if there is one.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed. Unless `dirty_ok`, then an error is returned when the repo is in a dirty
+    /// state (as a reference for the current state is inherently not a reliable identifier).
     fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
-    fn current_ref_name(&self, _dirty_ok: bool) -> Result<HistoryRefName, DriverError> {
+
+    /// Thin wrapper for `current_ref()` that just unpacks the name if there is one.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed. Unless `dirty_ok`, then an error is returned when the repo is in a dirty
+    /// state (as a reference for the current state is inherently not a reliable identifier).
+    fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
         todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
     }
 }

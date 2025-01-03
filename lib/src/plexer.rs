@@ -95,12 +95,15 @@ impl Driver for Repo {
         self.adapter.parent_ref_id()
     }
 
-    fn parent_ref_name(&self) -> Result<repo::HistoryRefName, DriverError> {
+    fn parent_ref_name(&self) -> Result<Option<repo::HistoryRefName>, DriverError> {
         self.adapter.parent_ref_name()
     }
 
     // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
-    fn first_ancestor_ref_name(&self, limit: Option<u64>) -> Result<AncestorRef, DriverError> {
+    fn first_ancestor_ref_name(
+        &self,
+        limit: Option<u64>,
+    ) -> Result<Option<AncestorRef>, DriverError> {
         self.adapter.first_ancestor_ref_name(limit)
     }
 
@@ -110,7 +113,10 @@ impl Driver for Repo {
     fn current_ref_id(&self, dirty_ok: bool) -> Result<repo::HistoryRefId, DriverError> {
         self.adapter.current_ref_id(dirty_ok)
     }
-    fn current_ref_name(&self, dirty_ok: bool) -> Result<repo::HistoryRefName, DriverError> {
+    fn current_ref_name(
+        &self,
+        dirty_ok: bool,
+    ) -> Result<Option<repo::HistoryRefName>, DriverError> {
         self.adapter.current_ref_name(dirty_ok)
     }
 }
