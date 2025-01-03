@@ -258,17 +258,17 @@ mod vcs_test_setup {
     }
 
     fn setup_temp_repo_git(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
-        run_cli_from_tempdir("git", &vec!["init", TEST_VCS_BASENAME_GIT], tmpdir_root)
+        run_cli_from_tempdir("git", &["init", TEST_VCS_BASENAME_GIT], tmpdir_root)
     }
 
     fn setup_temp_repo_hg(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
-        run_cli_from_tempdir("hg", &vec!["init", TEST_VCS_BASENAME_HG], tmpdir_root)
+        run_cli_from_tempdir("hg", &["init", TEST_VCS_BASENAME_HG], tmpdir_root)
     }
 
     fn setup_temp_repo_jj(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
         run_cli_from_tempdir(
             "jj",
-            &vec!["git", "init", TEST_VCS_BASENAME_JJ],
+            &["git", "init", TEST_VCS_BASENAME_JJ],
             tmpdir_root,
         )
     }
