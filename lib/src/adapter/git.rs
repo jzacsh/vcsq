@@ -79,9 +79,7 @@ impl Repo for RepoGit {
                 // first 3 chars are modification-indicators like "?? " to indicate the file is
                 // untracked.
                 ln.chars()
-                    .into_iter()
                     .skip(3)
-                    .into_iter()
                     .collect::<String>()
             })
             .map(PathBuf::from)
