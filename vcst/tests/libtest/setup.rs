@@ -282,12 +282,12 @@ mod vcs_test_setup {
         Ok(())
     }
 
-    fn setup_temp_plainfile(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
+    fn setup_temp_plainfile(tmpdir_root: &Path) -> Result<(), TestSetupError> {
         use super::make_test_temp::touch;
 
-        let mut plain_file = tmpdir_root.clone();
+        let mut plain_file = tmpdir_root.to_path_buf();
         plain_file.push(TEST_VCS_BASENAME_NONDIR);
-        touch(plain_file.as_path())
+        touch(&plain_file)
     }
     /// Creates new temp directories on disk.
     pub fn setup_temp_repos(tmpdir_root: &Path) -> Result<(), TestSetupError> {
@@ -295,7 +295,7 @@ mod vcs_test_setup {
         setup_temp_repo_hg(&tmpdir_root.to_path_buf())?;
         setup_temp_repo_jj(&tmpdir_root.to_path_buf())?;
         setup_temp_nonvcs_dir(tmpdir_root.to_path_buf())?;
-        setup_temp_plainfile(&tmpdir_root.to_path_buf())?;
+        setup_temp_plainfile(tmpdir_root)?;
         Ok(())
     }
 }
