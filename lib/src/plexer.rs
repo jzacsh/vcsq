@@ -23,7 +23,7 @@ pub struct Repo {
 impl Repo {
     /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
     /// returns a Repo object that can answer further questions about said repo.
-    pub fn new(dir: DirPath) -> Result<Repo, DriverError> {
+    pub fn new(dir: DirPath) -> Result<Self, DriverError> {
         let mut attempts = Vec::with_capacity(5);
 
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
