@@ -20,6 +20,7 @@
 
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/rust/tags/
+# https://doc.rust-lang.org/nightly/clippy/continuous_integration/gitlab.html
 image: "rust:latest"
 
 stages:
@@ -57,6 +58,7 @@ test:lint:
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
+    - rustup component add clippy # install clippy
     - cargo clippy --version  # Print version info for debugging
     - cd vcst && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
     - cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
