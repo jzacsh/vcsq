@@ -221,19 +221,19 @@ mod vcs_test_setup {
 
     fn run_cli_from_tempdir(
         cmd: &str,
-        args: Vec<&str>,
+        args: &[&str],
         tmpdir_root: &PathBuf,
     ) -> Result<(), TestSetupError> {
         let context_map = || {
             format!(
                 "`{} {:?}` at {}",
                 &cmd,
-                &args,
+                args,
                 &tmpdir_root.to_string_lossy()
             )
         };
         let cli_output = Command::new(cmd)
-            .args(&args)
+            .args(args)
             .stdout(Stdio::null())
             .current_dir(tmpdir_root)
             .output()
@@ -258,15 +258,19 @@ mod vcs_test_setup {
     }
 
     fn setup_temp_repo_git(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
-        run_cli_from_tempdir("git", vec!["init", TEST_VCS_BASENAME_GIT], tmpdir_root)
+        run_cli_from_tempdir("git", &vec!["init", TEST_VCS_BASENAME_GIT], tmpdir_root)
     }
 
     fn setup_temp_repo_hg(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
-        run_cli_from_tempdir("hg", vec!["init", TEST_VCS_BASENAME_HG], tmpdir_root)
+        run_cli_from_tempdir("hg", &vec!["init", TEST_VCS_BASENAME_HG], tmpdir_root)
     }
 
     fn setup_temp_repo_jj(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
-        run_cli_from_tempdir("jj", vec!["git", "init", TEST_VCS_BASENAME_JJ], tmpdir_root)
+        run_cli_from_tempdir(
+            "jj",
+            &vec!["git", "init", TEST_VCS_BASENAME_JJ],
+            tmpdir_root,
+        )
     }
 
     fn setup_temp_nonvcs_dir(mut tmpdir_root: PathBuf) -> Result<(), TestSetupError> {
