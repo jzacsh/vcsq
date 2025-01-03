@@ -76,9 +76,7 @@ impl Repo for RepoHg {
             .map(|ln| {
                 // first 2 chars are modification-indicators like "?? " to indicate the file is
                 // untracked.
-                ln.chars()
-                    .skip(2)
-                    .collect::<String>()
+                ln.chars().skip(2).collect::<String>()
             })
             .map(PathBuf::from)
             .collect();
