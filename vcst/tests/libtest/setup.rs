@@ -223,7 +223,7 @@ pub mod vcs_test_setup {
     fn run_cli_from_tempdir(
         cmd: &str,
         args: Vec<&str>,
-        tmpdir_root: PathBuf,
+        tmpdir_root: &PathBuf,
     ) -> Result<(), TestSetupError> {
         let context_map = || {
             format!(
@@ -258,15 +258,15 @@ pub mod vcs_test_setup {
         })
     }
 
-    fn setup_temp_repo_git(tmpdir_root: PathBuf) -> Result<(), TestSetupError> {
+    fn setup_temp_repo_git(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
         run_cli_from_tempdir("git", vec!["init", TEST_VCS_BASENAME_GIT], tmpdir_root)
     }
 
-    fn setup_temp_repo_hg(tmpdir_root: PathBuf) -> Result<(), TestSetupError> {
+    fn setup_temp_repo_hg(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
         run_cli_from_tempdir("hg", vec!["init", TEST_VCS_BASENAME_HG], tmpdir_root)
     }
 
-    fn setup_temp_repo_jj(tmpdir_root: PathBuf) -> Result<(), TestSetupError> {
+    fn setup_temp_repo_jj(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
         run_cli_from_tempdir("jj", vec!["git", "init", TEST_VCS_BASENAME_JJ], tmpdir_root)
     }
 
@@ -283,7 +283,7 @@ pub mod vcs_test_setup {
         Ok(())
     }
 
-    fn setup_temp_plainfile(tmpdir_root: PathBuf) -> Result<(), TestSetupError> {
+    fn setup_temp_plainfile(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
         use super::make_test_temp::touch;
 
         let mut plain_file = tmpdir_root.clone();
@@ -292,11 +292,11 @@ pub mod vcs_test_setup {
     }
     /// Creates new temp directories on disk.
     pub fn setup_temp_repos(tmpdir_root: &Path) -> Result<(), TestSetupError> {
-        setup_temp_repo_git(tmpdir_root.to_path_buf())?;
-        setup_temp_repo_hg(tmpdir_root.to_path_buf())?;
-        setup_temp_repo_jj(tmpdir_root.to_path_buf())?;
+        setup_temp_repo_git(&tmpdir_root.to_path_buf())?;
+        setup_temp_repo_hg(&tmpdir_root.to_path_buf())?;
+        setup_temp_repo_jj(&tmpdir_root.to_path_buf())?;
         setup_temp_nonvcs_dir(tmpdir_root.to_path_buf())?;
-        setup_temp_plainfile(tmpdir_root.to_path_buf())?;
+        setup_temp_plainfile(&tmpdir_root.to_path_buf())?;
         Ok(())
     }
 }
