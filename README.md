@@ -124,25 +124,25 @@ So to see untested lines, just `^F` for " |0" in the output.
   - [ ] flag-guard `todo!()`/`unimplemented!()` blocks for dev/tests only; eg:
   via `#[cfg(debug_assertions)]`
   - [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
-  - [ ] centralize/codify standards I'm trying to follow, so all "preferences"
+  - [x] centralize/codify standards I'm trying to follow, so all "preferences"
   are automated:
-    - [ ] get local test/build/watch command that will error when clippy isn't
+    - [x] get local test/build/watch command that will error when clippy isn't
     happy (and document that in the Development instructions above with another
     `-x ...` on the recommended watch line); ie: something that will _error out_
     when either vcst/ or lib/ cause any output from `cargo clippy` (and then
     codify the tip: "maybe just run `cargo clippy --allow-no-vcs --fix`" into readme).
-      - [ ] eval options:
+      - [x] eval options:
         - `cargo fmt --check` seems to be a thing
-      - [ ] ci/cd clippy: get [gitlab ci][rustGitlabCiTempl] to do the above and
+      - [x] ci/cd clippy: get [gitlab ci][rustGitlabCiTempl] to do the above and
       report on failures.
-    - [ ] get local test/build/watch command that will _report_ coverage status
-      - [ ] ci/cd: get [gitlab ci][rustGitlabCiTempl] to do the above and report
+    - [x] get local test/build/watch command that will _report_ coverage status
+      - [x] ci/cd: get [gitlab ci][rustGitlabCiTempl] to do the above and report
       on a health-status on this. find out what the SLA is for this reporting
       (do you need to save it locally somehwo to have good guarantees? or will
       it be around for a longtime in the gitlab CI pipeline? are their generic
       solutions for updating this sort of history directly into the repo
       periodically?)
-    - [ ] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
+    - [x] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
     `--no-deps --all-features` for that)
   - [x] get to clippy:pedantic level:
     - [x] address clippy::pedantic output `cargo clippy --all -- -W
