@@ -2,7 +2,6 @@ use clap::{Parser, Subcommand};
 use libvcst::plexer;
 use libvcst::repo::{DirPath, Driver, DriverError};
 use std::io;
-use std::path::PathBuf;
 use thiserror::Error;
 
 #[derive(Parser, Debug)]
@@ -144,17 +143,8 @@ pub enum VcstQuery {
 }
 
 impl VcstQuery {
-    fn dir(&self) -> Result<String, VcstError> {
-        Ok(self
-            .dir_path()
-            .to_str()
-            .ok_or_else(|| {
-                VcstError::Usage(format!(
-                    "invalid unicode found in dir: {:?}",
-                    self.dir_path()
-                ))
-            })?
-            .to_string())
+    fn dir(&self) -> Option<DirPath> {
+        Some(self.dir_path().to_path_buf())
     }
 
     // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
@@ -187,8 +177,9 @@ impl<'a> PlexerQuery<'a> {
         stdout: &'a mut dyn io::Write,
     ) -> Result<PlexerQuery<'a>, VcstError> {
         let query = args.reduce()?;
-        let dir: String = query.dir()?;
-        let dir: DirPath = PathBuf::from(dir);
+        let dir = query.dir().ok_or(VcstError::Usage(
+            "bug: dir missing (clap should've caught/errored on this already)".into(),
+        ))?;
         if !dir.is_dir() {
             return Err(VcstError::Usage(
                 "dir must be a readable directory".to_string(),
