@@ -51,8 +51,7 @@ impl Driver for Repo {
     fn root(&self) -> Result<DirPath, DriverError> {
         let output = DriverError::expect_cmd_lossy("jj cli".to_string(), self.jj_root().output())?;
         Ok(PathBuf::from(DriverError::expect_cmd_line(
-            "jj cli".to_string(),
-            output,
+            "jj cli", &output,
         )?))
     }
 
@@ -61,7 +60,7 @@ impl Driver for Repo {
         let lines = DriverError::expect_cmd_lines(
             self.jj_dirty_files().output(),
             min_lines,
-            "jj cli: exec".to_string(),
+            "jj cli: exec",
             Some(ERROR_REPO_NOT_DIRTY.to_string()),
         )?;
         let dirty_files = lines.into_iter().map(PathBuf::from).collect();

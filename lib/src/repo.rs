@@ -47,10 +47,7 @@ impl DriverError {
         context: String,
         cmd_output: std::io::Result<Output>,
     ) -> Result<Utf8CmdOutput, Self> {
-        let output = cmd_output.map_err(|e| Self::Command {
-            context: context.clone(),
-            source: e,
-        })?;
+        let output = cmd_output.map_err(|e| Self::Command { context, source: e })?;
         Ok(Utf8CmdOutput::from(output))
     }
 
@@ -65,7 +62,7 @@ impl DriverError {
         let utf8_output = Self::unwrap_cmd(context.clone(), cmd_output)?;
         if !utf8_output.status.success() {
             return Err(Self::Stderr {
-                context: context.clone(),
+                context,
                 stderr: utf8_output.stderr.map_err(|e| {
                     format!(
                         "bad utf8 from stderr: {}; lossy conversion: {}",
@@ -86,10 +83,7 @@ impl DriverError {
         context: String,
         cmd_output: std::io::Result<Output>,
     ) -> Result<Utf8CmdOutputLossy, Self> {
-        let output = cmd_output.map_err(|e| Self::Command {
-            context: context.clone(),
-            source: e,
-        })?;
+        let output = cmd_output.map_err(|e| Self::Command { context, source: e })?;
         Ok(Utf8CmdOutputLossy::from(output))
     }
 
@@ -105,7 +99,7 @@ impl DriverError {
         let utf8_output = Self::unwrap_cmd_lossy(context.clone(), cmd_output)?;
         if !utf8_output.status.success() {
             return Err(Self::Stderr {
-                context: context.clone(),
+                context,
                 stderr: utf8_output.stderr,
             });
         }
@@ -120,7 +114,7 @@ impl DriverError {
     // TODO: (codehealth) once the above TODO on type-cleanup is fixed, then redesign other APIs
     // above to be less all-in-one (they should accept the Utf8*Output* APIs, not generate them
     // internally).
-    pub fn expect_cmd_line(context: String, output: Utf8CmdOutputLossy) -> Result<String, Self> {
+    pub fn expect_cmd_line(context: &str, output: &Utf8CmdOutputLossy) -> Result<String, Self> {
         let lines = output.stdout_strings();
         if lines.len() > 1 {
             return Err(Self::Unknown(format!(
@@ -140,10 +134,10 @@ impl DriverError {
     pub fn expect_cmd_lines(
         output: std::io::Result<Output>,
         min_lines: u8,
-        context: String,
+        context: &str,
         expect_msg: Option<String>,
     ) -> Result<Vec<String>, Self> {
-        let lines = Self::expect_cmd_lossy(context.clone(), output)?.stdout_strings();
+        let lines = Self::expect_cmd_lossy(context.to_string(), output)?.stdout_strings();
         if lines.len() < min_lines.into() {
             return Err(Self::Unknown(format!(
                 "{}: {}",

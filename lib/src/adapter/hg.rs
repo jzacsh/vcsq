@@ -58,8 +58,7 @@ impl Driver for Repo {
         let output =
             DriverError::expect_cmd_lossy("hg cli: exec".to_string(), self.hg_root().output())?;
         Ok(PathBuf::from(DriverError::expect_cmd_line(
-            "hg cli".to_string(),
-            output,
+            "hg cli", &output,
         )?))
     }
 
@@ -68,7 +67,7 @@ impl Driver for Repo {
         let lines = DriverError::expect_cmd_lines(
             self.hg_dirty_files().output(),
             min_lines,
-            "hg cli: exec".to_string(),
+            "hg cli: exec",
             Some(ERROR_REPO_NOT_DIRTY.to_string()),
         )?;
         let dirty_files = lines

@@ -60,8 +60,7 @@ impl Driver for Repo {
             self.git_show_top_level().output(),
         )?;
         Ok(PathBuf::from(DriverError::expect_cmd_line(
-            "git cli".to_string(),
-            output,
+            "git cli", &output,
         )?))
     }
 
@@ -70,7 +69,7 @@ impl Driver for Repo {
         let lines = DriverError::expect_cmd_lines(
             self.git_dirty_files().output(),
             min_lines,
-            "git cli: exec".to_string(),
+            "git cli: exec",
             Some(ERROR_REPO_NOT_DIRTY.to_string()),
         )?;
         let dirty_files = lines
