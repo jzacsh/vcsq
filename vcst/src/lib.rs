@@ -143,8 +143,8 @@ pub enum VcstQuery {
 }
 
 impl VcstQuery {
-    fn dir(&self) -> Option<DirPath> {
-        Some(self.dir_path().to_path_buf())
+    fn dir(&self) -> DirPath {
+        self.dir_path().clone()
     }
 
     // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
@@ -177,9 +177,7 @@ impl<'a> PlexerQuery<'a> {
         stdout: &'a mut dyn io::Write,
     ) -> Result<PlexerQuery<'a>, VcstError> {
         let query = args.reduce()?;
-        let dir = query.dir().ok_or(VcstError::Usage(
-            "bug: dir missing (clap should've caught/errored on this already)".into(),
-        ))?;
+        let dir = query.dir();
         if !dir.is_dir() {
             return Err(VcstError::Usage(
                 "dir must be a readable directory".to_string(),
