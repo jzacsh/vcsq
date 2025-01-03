@@ -32,7 +32,7 @@ impl RepoPlexer {
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
         attempts.push(VcsBrand::Git);
-        if let Some(git) = git::RepoGit::new(dir.clone())? {
+        if let Some(git) = git::Repo::new(dir.clone())? {
             return Ok(Self {
                 brand: attempts.last().expect("bug: just pushed vcs enum").clone(),
                 adapter: Box::from(git),

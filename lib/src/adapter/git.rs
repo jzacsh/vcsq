@@ -3,11 +3,11 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 #[derive(Debug)]
-pub struct RepoGit {
+pub struct Repo {
     dir: DirPath,
 }
 
-impl RepoGit {
+impl Repo {
     /// Whether `dir` is a git repo (if so: wraps it in an object you can call for more
     /// questions.
     ///
@@ -16,7 +16,7 @@ impl RepoGit {
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
     pub fn new(dir: DirPath) -> Result<Option<Self>, DriverError> {
-        let repo = RepoGit { dir };
+        let repo = Repo { dir };
         let is_ok = DriverError::unwrap_cmd_lossy(
             "git cli".to_string(),
             repo.git_show_top_level()
@@ -53,7 +53,7 @@ impl RepoGit {
     }
 }
 
-impl Driver for RepoGit {
+impl Driver for Repo {
     fn root(&self) -> Result<DirPath, DriverError> {
         let output = DriverError::expect_cmd_lossy(
             "git cli".to_string(),
