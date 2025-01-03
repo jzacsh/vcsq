@@ -18,11 +18,7 @@ impl From<Output> for Utf8CmdOutputLossy {
         let status = output.status;
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
         let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-        Self {
-            status,
-            stderr,
-            stdout,
-        }
+        Self { status, stdout, stderr }
     }
 }
 
@@ -77,6 +73,6 @@ impl Utf8CmdOutput {
 fn tty_strings(tty_out: String) -> Vec<String> {
     tty_out
         .lines()
-        .map(|s| s.to_string())
+        .map(std::string::ToString::to_string)
         .collect::<Vec<String>>()
 }
