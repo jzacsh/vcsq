@@ -55,7 +55,7 @@ impl RepoLoadError {
     }
 
     /// Like `unwrap_cmd(...)` but additionally expects the command to have succeeded, otherwise
-    /// unpacks the stderr into an Err() case for you.
+    /// unpacks the stderr into an `Err()` case for you.
     ///
     /// For a lossy version of this function see `expect_cmd_lossy(...)`.
     pub fn expect_cmd(
@@ -77,7 +77,7 @@ impl RepoLoadError {
         Ok(utf8_output)
     }
 
-    /// Assumes cmd_output is an interaction with a textual CLI and does a dirty (lossy) conersion
+    /// Assumes `cmd_output` is an interaction with a textual CLI and does a dirty (lossy) conersion
     /// of its stdout/stderr outputs.
     ///
     /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
@@ -94,7 +94,7 @@ impl RepoLoadError {
     }
 
     /// Like `unwrap_cmd_lossy(...)` but additionally expects the command to have succeeded,
-    /// otherwise unpacks the stderr into an Err() case for you.
+    /// otherwise unpacks the stderr into an `Err()` case for you.
     ///
     /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
     /// `expect_cmd(...)`.
@@ -133,7 +133,7 @@ impl RepoLoadError {
         Ok(lines
             .last()
             .ok_or_else(|| {
-                Self::Unknown(format!("unexpectedly returned empty output: {}", context))
+                Self::Unknown(format!("unexpectedly returned empty output: {context}"))
             })?
             .to_string())
     }
@@ -172,7 +172,7 @@ pub type RepoRefId = String;
 /// VCS repo's human-readable identifier describing a reference-point in its history (eg: branch or
 /// tag in git, bookmark in jj).
 ///
-/// These generally are sparse in a repo's history, unlike RepoRefId.
+/// These generally are sparse in a repo's history, unlike `RepoRefId`.
 pub type RepoRefName = String;
 
 /// Single point in time
@@ -228,7 +228,7 @@ where
     }
 
     /// Lists filepaths touched that are the cause of the repo being dirty, or (assuming `clean_ok`) simply lists no output is
-    /// the repo isn't dirty (thus can be used as a 1:1 proxy for IsClean's behavior).
+    /// the repo isn't dirty (thus can be used as a 1:1 proxy for `IsClean`'s behavior).
     ///
     /// Should return an error if repo isn't dirty and not `clean_ok`
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, RepoLoadError>;

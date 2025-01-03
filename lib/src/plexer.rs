@@ -12,7 +12,7 @@ pub enum VcsBrand {
 }
 
 /// Multiplexes all available VCS adapters into one interface so you don't have to figure out which
-/// VCS you're interacting with in order to start asking repo::Repo questions.
+/// VCS you're interacting with in order to start asking `repo::Repo` questions.
 #[derive(Debug)]
 pub struct RepoPlexer {
     pub brand: VcsBrand,
