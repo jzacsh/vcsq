@@ -150,6 +150,8 @@ So to see untested lines, just `^F` for " |0" in the output.
     - [x] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
     `--no-deps --all-features` for that)
   - [x] get to clippy:pedantic level:
+    - [ ] merge the two folders lib/ and vcst/ into root (so we can have one
+      crate when published).
     - [x] address clippy::pedantic output `cargo clippy --all -- -W
     clippy::pedantic`
       - [x] in `vcst/` dir
