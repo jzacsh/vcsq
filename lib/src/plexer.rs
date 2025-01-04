@@ -30,7 +30,7 @@ impl Repo {
     /// Returns a [`DriverError`] if either no VCS driver is present that recognizes the directory,
     /// or if some critical error happened (like one of the drivers hit an access error to the
     /// directory, or found something silly like the directory is actually a plain file).
-    pub fn new_driver(dir: DirPath) -> Result<Self, DriverError> {
+    pub fn new_driver(dir: &DirPath) -> Result<Self, DriverError> {
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
         // _none_ of our adapter's underlying CLIs are in our plexer, _then_ translate that to an
         // error.

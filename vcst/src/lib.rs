@@ -190,7 +190,7 @@ impl<'a> PlexerQuery<'a> {
                 "dir must be a readable directory".to_string(),
             ));
         }
-        let plexer = plexer::Repo::new_driver(dir)?;
+        let plexer = plexer::Repo::new_driver(&dir)?;
         Ok(Some(PlexerQuery {
             plexer,
             cli: query,
