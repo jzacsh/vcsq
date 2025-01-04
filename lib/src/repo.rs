@@ -225,6 +225,16 @@ pub trait Validator
 where
     Self: std::fmt::Debug,
 {
+    /// Inspects on-disk directory path `dir` to determine if its a VCS repo, and if it is then
+    /// returns a Driver that can answer further questions about said repo.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DriverError`] if either this validator doesn't recognize the directory, as a
+    /// VCS or if some critical error happened (like one of the drivers hit an access error to the
+    /// directory, or found something silly like the directory is actually a plain file).
+    fn new_driver(&self, dir: DirPath) -> Result<Option<Box<dyn Driver>>, DriverError>;
+
     /// Returns basic info from the underlying VCS, proving its presence on the system, or an error
     /// if the attempt failed.
     ///

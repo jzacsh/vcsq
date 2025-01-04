@@ -5,22 +5,16 @@ use std::process::{Command, Stdio};
 static VCS_BIN_NAME: &str = "git";
 
 #[derive(Debug)]
-pub struct Loader;
-
-impl Validator for Loader {
-    fn check_health(&self) -> Result<VcsAvailable, DriverError> {
-        let mut cmd = Command::new(VCS_BIN_NAME);
-        cmd.arg("--version");
-        DriverError::expect_cmd_lossy("git cli: exec".to_string(), cmd.output())
-    }
-}
-
-#[derive(Debug)]
 pub struct Repo {
     dir: DirPath,
 }
 
-impl Repo {
+#[derive(Debug)]
+pub struct Loader
+where
+    Self: Sized;
+
+impl Validator for Loader {
     /// Whether `dir` is a git repo (if so: wraps it in an object you can call for more
     /// questions.
     ///
@@ -28,7 +22,7 @@ impl Repo {
     /// ```sh
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
-    pub fn new(dir: DirPath) -> Result<Option<Self>, DriverError> {
+    fn new_driver(&self, dir: DirPath) -> Result<Option<Box<dyn Driver>>, DriverError> {
         let repo = Repo { dir };
         let is_ok = DriverError::unwrap_cmd_lossy(
             "git cli".to_string(),
@@ -41,12 +35,21 @@ impl Repo {
         .status
         .success();
         if is_ok {
+            let repo: Box<dyn Driver> = Box::from(repo);
             Ok(Some(repo))
         } else {
             Ok(None)
         }
     }
 
+    fn check_health(&self) -> Result<VcsAvailable, DriverError> {
+        let mut cmd = Command::new(VCS_BIN_NAME);
+        cmd.arg("--version");
+        DriverError::expect_cmd_lossy("git cli: exec".to_string(), cmd.output())
+    }
+}
+
+impl Repo {
     fn start_shellout(&self) -> Command {
         let mut cmd = Command::new(VCS_BIN_NAME);
         cmd.current_dir(self.dir.clone());

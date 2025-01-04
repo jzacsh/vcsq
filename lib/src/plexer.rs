@@ -30,7 +30,7 @@ impl Repo {
     /// Returns a [`DriverError`] if either no VCS driver is present that recognizes the directory,
     /// or if some critical error happened (like one of the drivers hit an access error to the
     /// directory, or found something silly like the directory is actually a plain file).
-    pub fn new(dir: &DirPath) -> Result<Self, DriverError> {
+    pub fn new_driver(dir: DirPath) -> Result<Self, DriverError> {
         let mut attempts = Vec::with_capacity(5);
 
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
@@ -43,28 +43,28 @@ impl Repo {
 
         let current_attempt = VcsBrand::Git;
         attempts.push(current_attempt.clone());
-        if let Some(git) = git::Repo::new(dir.clone())? {
+        if let Some(adapter) = (git::Loader {}).new_driver(dir.clone())? {
             return Ok(Self {
                 brand: current_attempt,
-                adapter: Box::from(git),
+                adapter,
             });
         }
 
         let current_attempt = VcsBrand::Mercurial;
         attempts.push(current_attempt.clone());
-        if let Some(hg) = hg::Repo::new(dir.clone())? {
+        if let Some(adapter) = (hg::Loader {}).new_driver(dir.clone())? {
             return Ok(Self {
                 brand: current_attempt,
-                adapter: Box::from(hg),
+                adapter,
             });
         }
 
         let current_attempt = VcsBrand::Jujutsu;
         attempts.push(current_attempt.clone());
-        if let Some(jj) = jj::Repo::new(dir.clone())? {
+        if let Some(adapter) = (jj::Loader {}).new_driver(dir.clone())? {
             return Ok(Self {
                 brand: current_attempt,
-                adapter: Box::from(jj),
+                adapter,
             });
         }
 
