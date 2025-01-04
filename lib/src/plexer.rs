@@ -3,10 +3,10 @@ use crate::adapter::hg;
 use crate::adapter::jj;
 use crate::repo;
 use crate::repo::{AncestorRef, DirPath, Driver, DriverError, Validator, VcsAvailable};
-use strum::{EnumIter, IntoEnumIterator};
+use strum::{AsRefStr, EnumIter, IntoEnumIterator};
 
 /// The particular brands of VCS this library supports.
-#[derive(Debug, Clone, EnumIter, PartialEq)]
+#[derive(Debug, Clone, EnumIter, AsRefStr, PartialEq)]
 pub enum VcsBrand {
     Git,
     Mercurial,
@@ -31,47 +31,33 @@ impl Repo {
     /// or if some critical error happened (like one of the drivers hit an access error to the
     /// directory, or found something silly like the directory is actually a plain file).
     pub fn new_driver(dir: DirPath) -> Result<Self, DriverError> {
-        let mut attempts = Vec::with_capacity(5);
-
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
         // _none_ of our adapter's underlying CLIs are in our plexer, _then_ translate that to an
         // error.
         //    if let NotFound = e.kind() { ... }
         //    https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 
-        // TODO: (rust) turn this core body into a for loop over VcsBrand::iter()
-
-        let current_attempt = VcsBrand::Git;
-        attempts.push(current_attempt.clone());
-        if let Some(adapter) = (git::Loader {}).new_driver(dir.clone())? {
-            return Ok(Self {
-                brand: current_attempt,
-                adapter,
-            });
-        }
-
-        let current_attempt = VcsBrand::Mercurial;
-        attempts.push(current_attempt.clone());
-        if let Some(adapter) = (hg::Loader {}).new_driver(dir.clone())? {
-            return Ok(Self {
-                brand: current_attempt,
-                adapter,
-            });
-        }
-
-        let current_attempt = VcsBrand::Jujutsu;
-        attempts.push(current_attempt.clone());
-        if let Some(adapter) = (jj::Loader {}).new_driver(dir.clone())? {
-            return Ok(Self {
-                brand: current_attempt,
-                adapter,
-            });
+        for current_attempt in VcsBrand::iter() {
+            let loader: Box<dyn repo::Validator> = match &current_attempt {
+                VcsBrand::Git => Box::from(git::Loader {}),
+                VcsBrand::Mercurial => Box::from(hg::Loader {}),
+                VcsBrand::Jujutsu => Box::from(jj::Loader {}),
+            };
+            if let Some(adapter) = loader.new_driver(dir.clone())? {
+                return Ok(Self {
+                    brand: current_attempt.clone(),
+                    adapter,
+                });
+            }
         }
 
         Err(format!(
-            "if dir is a VCS, it's of an unknown brand (tried {:?}: {:?})",
-            attempts.len(),
-            attempts
+            "if dir is a VCS, it's of an unknown brand (tried these {:?}: {})",
+            VcsBrand::iter().len(),
+            VcsBrand::iter()
+                .map(|b| b.as_ref().to_string())
+                .collect::<Vec<String>>()
+                .join(", "),
         )
         .into())
     }

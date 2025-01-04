@@ -247,6 +247,9 @@ where
 
 /// Operations any VCS should be able to answer about a repo, so any proprietary/brand-specific
 /// implementations must implement this driver.
+///
+/// Implementations of this trait can be expected from the factory `new_driver` of `Validator`
+/// trait.
 pub trait Driver
 where
     Self: std::fmt::Debug,
@@ -258,14 +261,6 @@ where
     // that is: how can we handle the case that JJ repo is a JJ repo, or maybe a JJ-colocated-git repo,
     // or JJ-colocated-p4 repo, or JJ-wrapping-git repo? Just true for all of those? Or some generic
     // type we can define that would let JJ pack the answer here?
-
-    // TODO: (rust) ability to provide an API for plexer.rs to use, so it knwos it always can call an
-    // adapter's new() with the same api? ie:
-    // ```rs
-    //   fn new(dir: DirPath) -> Result<Option<Repo>, RepoLoadError>;
-    // ```
-    // Right now we do this by hand (trying to keep them in sync) but my attempts to describe this with
-    // types has lead to fights against object-size knowledge rustc complains about.
 
     /// Prints the root dir of the repo.
     ///
