@@ -1,4 +1,6 @@
-use crate::repo::{DirPath, Driver, DriverError, Validator, VcsAvailable, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{
+    DirPath, Driver, DriverError, HistoryRefId, Validator, VcsAvailable, ERROR_REPO_NOT_DIRTY,
+};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -101,5 +103,9 @@ impl Driver for Repo {
         )?;
         let files = lines.into_iter().map(PathBuf::from).collect();
         Ok(files)
+    }
+
+    fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
+        todo!();
     }
 }

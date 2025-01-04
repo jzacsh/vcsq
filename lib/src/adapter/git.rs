@@ -1,8 +1,39 @@
-use crate::repo::{DirPath, Driver, DriverError, Validator, VcsAvailable, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{
+    DirPath, Driver, DriverError, HistoryRefId, HistoryRefName, Validator, VcsAvailable,
+    ERROR_REPO_NOT_DIRTY,
+};
+use const_format::concatcp;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 static VCS_BIN_NAME: &str = "git";
+
+const VCST_FIRST_COMMIT_ID: &str = "0ff8325e7d74a838d39cdffff9cddcecdce30f10";
+const VCST_UNIQUE_PREFIX: &str = concatcp!("VCST_SCRAPING_", VCST_FIRST_COMMIT_ID, "_");
+const GIT_LOG_SCRAPABLE_PRETTY_DECOR_PREFIX: &str =
+    concatcp!("prefix=", VCST_UNIQUE_PREFIX, "prefix");
+const GIT_LOG_SCRAPABLE_PRETTY_DECOR_POINTER: &str =
+    concatcp!("pointer=", VCST_UNIQUE_PREFIX, "pointer");
+const GIT_LOG_SCRAPABLE_PRETTY_DECOR_SUFFIX: &str =
+    concatcp!("suffix=", VCST_UNIQUE_PREFIX, "suffix");
+const GIT_LOG_SCRAPABLE_PRETTY_DECOR_TAG: &str = concatcp!("tag=", VCST_UNIQUE_PREFIX, "tag");
+const GIT_LOG_SCRAPABLE_PRETTY_DECOR_SEP: &str =
+    concatcp!("separator=", VCST_UNIQUE_PREFIX, "separator");
+
+const GIT_LOG_SCRAPABLE_PRETTY_FMT: &str = concatcp!(
+    GIT_LOG_SCRAPABLE_PRETTY_DECOR_PREFIX,
+    ",",
+    GIT_LOG_SCRAPABLE_PRETTY_DECOR_POINTER,
+    ",",
+    GIT_LOG_SCRAPABLE_PRETTY_DECOR_SUFFIX,
+    ",",
+    GIT_LOG_SCRAPABLE_PRETTY_DECOR_TAG,
+    ",",
+    GIT_LOG_SCRAPABLE_PRETTY_DECOR_SEP,
+    ","
+);
+const GIT_LOG_SCRAPABLE_PRETTY_FLAG: &str =
+    concatcp!("--pretty=%(decorate:", GIT_LOG_SCRAPABLE_PRETTY_FMT, ")");
 
 #[derive(Debug)]
 pub struct Repo {
@@ -75,6 +106,27 @@ impl Repo {
         cmd.arg("ls-files").arg("--no-cached");
         cmd
     }
+
+    fn git_current_ref_id(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("log").arg("--pretty=%H").arg("HEAD").arg("-1");
+        cmd
+    }
+
+    fn git_current_ref_name(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("log")
+            .arg(GIT_LOG_SCRAPABLE_PRETTY_FLAG)
+            .arg("HEAD")
+            .arg("-1");
+        cmd
+    }
+
+    fn git_current_branch(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("branch").arg("--show-current");
+        cmd
+    }
 }
 
 impl Driver for Repo {
@@ -117,5 +169,46 @@ impl Driver for Repo {
         )?;
         let files = lines.into_iter().map(PathBuf::from).collect();
         Ok(files)
+    }
+
+    fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
+        let output = DriverError::expect_cmd_lossy(
+            "git cli :exec".to_string(),
+            self.git_current_ref_id().output(),
+        )?;
+        DriverError::expect_cmd_line("git cli: exec", &output)
+    }
+
+    fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
+        let output = DriverError::expect_cmd_lossy(
+            "git cli :exec".to_string(),
+            self.git_current_ref_name().output(),
+        )?;
+        let line = DriverError::expect_cmd_line("git cli: exec", &output)?;
+        let tag = line
+            .split(GIT_LOG_SCRAPABLE_PRETTY_DECOR_SEP)
+            .filter(|item| item.starts_with(GIT_LOG_SCRAPABLE_PRETTY_DECOR_TAG))
+            .map(|tag| {
+                // strip our custom prefix
+                tag.chars()
+                    .skip(GIT_LOG_SCRAPABLE_PRETTY_DECOR_TAG.len())
+                    .collect::<String>()
+            })
+            .collect::<Vec<String>>()
+            .pop();
+        if tag.is_some() {
+            return Ok(tag);
+        }
+
+        let output = DriverError::expect_cmd_lossy(
+            "git cli :exec".to_string(),
+            self.git_current_branch().output(),
+        )?;
+        let branch_line = DriverError::expect_cmd_line("git cli: exec", &output)?;
+        if branch_line.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(branch_line))
+        }
     }
 }
