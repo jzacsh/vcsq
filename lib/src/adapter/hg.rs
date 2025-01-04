@@ -9,6 +9,12 @@ pub struct Repo {
 
 static VCS_BIN_NAME: &str = "hg";
 
+fn start_vcs_shellout() -> Command {
+    let mut cmd = Command::new(VCS_BIN_NAME);
+    cmd.env("HGPLAIN", "1");
+    cmd
+}
+
 #[derive(Debug)]
 pub struct Loader
 where
@@ -37,7 +43,7 @@ impl Validator for Loader {
     }
 
     fn check_health(&self) -> Result<VcsAvailable, DriverError> {
-        let mut cmd = Command::new(VCS_BIN_NAME);
+        let mut cmd = start_vcs_shellout();
         cmd.arg("--version");
         DriverError::expect_cmd_lossy("hg cli: exec".to_string(), cmd.output())
     }
@@ -45,7 +51,7 @@ impl Validator for Loader {
 
 impl Repo {
     fn start_shellout(&self) -> Command {
-        let mut cmd = Command::new(VCS_BIN_NAME);
+        let mut cmd = start_vcs_shellout();
         cmd.current_dir(self.dir.clone());
         cmd
     }
@@ -58,13 +64,18 @@ impl Repo {
 
     fn hg_dirty_files(&self) -> Command {
         let mut cmd = self.start_shellout();
-        cmd.env("HGPLAIN", "1")
-            .arg("status")
+        cmd.arg("status")
             .arg("--modified")
             .arg("--added")
             .arg("--removed")
             .arg("--deleted")
             .arg("--unknown");
+        cmd
+    }
+
+    fn hg_tracked_files(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("status").arg("--all");
         cmd
     }
 }
@@ -96,5 +107,23 @@ impl Driver for Repo {
             .map(PathBuf::from)
             .collect();
         Ok(dirty_files)
+    }
+
+    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError> {
+        let lines = DriverError::expect_cmd_lines(
+            self.hg_tracked_files().output(),
+            0, /*min_lines*/
+            "hg cli: exec",
+            None,
+        )?;
+        // first 2 chars ar the files status codes, of which the one we car eabout from the
+        // docs is: "C = clean". We look for those lines, then strip that status information.
+        let files = lines
+            .into_iter()
+            .filter(|ln| ln.starts_with("C "))
+            .map(|ln| ln.chars().skip(2).collect::<String>())
+            .map(PathBuf::from)
+            .collect();
+        Ok(files)
     }
 }

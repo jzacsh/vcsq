@@ -209,7 +209,7 @@ impl TestDirs {
     }
 }
 
-mod vcs_test_setup {
+pub mod vcs_test_setup {
     use super::TestSetupError;
     use super::{
         TEST_VCS_BASENAME_GIT, TEST_VCS_BASENAME_HG, TEST_VCS_BASENAME_JJ,
@@ -219,7 +219,7 @@ mod vcs_test_setup {
     use std::path::PathBuf;
     use std::process::{Command, Stdio};
 
-    fn run_cli_from_tempdir(
+    pub fn run_cli_from_tempdir(
         cmd: &str,
         args: &[&str],
         tmpdir_root: &PathBuf,
@@ -266,11 +266,7 @@ mod vcs_test_setup {
     }
 
     fn setup_temp_repo_jj(tmpdir_root: &PathBuf) -> Result<(), TestSetupError> {
-        run_cli_from_tempdir(
-            "jj",
-            &["git", "init", TEST_VCS_BASENAME_JJ],
-            tmpdir_root,
-        )
+        run_cli_from_tempdir("jj", &["git", "init", TEST_VCS_BASENAME_JJ], tmpdir_root)
     }
 
     fn setup_temp_nonvcs_dir(mut tmpdir_root: PathBuf) -> Result<(), TestSetupError> {

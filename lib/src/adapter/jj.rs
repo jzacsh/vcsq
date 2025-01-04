@@ -61,6 +61,15 @@ impl Repo {
         cmd.arg("diff").arg("--name-only");
         cmd
     }
+
+    fn jj_tracked_files(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        // TODO: unclear @- is always the right bet. _Sometimes_ you can put yourself into a weird
+        // state where your '@' is actually not just an ephemeral copy, as you've re-attached
+        // yourself to it.
+        cmd.arg("file").arg("list").arg("-r").arg("@-");
+        cmd
+    }
 }
 
 impl Driver for Repo {
@@ -81,5 +90,16 @@ impl Driver for Repo {
         )?;
         let dirty_files = lines.into_iter().map(PathBuf::from).collect();
         Ok(dirty_files)
+    }
+
+    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError> {
+        let lines = DriverError::expect_cmd_lines(
+            self.jj_tracked_files().output(),
+            0, /*min_lines*/
+            "jj cli: exec",
+            None,
+        )?;
+        let files = lines.into_iter().map(PathBuf::from).collect();
+        Ok(files)
     }
 }

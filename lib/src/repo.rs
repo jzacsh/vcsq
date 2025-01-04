@@ -292,6 +292,16 @@ where
     /// in which case an empty vector will be returned).
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError>;
 
+    /// Lists filepaths tracked by this repo, ignoring the state of the repo (ie: any "staged"
+    /// (git) or deleted "working-copy" (jj) edits. The goal of this listing is to show the full
+    /// listing of the repository's contents, as of the time of the current commit.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
+    /// VCS APIs failed.
+    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError>;
+
     /// Returns the historical reference of the direct ancestor of the current state.
     ///
     /// # Errors

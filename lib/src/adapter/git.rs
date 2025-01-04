@@ -67,6 +67,14 @@ impl Repo {
         cmd.arg("status").arg("--porcelain");
         cmd
     }
+
+    fn git_tracked_files(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        // TODO: (bug) investigate more, but manual testing shows --no-cached doesn't actually
+        // work/change anything about ls-files behavior.
+        cmd.arg("ls-files").arg("--no-cached");
+        cmd
+    }
 }
 
 impl Driver for Repo {
@@ -88,7 +96,7 @@ impl Driver for Repo {
             "git cli: exec",
             Some(ERROR_REPO_NOT_DIRTY.to_string()),
         )?;
-        let dirty_files = lines
+        let files = lines
             .into_iter()
             .map(|ln| {
                 // first 3 chars are modification-indicators like "?? " to indicate the file is
@@ -97,6 +105,17 @@ impl Driver for Repo {
             })
             .map(PathBuf::from)
             .collect();
-        Ok(dirty_files)
+        Ok(files)
+    }
+
+    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError> {
+        let lines = DriverError::expect_cmd_lines(
+            self.git_tracked_files().output(),
+            0, /*min_lines*/
+            "git cli: exec",
+            None,
+        )?;
+        let files = lines.into_iter().map(PathBuf::from).collect();
+        Ok(files)
     }
 }

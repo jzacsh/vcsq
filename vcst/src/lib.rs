@@ -115,6 +115,12 @@ pub enum VcstQuery {
         max: u64,
     },
 
+    /// Lists filepaths tracked by this repo, ignoring the state of the repo (ie: any "staged"
+    /// (git) or deleted "working-copy" (jj) edits. The goal of this listing is to show the full
+    /// listing of the repository's contents, as of the time of the current commit.
+    #[command(arg_required_else_help = true)]
+    TrackedFiles { dir: DirPath },
+
     /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output if
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for `IsClean`'s behavior).
     #[command(arg_required_else_help = true)]
@@ -158,7 +164,8 @@ impl VcstQuery {
             VcstQuery::Brand { dir }
             | VcstQuery::Root { dir }
             | VcstQuery::IsClean { dir }
-            | VcstQuery::DirtyFiles { dir, clean_ok: _ } => Some(dir),
+            | VcstQuery::DirtyFiles { dir, clean_ok: _ }
+            | VcstQuery::TrackedFiles { dir } => Some(dir),
             VcstQuery::CheckHealth => None,
             #[cfg(debug_assertions)]
             VcstQuery::CurrentId { dir, dirty_ok: _ }
@@ -233,13 +240,24 @@ impl<'a> PlexerQuery<'a> {
                 dirty_ok: _,
             } => todo!(),
             VcstQuery::DirtyFiles { dir: _, clean_ok } => {
-                let dirty_files = self
+                let files = self
                     .plexer
                     .dirty_files(clean_ok)
                     .map_err(VcstError::Plexing)?;
-                for dirty_file in dirty_files {
-                    writeln!(self.stdout, "{}", dirty_file.display()).unwrap_or_else(|_| {
-                        panic!("failed stdout write of: {}", dirty_file.display())
+                for file in files {
+                    writeln!(self.stdout, "{}", file.display()).unwrap_or_else(|_| {
+                        panic!("failed stdout write of: {}", file.display())
+                    });
+                }
+            }
+            VcstQuery::TrackedFiles { dir: _ } => {
+                let files = self
+                    .plexer
+                    .tracked_files()
+                    .map_err(VcstError::Plexing)?;
+                for file in files {
+                    writeln!(self.stdout, "{}", file.display()).unwrap_or_else(|_| {
+                        panic!("failed stdout write of: {}", file.display())
                     });
                 }
             }

@@ -110,7 +110,7 @@ So to see untested lines, just `^F` for " |0" in the output.
   - try `cargo build --release` to turn these back off
   - in the meantime: dbug build via: `cargo run --` to run,  `cargo build`
   build (because they just `todo!()`), via `#[cfg(debug_assertions)]`
-- [ ] **feature**: add ["list tracked files" concept][vcsListUsecase]
+- [x] **feature**: add ["list tracked files" concept][vcsListUsecase]
 - [x] install jj VCS to $PATH of gitlab ci/cd
 
   - [x] copy `git --version && hg --version && jj --version` from ci/cd yml into

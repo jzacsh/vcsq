@@ -103,6 +103,10 @@ impl Driver for Repo {
         self.adapter.dirty_files(clean_ok)
     }
 
+    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError> {
+        self.adapter.tracked_files()
+    }
+
     fn parent_ref(&self) -> Result<repo::HistoryRef, DriverError> {
         self.adapter.parent_ref()
     }
