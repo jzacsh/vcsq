@@ -1,4 +1,6 @@
-use crate::repo::{DirPath, Driver, DriverError, Validator, VcsAvailable, ERROR_REPO_NOT_DIRTY};
+use crate::repo::{
+    DirPath, Driver, DriverError, HistoryRefId, Validator, VcsAvailable, ERROR_REPO_NOT_DIRTY,
+};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -8,6 +10,8 @@ pub struct Repo {
 }
 
 static VCS_BIN_NAME: &str = "hg";
+
+const HG_LOGID_DIRTY_SUFFIX: &str = "+";
 
 fn start_vcs_shellout() -> Command {
     let mut cmd = Command::new(VCS_BIN_NAME);
@@ -78,6 +82,12 @@ impl Repo {
         cmd.arg("status").arg("--all");
         cmd
     }
+
+    fn hg_current_id(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("--debug").arg("id").arg("-i");
+        cmd
+    }
 }
 
 impl Driver for Repo {
@@ -125,5 +135,25 @@ impl Driver for Repo {
             .map(PathBuf::from)
             .collect();
         Ok(files)
+    }
+
+    fn current_ref_id(&self, dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
+        if !dirty_ok {
+            todo!(); // TODO: implement dirty_ok check
+        }
+        let output = DriverError::expect_cmd_lossy(
+            "hg cli :exec".to_string(),
+            self.hg_current_id().output(),
+        )?;
+        let current_id = DriverError::expect_cmd_line("hg cli: exec", &output)?;
+        if !current_id.ends_with(HG_LOGID_DIRTY_SUFFIX) {
+            return Ok(current_id);
+        }
+        Ok(current_id
+            .strip_suffix(HG_LOGID_DIRTY_SUFFIX)
+            .ok_or_else(|| {
+                DriverError::Unknown(format!("hg bug? got just a lone '{HG_LOGID_DIRTY_SUFFIX}'"))
+            })?
+            .to_string())
     }
 }

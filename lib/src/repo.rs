@@ -111,6 +111,7 @@ impl DriverError {
     ///
     /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the the
     /// stderr of `cmd_output` if the command actually exited non-zero.
+    // TODO: rename 'expect' to either 'to'  or 'unwrap_ok_cmd_lossy'
     pub fn expect_cmd_lossy(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -366,9 +367,7 @@ where
     /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
     /// VCS APIs failed. Unless `dirty_ok`, then an error is returned when the repo is in a dirty
     /// state (as a reference for the current state is inherently not a reliable identifier).
-    fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
-        todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
-    }
+    fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError>;
 
     /// Thin wrapper for `current_ref()` that just unpacks the name if there is one.
     ///

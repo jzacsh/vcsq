@@ -77,7 +77,6 @@ pub enum VcstQuery {
 
     /// Print the VCS repo's current revision ID (eg: rev in Mercurial, ref in git, etc).
     #[command(arg_required_else_help = true)]
-    #[cfg(debug_assertions)]
     CurrentId {
         dir: DirPath,
 
@@ -165,11 +164,11 @@ impl VcstQuery {
             | VcstQuery::Root { dir }
             | VcstQuery::IsClean { dir }
             | VcstQuery::DirtyFiles { dir, clean_ok: _ }
-            | VcstQuery::TrackedFiles { dir } => Some(dir),
+            | VcstQuery::TrackedFiles { dir }
+            | VcstQuery::CurrentId { dir, dirty_ok: _ } => Some(dir),
             VcstQuery::CheckHealth => None,
             #[cfg(debug_assertions)]
-            VcstQuery::CurrentId { dir, dirty_ok: _ }
-            | VcstQuery::CurrentName { dir, dirty_ok: _ }
+            VcstQuery::CurrentName { dir, dirty_ok: _ }
             | VcstQuery::ParentId { dir }
             | VcstQuery::ParentName { dir, max: _ }
             | VcstQuery::CurrentFiles { dir, dirty_ok: _ } => Some(dir),
@@ -224,12 +223,17 @@ impl<'a> PlexerQuery<'a> {
                 return Ok(u8::from(!is_clean));
             }
             VcstQuery::CheckHealth => panic!("bug: PlexerQuery() should not be constructed for the generalized CheckHealth query"),
-            #[cfg(debug_assertions)]
             VcstQuery::CurrentId {
                 dir: _,
-                dirty_ok: _,
-            }
-            | VcstQuery::CurrentName {
+                dirty_ok,
+            } => {
+                let current_id = self.plexer.current_ref_id(dirty_ok)?;
+                writeln!(self.stdout, "{current_id}").unwrap_or_else(|_| {
+                    panic!("failed stdout write of: {current_id}")
+                });
+            },
+            #[cfg(debug_assertions)]
+            VcstQuery::CurrentName {
                 dir: _,
                 dirty_ok: _,
             }
