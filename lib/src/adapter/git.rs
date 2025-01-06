@@ -171,7 +171,10 @@ impl Driver for Repo {
         Ok(files)
     }
 
-    fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
+    fn current_ref_id(&self, dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
+        if !dirty_ok {
+            todo!(); // TODO: implement dirty_ok check
+        }
         let output = DriverError::expect_cmd_lossy(
             "git cli :exec".to_string(),
             self.git_current_ref_id().output(),
@@ -179,7 +182,10 @@ impl Driver for Repo {
         DriverError::expect_cmd_line("git cli: exec", &output)
     }
 
-    fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
+    fn current_ref_name(&self, dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
+        if !dirty_ok {
+            todo!(); // TODO: implement dirty_ok check
+        }
         let output = DriverError::expect_cmd_lossy(
             "git cli :exec".to_string(),
             self.git_current_ref_name().output(),

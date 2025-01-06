@@ -137,8 +137,10 @@ impl Driver for Repo {
         Ok(files)
     }
 
-    // TODO: implement dirty_ok check
-    fn current_ref_id(&self, _dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
+    fn current_ref_id(&self, dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
+        if !dirty_ok {
+            todo!(); // TODO: implement dirty_ok check
+        }
         let output = DriverError::expect_cmd_lossy(
             "hg cli :exec".to_string(),
             self.hg_current_id().output(),
