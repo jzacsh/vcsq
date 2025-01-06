@@ -1,5 +1,6 @@
 use crate::repo::{
-    DirPath, Driver, DriverError, HistoryRefId, Validator, VcsAvailable, ERROR_REPO_NOT_DIRTY,
+    DirPath, Driver, DriverError, HistoryRefId, Validator, VcsAvailable, ERROR_REPO_NOT_CLEAN,
+    ERROR_REPO_NOT_DIRTY,
 };
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -138,8 +139,8 @@ impl Driver for Repo {
     }
 
     fn current_ref_id(&self, dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
-        if !dirty_ok {
-            todo!(); // TODO: implement dirty_ok check
+        if !dirty_ok && !self.is_clean()? {
+            return Err(ERROR_REPO_NOT_CLEAN.to_string().into());
         }
         let output = DriverError::expect_cmd_lossy(
             "hg cli :exec".to_string(),

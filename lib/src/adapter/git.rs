@@ -1,6 +1,6 @@
 use crate::repo::{
     DirPath, Driver, DriverError, HistoryRefId, HistoryRefName, Validator, VcsAvailable,
-    ERROR_REPO_NOT_DIRTY,
+    ERROR_REPO_NOT_CLEAN, ERROR_REPO_NOT_DIRTY,
 };
 use const_format::concatcp;
 use std::path::PathBuf;
@@ -172,9 +172,10 @@ impl Driver for Repo {
     }
 
     fn current_ref_id(&self, dirty_ok: bool) -> Result<HistoryRefId, DriverError> {
-        if !dirty_ok {
-            todo!(); // TODO: implement dirty_ok check
+        if !dirty_ok && !self.is_clean()? {
+            return Err(ERROR_REPO_NOT_CLEAN.to_string().into());
         }
+
         let output = DriverError::expect_cmd_lossy(
             "git cli :exec".to_string(),
             self.git_current_ref_id().output(),
@@ -183,8 +184,8 @@ impl Driver for Repo {
     }
 
     fn current_ref_name(&self, dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
-        if !dirty_ok {
-            todo!(); // TODO: implement dirty_ok check
+        if !dirty_ok && !self.is_clean()? {
+            return Err(ERROR_REPO_NOT_CLEAN.to_string().into());
         }
         let output = DriverError::expect_cmd_lossy(
             "git cli :exec".to_string(),

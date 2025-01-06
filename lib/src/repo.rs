@@ -6,6 +6,7 @@ use thiserror::Error;
 
 pub type DirPath = PathBuf;
 
+pub const ERROR_REPO_NOT_CLEAN: &str = "repo not clean, references not hermetic";
 pub const ERROR_REPO_NOT_DIRTY: &str = "repo not dirty";
 pub const ERROR_REPO_NONEMPTY_OUTPUT: &str = "unexpectedly returned no lines";
 
