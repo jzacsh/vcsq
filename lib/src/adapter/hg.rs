@@ -89,6 +89,16 @@ impl Repo {
         cmd.arg("--debug").arg("id").arg("-i");
         cmd
     }
+
+    fn hg_current_name(&self) -> Command {
+        let mut cmd = self.start_shellout();
+        cmd.arg("log")
+            .arg("--rev")
+            .arg(".")
+            .arg("--template")
+            .arg("{latesttag}");
+        cmd
+    }
 }
 
 impl Driver for Repo {
@@ -143,7 +153,7 @@ impl Driver for Repo {
             return Err(ERROR_REPO_NOT_CLEAN.to_string().into());
         }
         let output = DriverError::expect_cmd_lossy(
-            "hg cli :exec".to_string(),
+            "hg cli: exec".to_string(),
             self.hg_current_id().output(),
         )?;
         let current_id = DriverError::expect_cmd_line("hg cli: exec", &output)?;
@@ -159,7 +169,21 @@ impl Driver for Repo {
     }
 
     /// Returns the current mercurial tag if available.
-    fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
-        todo!(); // TODO: (feature) implement
+    fn current_ref_name(&self, dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
+        if !dirty_ok && !self.is_clean()? {
+            return Err(ERROR_REPO_NOT_CLEAN.to_string().into());
+        }
+
+        let output = DriverError::expect_cmd_lossy(
+            "hg cli: exec".to_string(),
+            self.hg_current_name().output(),
+        )?;
+        let hg_tag = DriverError::expect_cmd_line("hg cli: exec", &output)?;
+
+        if hg_tag.is_empty() || hg_tag == "null" {
+            Ok(None)
+        } else {
+            Ok(Some(hg_tag))
+        }
     }
 }
