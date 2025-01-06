@@ -8,6 +8,21 @@ use std::process::{Command, Stdio};
 
 static VCS_BIN_NAME: &str = "git";
 
+/// Error string intendd to match the case when git prints that "HEAD" is an unknown versiion
+/// becaus ethere's not yet any logs in the repo.
+///
+/// ## Example
+///
+/// ```sh
+/// $ git init .
+/// $ git rev-parse HEAD
+///   fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+///   Use '--' to separate paths from revisions, like this:
+///   'git <command> [<revision>...] -- [<file>...]'
+/// ```
+const GIT_ERROR_NO_LOG_YET: &str = "fatal: ambiguous argument 'HEAD': unknown revision";
+const GIT_SYNTHETIC_FIRST_COMMIT_ID: &str = "00000000000000000000000000000000000000000000000000";
+
 const VCST_FIRST_COMMIT_ID: &str = "0ff8325e7d74a838d39cdffff9cddcecdce30f10";
 const VCST_UNIQUE_PREFIX: &str = concatcp!("VCST_SCRAPING_", VCST_FIRST_COMMIT_ID, "_");
 const GIT_LOG_SCRAPABLE_PRETTY_DECOR_PREFIX: &str =
@@ -109,7 +124,7 @@ impl Repo {
 
     fn git_current_ref_id(&self) -> Command {
         let mut cmd = self.start_shellout();
-        cmd.arg("log").arg("--pretty=%H").arg("HEAD").arg("-1");
+        cmd.arg("rev-parse").arg("HEAD");
         cmd
     }
 
@@ -176,11 +191,37 @@ impl Driver for Repo {
             return Err(ERROR_REPO_NOT_CLEAN.to_string().into());
         }
 
-        let output = DriverError::expect_cmd_lossy(
+        let out = DriverError::expect_cmd_lossy(
             "git cli :exec".to_string(),
             self.git_current_ref_id().output(),
-        )?;
-        DriverError::expect_cmd_line("git cli: exec", &output)
+        );
+        match out {
+            Ok(output) => DriverError::expect_cmd_line("git cli: exec", &output),
+            Err(err) => {
+                match err {
+                    DriverError::Stderr {
+                        context: _,
+                        ref stderr,
+                    } => {
+                        if stderr.contains(GIT_ERROR_NO_LOG_YET) {
+                            // TODO: (feature) reocnsider this approach; perhaps better to do the inverse: make
+                            // other adapters return a special signal "first commit" back up, and let our CLI
+                            // add options for this case (and handle uniformly). As is, this synthetic commit
+                            // might lead to some confusion down the line if it gets passed back to git.
+                            return Ok(GIT_SYNTHETIC_FIRST_COMMIT_ID.into());
+                        }
+                        Err(err)
+                    }
+                    DriverError::Directory(_)
+                    | DriverError::Command {
+                        context: _,
+                        source: _,
+                    }
+                    | DriverError::RootName(_)
+                    | DriverError::Unknown(_) => Err(err),
+                }
+            }
+        }
     }
 
     /// Returns a git tag if available, otherwise the current branch if available.
