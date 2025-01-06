@@ -81,6 +81,7 @@ pub enum VcstQuery {
         dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
+        #[arg(long, default_value_t = false)]
         dirty_ok: bool,
     },
 
@@ -92,6 +93,7 @@ pub enum VcstQuery {
         dir: DirPath,
 
         /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
+        #[arg(long, default_value_t = false)]
         dirty_ok: bool,
     },
 
