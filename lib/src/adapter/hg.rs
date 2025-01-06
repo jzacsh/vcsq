@@ -1,6 +1,6 @@
 use crate::repo::{
-    DirPath, Driver, DriverError, HistoryRefId, Validator, VcsAvailable, ERROR_REPO_NOT_CLEAN,
-    ERROR_REPO_NOT_DIRTY,
+    DirPath, Driver, DriverError, HistoryRefId, HistoryRefName, Validator, VcsAvailable,
+    ERROR_REPO_NOT_CLEAN, ERROR_REPO_NOT_DIRTY,
 };
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -156,5 +156,10 @@ impl Driver for Repo {
                 DriverError::Unknown(format!("hg bug? got just a lone '{HG_LOGID_DIRTY_SUFFIX}'"))
             })?
             .to_string())
+    }
+
+    /// Returns the current mercurial tag if available.
+    fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
+        todo!(); // TODO: (feature) implement
     }
 }

@@ -183,6 +183,7 @@ impl Driver for Repo {
         DriverError::expect_cmd_line("git cli: exec", &output)
     }
 
+    /// Returns a git tag if available, otherwise the current branch if available.
     fn current_ref_name(&self, dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
         if !dirty_ok && !self.is_clean()? {
             return Err(ERROR_REPO_NOT_CLEAN.to_string().into());

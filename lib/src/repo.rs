@@ -385,7 +385,5 @@ where
     /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
     /// VCS APIs failed. Unless `dirty_ok`, then an error is returned when the repo is in a dirty
     /// state (as a reference for the current state is inherently not a reliable identifier).
-    fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
-        todo!(); // TODO: (feature) implement in adaapters. ... _maybe_
-    }
+    fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError>;
 }
