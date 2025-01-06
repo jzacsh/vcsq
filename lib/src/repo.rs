@@ -111,6 +111,7 @@ impl DriverError {
     ///
     /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the the
     /// stderr of `cmd_output` if the command actually exited non-zero.
+    // TODO: rename 'expect' to either 'to'  or 'unwrap_ok_cmd_lossy'
     pub fn expect_cmd_lossy(
         context: String,
         cmd_output: std::io::Result<Output>,
