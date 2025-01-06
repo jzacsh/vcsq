@@ -357,8 +357,16 @@ where
     /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
     /// VCS APIs failed. Unless `dirty_ok`, then an error is returned when the repo is in a dirty
     /// state (as a reference for the current state is inherently not a reliable identifier).
-    fn current_ref(&self, _dirty_ok: bool) -> Result<HistoryRef, DriverError> {
-        todo!(); // TODO: default implementation based on implementor's own impls of {current_ref_id, current_ref_name}
+    fn current_ref(&self, dirty_ok: bool) -> Result<HistoryRef, DriverError> {
+        let is_dirty = !self.is_clean()?;
+        if !dirty_ok && is_dirty {
+            return Err(ERROR_REPO_NOT_CLEAN.to_string().into());
+        }
+        Ok(HistoryRef {
+            id: self.current_ref_id(dirty_ok)?,
+            name: self.current_ref_name(dirty_ok)?,
+            dirty: is_dirty,
+        })
     }
 
     /// Thin wrapper for `current_ref()` that just unpacks the name if there is one.
