@@ -228,8 +228,8 @@ impl<'a> PlexerQuery<'a> {
                 dirty_ok,
             } => {
                 let current_id = self.plexer.current_ref_id(dirty_ok)?;
-                writeln!(self.stdout, "{}", current_id).unwrap_or_else(|_| {
-                    panic!("failed stdout write of: {}", current_id)
+                writeln!(self.stdout, "{current_id}").unwrap_or_else(|_| {
+                    panic!("failed stdout write of: {current_id}")
                 });
             },
             #[cfg(debug_assertions)]
