@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
-use libvcst::plexer;
-use libvcst::repo::{QueryDir, Driver, DriverError};
+use vcsq_lib::plexer;
+use vcsq_lib::repo::{QueryDir, Driver, DriverError};
 use std::io;
 use thiserror::Error;
 

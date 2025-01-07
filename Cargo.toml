@@ -6,6 +6,16 @@ members = [
   "vcsq-cli",
 ]
 
+[workspace.package]
+version = "0.7.0"
+edition = "2021"
+authors = ["Jonathan Zacsh j@zac.sh"]
+description = "vcsq (vcsQuery): Version Control System (VCS) Querying CLI"
+license = "Apache-2.0"
+repository = "https://gitlab.com/jzacsh/vcsq"
+readme = "README.md"
+documentation = "https://gitlab.com/jzacsh/vcsq"
+keywords = ["vcs", "scm"]
 
 [workspace.dependencies]
 thiserror = "2.0.9"

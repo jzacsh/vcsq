@@ -1,7 +1,7 @@
 use crate::libtest::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
 use crate::libtest::setup::{make_test_temp, TestDirs, TestScope};
 use assert_cmd::Command;
-use libvcst::repo::ERROR_REPO_NOT_DIRTY;
+use vcsq_lib::repo::ERROR_REPO_NOT_DIRTY;
 use predicates::prelude::*;
 
 static TEST_SCOPE: TestScope = TestScope::new("cmd_dirty.rs");

@@ -1,12 +1,19 @@
 [package]
-name = "vcst"
-version = "0.7.0"
-edition = "2021"
+name = "vcsq"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+documentation.workspace = true
+keywords.workspace = true
 
 [dependencies]
 thiserror.workspace = true
 clap = { version = "4.5.23", features = ["derive"] }
-libvcst = { path = "../vcsq-lib" }
+vcsq-lib = { path = "../vcsq-lib" }
 
 [dev-dependencies]
 assert_cmd = "2.0.16"
