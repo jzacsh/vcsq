@@ -8,7 +8,7 @@ static TEST_SCOPE: TestScope = TestScope::new("cmd_root.rs");
 #[test]
 fn git() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).git_repo;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let expected_root = test_dir.display().to_string();
 
@@ -22,7 +22,7 @@ fn git() {
 #[test]
 fn hg() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).hg_repo;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let expected_root = test_dir.display().to_string();
 
@@ -36,7 +36,7 @@ fn hg() {
 #[test]
 fn jj() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).jj_repo;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let expected_root = test_dir.display().to_string();
 
@@ -49,7 +49,7 @@ fn jj() {
 #[test]
 fn novcs() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_vcs;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("root").arg(test_dir).assert();
     assert
@@ -61,7 +61,7 @@ fn novcs() {
 #[test]
 fn non_dir() {
     let not_dir = &TestDirs::create_once(&TEST_SCOPE).not_dir;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("root").arg(not_dir).assert();
     assert
@@ -74,7 +74,7 @@ fn non_dir() {
 fn non_extant() {
     let test_dirs = &TestDirs::create_once(&TEST_SCOPE);
     let non_extant_path = test_dirs.non_extant();
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("root").arg(non_extant_path).assert();
     assert

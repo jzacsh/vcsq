@@ -12,7 +12,7 @@ fn git() {
     //
     // Assert: nothing to track yet, so nutput
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("tracked-files").arg(test_dir).assert();
     assert
         .success()
@@ -44,7 +44,7 @@ fn git() {
     //
     // Assert: actual history to report, all committed files listed
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("tracked-files").arg(test_dir).assert();
     assert
         .success()
@@ -59,7 +59,7 @@ fn hg() {
     //
     // Assert: nothing to track yet, so nutput
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("tracked-files").arg(test_dir).assert();
     assert
         .success()
@@ -90,7 +90,7 @@ fn hg() {
     //
     // Assert: actual history to report, all committed files listed
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("tracked-files").arg(test_dir).assert();
     assert
         .success()
@@ -105,7 +105,7 @@ fn jj() {
     //
     // Assert: nothing to track yet, so nutput
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("tracked-files").arg(test_dir).assert();
     assert
         .success()
@@ -135,7 +135,7 @@ fn jj() {
     //
     // Assert: actual history to report, all committed files listed
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("tracked-files").arg(test_dir).assert();
     assert
         .success()
@@ -146,7 +146,7 @@ fn jj() {
 #[test]
 fn novcs() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_vcs;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("tracked-files").arg(test_dir).assert();
     assert
@@ -158,7 +158,7 @@ fn novcs() {
 #[test]
 fn non_dir() {
     let not_dir = &TestDirs::create_once(&TEST_SCOPE).not_dir;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("tracked-files").arg(not_dir).assert();
     assert
@@ -171,7 +171,7 @@ fn non_dir() {
 fn non_extant() {
     let test_dirs = &TestDirs::create_once(&TEST_SCOPE);
     let non_extant_path = test_dirs.non_extant();
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("tracked-files").arg(non_extant_path).assert();
     assert

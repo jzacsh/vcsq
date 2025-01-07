@@ -1,5 +1,5 @@
 [package]
-name = "vcsq-lib"
+name = "vcsq_lib"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true

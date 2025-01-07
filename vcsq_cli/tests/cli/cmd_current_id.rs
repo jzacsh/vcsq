@@ -12,7 +12,7 @@ fn git() {
     //
     // Assert: repo now no real current id, because it has not history
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("current-id").arg(&test_dir).assert();
     assert
         .success()
@@ -44,7 +44,7 @@ fn git() {
     //
     // Assert: repo now has a current id, because it has history
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("current-id").arg(&test_dir).assert();
     assert
         .success()
@@ -62,7 +62,7 @@ fn hg() {
     //
     // Assert: repo now no real current id, because it has not history
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("current-id").arg(&test_dir).assert();
     assert
         .success()
@@ -93,7 +93,7 @@ fn hg() {
     //
     // Assert: repo now has a current id, because it has history
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("current-id").arg(&test_dir).assert();
     assert
         .success()
@@ -111,7 +111,7 @@ fn jj() {
     //
     // Assert: repo now no real current id, because it has not history
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("current-id").arg(&test_dir).assert();
     assert
         .success()
@@ -141,7 +141,7 @@ fn jj() {
     //
     // Assert: repo now has a current id, because it has history
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
     let assert = cmd.arg("current-id").arg(test_dir).assert();
     assert
         .success()
@@ -155,7 +155,7 @@ fn jj() {
 #[test]
 fn novcs() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_vcs;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("current-id").arg(test_dir).assert();
     assert
@@ -167,7 +167,7 @@ fn novcs() {
 #[test]
 fn non_dir() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_dir;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("current-id").arg(test_dir).assert();
     assert
@@ -180,7 +180,7 @@ fn non_dir() {
 fn non_extant() {
     let test_dirs = &TestDirs::create_once(&TEST_SCOPE);
     let non_extant_path = test_dirs.non_extant();
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("current-id").arg(non_extant_path).assert();
     assert

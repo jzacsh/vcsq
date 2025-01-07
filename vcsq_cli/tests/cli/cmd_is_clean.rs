@@ -1,10 +1,9 @@
 use crate::libtest::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
 use crate::libtest::setup::{make_test_temp, TestDirs, TestScope};
 use assert_cmd::Command;
-use vcsq_lib::repo::ERROR_REPO_NOT_DIRTY;
 use predicates::prelude::*;
 
-static TEST_SCOPE: TestScope = TestScope::new("cmd_dirty.rs");
+static TEST_SCOPE: TestScope = TestScope::new("cmd_is_clean.rs");
 
 #[test]
 fn git() {
@@ -14,43 +13,29 @@ fn git() {
     //
     // Arrange+Assert: clean repo lists nothing dirty
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd
-        .arg("dirty-files")
-        .arg("--clean-ok")
-        .arg(test_dir)
-        .assert();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::is_empty())
         .stderr(predicate::str::is_empty());
 
     //
-    // Arrange+Assert: clean repo lists complains without --clean-ok
-    //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
-    assert
-        .failure()
-        .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::contains(ERROR_REPO_NOT_DIRTY));
-
-    //
     // Arrange: make the repo dirty
     //
     let mut untracked_file = test_dir.clone();
-    untracked_file.push("git-docs.md");
+    untracked_file.push("git-unclean.md");
 
     make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
 
     //
     // Assert: dirty repo now has report of what's dirty
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
-        .success()
-        .stdout(predicate::str::diff("git-docs.md\n"))
+        .failure()
+        .stdout(predicate::str::is_empty())
         .stderr(predicate::str::is_empty());
 }
 
@@ -62,43 +47,29 @@ fn hg() {
     //
     // Arrange+Assert: clean repo lists nothing dirty
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd
-        .arg("dirty-files")
-        .arg("--clean-ok")
-        .arg(test_dir)
-        .assert();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::is_empty())
         .stderr(predicate::str::is_empty());
 
     //
-    // Arrange+Assert: clean repo lists complains without --clean-ok
-    //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
-    assert
-        .failure()
-        .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::contains(ERROR_REPO_NOT_DIRTY));
-
-    //
     // Arrange: make the repo dirty
     //
     let mut untracked_file = test_dir.clone();
-    untracked_file.push("mercurial.md");
+    untracked_file.push("mercurial-unclean.md");
 
     make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
 
     //
     // Assert: dirty repo now has report of what's dirty
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
-        .success()
-        .stdout(predicate::str::diff("mercurial.md\n"))
+        .failure()
+        .stdout(predicate::str::is_empty())
         .stderr(predicate::str::is_empty());
 }
 
@@ -110,52 +81,38 @@ fn jj() {
     //
     // Arrange+Assert: clean repo lists nothing dirty
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd
-        .arg("dirty-files")
-        .arg("--clean-ok")
-        .arg(test_dir)
-        .assert();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .success()
         .stdout(predicate::str::is_empty())
         .stderr(predicate::str::is_empty());
 
     //
-    // Arrange+Assert: clean repo lists complains without --clean-ok
-    //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
-    assert
-        .failure()
-        .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::contains(ERROR_REPO_NOT_DIRTY));
-
-    //
     // Arrange: make the repo dirty
     //
     let mut untracked_file = test_dir.clone();
-    untracked_file.push("jj-vcs-docs.md");
+    untracked_file.push("jj-vcs-unclean.md");
 
     make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
 
     //
     // Assert: dirty repo now has report of what's dirty
     //
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
-        .success()
-        .stdout(predicate::str::diff("jj-vcs-docs.md\n"))
+        .failure()
+        .stdout(predicate::str::is_empty())
         .stderr(predicate::str::is_empty());
 }
 
 #[test]
 fn novcs() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_vcs;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
+    let assert = cmd.arg("is-clean").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -165,9 +122,9 @@ fn novcs() {
 #[test]
 fn non_dir() {
     let test_dir = &TestDirs::create_once(&TEST_SCOPE).not_dir;
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
-    let assert = cmd.arg("dirty-files").arg(test_dir).assert();
+    let assert = cmd.arg("brand").arg(test_dir).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())
@@ -178,9 +135,9 @@ fn non_dir() {
 fn non_extant() {
     let test_dirs = &TestDirs::create_once(&TEST_SCOPE);
     let non_extant_path = test_dirs.non_extant();
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
-    let assert = cmd.arg("dirty-files").arg(non_extant_path).assert();
+    let assert = cmd.arg("brand").arg(non_extant_path).assert();
     assert
         .failure()
         .stdout(predicate::str::is_empty())

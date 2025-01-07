@@ -10,7 +10,7 @@ use predicates::prelude::*;
 
 #[test]
 fn full_pass() {
-    let mut cmd = Command::cargo_bin("vcst").unwrap();
+    let mut cmd = Command::cargo_bin("vcsq").unwrap();
 
     let assert = cmd.arg("check-health").assert();
     assert

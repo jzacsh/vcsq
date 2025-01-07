@@ -15,7 +15,7 @@ static ENVVAR_OVERRIDE_TESTDIR_ROOT: &str = "VCST_TESTDIR";
 
 /// Directory under which all files are managed. This directory may itself be sub-contained (say in
 /// /tmp/foo, depending on `ENVVAR_OVERRIDE_TESTDIR_ROOT` being present).
-static TESTDIR_TMPDIR_ROOT: &str = "vcst-e2e-testdirs";
+static TESTDIR_TMPDIR_ROOT: &str = "vcsq-e2e-testdirs";
 
 // TODO: (rust) how much of this file do the following two crates make obsolete/deletable?
 // - https://docs.rs/assert_cmd/latest/assert_cmd

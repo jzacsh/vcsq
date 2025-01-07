@@ -1,15 +1,15 @@
 use clap::{Parser, Subcommand};
-use vcsq_lib::plexer;
-use vcsq_lib::repo::{QueryDir, Driver, DriverError};
 use std::io;
 use thiserror::Error;
+use vcsq_lib::plexer;
+use vcsq_lib::repo::{Driver, DriverError, QueryDir};
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "vcst",
+    name = "vcsq",
     version,
     about = "vcs queries in rust",
-    long_about = "vcst is a rust CLI providing Version Control System (VCS) inspection, without you
+    long_about = "vcsq is a rust CLI providing Version Control System (VCS) inspection, without you
 needing to know each VCS's proprietary incantations."
 )]
 pub struct VcstArgs {
