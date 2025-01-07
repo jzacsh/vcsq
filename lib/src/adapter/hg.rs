@@ -86,7 +86,7 @@ impl Repo {
 
     fn hg_current_id(&self) -> Command {
         let mut cmd = self.start_shellout();
-        cmd.arg("--debug").arg("id").arg("-i");
+        cmd.arg("--debug").arg("id").arg("--id");
         cmd
     }
 
