@@ -108,9 +108,10 @@ So to see untested lines, just `^F` for " |0" in the output.
 
 - [ ] **finish initial features**: see lines in vcst/src/lib.rs disabled in release
   - try `cargo build --release` to turn these back off
-  - in the meantime: dbug build via: `cargo run --` to run,  `cargo build`
-  - `grep -rnE '(todo|unimplemented|panic)!' {lib,vcst}/src/` to hunt down tasks
-  build (because they just `todo!()`), via `#[cfg(debug_assertions)]`
+  - in the meantime: dbug build via: `cargo run --` to run, `cargo build`
+  - `grep -C 1 -rnE '\b(todo|unimplemented|panic|expect)!' {lib,vcst}/src` to
+  hunt down tasks build (because they just `todo!()`, hidden via
+  `#[cfg(debug_assertions)]`)
 - [x] **feature**: add ["list tracked files" concept][vcsListUsecase]
 - [x] install jj VCS to $PATH of gitlab ci/cd
 
