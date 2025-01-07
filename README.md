@@ -13,14 +13,16 @@ This repo lives at <https://gitlab.com/jzacsh/vcst>
 
 **Goal**: answer _basic_ introspective questions about a repo/directory.
 
-This very much inspired by Greg's famous `vcprompt` CLI I've been using for
-years via my `$PS1`, but also APIs I've frequently[^freq] wanted for scripting
-purposes. Each of those APIs I wished for is now outlined in this codebase's
-`VcstQuery` enum of in the namesaked reference binary (at `./vcst/src/lib.rs`).
+This very much inspired by the use-case of the popular [`vcprompt`
+CLI][vcprompt] I've been using for years via my `$PS1`, but also by APIs I've
+frequently[^freq] wanted for scripting purposes. Each of those APIs I wished for
+is now outlined in this codebase's `VcstQuery` enum of in the namesaked
+reference binary (at `./vcst/src/lib.rs`).
 
 The goal is to have coverage for the popular VCS I personally encounter
 regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
-possible to add new ones.
+possible to add new ones. So **contributions of new VCS coverage** is welcome,
+just chat with me about it first to avoid any mis-spent time.
 
 ### Usage
 
@@ -125,6 +127,7 @@ So to see untested lines, just `^F` for " |0" in the output.
 [wwwVcsts]: https://gitlab.com/jzacsh/jzacsh.gitlab.io/-/blob/fix-jj-usage-vcslib-refactoring/src/bin/vcslib.ts?ref_type=heads
 [gitlab_ci_badge]: https://gitlab.com/jzacsh/vcst/badges/main/pipeline.svg
 [gitlab_ci_dash]: https://gitlab.com/jzacsh/vcst/-/jobs
+[vcprompt]: http://vc.gerg.ca/hg/vcprompt
 
 ## License
 
