@@ -54,19 +54,17 @@ development just involves producing a debug binary and making sure you haven't
 broken tests:
 
 ```sh
-$ RUST_BACKTRACE=full cargo watch test  --color=always -- --nocapture
+$ RUST_BACKTRACE=full cargo watch test --workspace --color=always -- --nocapture
 # ...
 ```
 
 In a second terminal I ensure the binary is being continuously rebuilt:
 
 ```sh
-$ cd vcsq-cli && cargo watch \
+$ RUSTFLAGS='-Ddeprecated -Dwarnings' cargo watch \
   -x build \
-  -x 'clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
-  -s 'cd ../vcsq-lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
-  -x 'doc --all-features' \
-  -s 'cd ../vcsq-lib && cargo doc --all-features'
+  -x 'clippy --workspace --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
+  -x 'doc --workspace --all-features'
 
 # ...
 # can also be tacked onto the previous command via another '-x build' arg at the
