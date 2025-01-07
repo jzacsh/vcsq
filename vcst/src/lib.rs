@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use libvcst::plexer;
-use libvcst::repo::{DirPath, Driver, DriverError};
+use libvcst::repo::{QueryDir, Driver, DriverError};
 use std::io;
 use thiserror::Error;
 
@@ -15,7 +15,7 @@ needing to know each VCS's proprietary incantations."
 pub struct VcstArgs {
     /// Directory for which you'd like to ask VCS questions.
     #[arg(short, long)]
-    pub dir: Option<DirPath>,
+    pub dir: Option<QueryDir>,
 
     #[command(subcommand)]
     pub query: Option<VcstQuery>,
@@ -62,23 +62,23 @@ impl VcstArgs {
 pub enum VcstQuery {
     /// Prints the brand of the VCS repo, or exits non-zero if it's not a known VCS repo.
     #[command(arg_required_else_help = true)]
-    Brand { dir: DirPath },
+    Brand { dir: QueryDir },
 
     /// Prints the root dir of the repo
     #[command(arg_required_else_help = true)]
-    Root { dir: DirPath },
+    Root { dir: QueryDir },
 
     /// Whether VCS repo is in a clean state, or has uncommitted work.
     #[command(arg_required_else_help = true)]
     IsClean {
         // TODO: (feature) implement subcommand here, eg: enum {diffstat, diff, files}
-        dir: DirPath,
+        dir: QueryDir,
     },
 
     /// Print the VCS repo's current revision ID (eg: rev in Mercurial, ref in git, etc).
     #[command(arg_required_else_help = true)]
     CurrentId {
-        dir: DirPath,
+        dir: QueryDir,
 
         /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
         #[arg(long, default_value_t = false)]
@@ -90,7 +90,7 @@ pub enum VcstQuery {
     #[command(arg_required_else_help = true)]
     #[cfg(debug_assertions)]
     CurrentName {
-        dir: DirPath,
+        dir: QueryDir,
 
         /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
         #[arg(long, default_value_t = false)]
@@ -101,7 +101,7 @@ pub enum VcstQuery {
     /// Mercurial, ref in git, etc).
     #[command(arg_required_else_help = true)]
     #[cfg(debug_assertions)]
-    ParentId { dir: DirPath },
+    ParentId { dir: QueryDir },
 
     /// Print the VCS repo's parent revision's human-readable revision name for the first parent it
     /// finds with one, or until it has stepped --max steps. Non-zero exit with no stderr output
@@ -109,7 +109,7 @@ pub enum VcstQuery {
     #[command(arg_required_else_help = true)]
     #[cfg(debug_assertions)]
     ParentName {
-        dir: DirPath,
+        dir: QueryDir,
 
         /// Max number of parents back to walk when seeking a parent with a hand-written ref name.
         // TODO: (rust) there's a type-way to express positive natural numbers, yeah?
@@ -120,13 +120,13 @@ pub enum VcstQuery {
     /// (git) or deleted "working-copy" (jj) edits. The goal of this listing is to show the full
     /// listing of the repository's contents, as of the time of the current commit.
     #[command(arg_required_else_help = true)]
-    TrackedFiles { dir: DirPath },
+    TrackedFiles { dir: QueryDir },
 
     /// Lists filepaths touched that are the cause of the repo being dirty, or lists no output if
     /// the repo isn't dirty (thus can be used as a 1:1 proxy for `IsClean`'s behavior).
     #[command(arg_required_else_help = true)]
     DirtyFiles {
-        dir: DirPath,
+        dir: QueryDir,
         #[arg(long, default_value_t = false)]
         clean_ok: bool,
         // TODO: (feature) add flag like "--exists" to only show files that are currently present
@@ -137,7 +137,7 @@ pub enum VcstQuery {
     #[command(arg_required_else_help = true)]
     #[cfg(debug_assertions)]
     CurrentFiles {
-        dir: DirPath,
+        dir: QueryDir,
 
         /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
         dirty_ok: bool,
@@ -154,13 +154,13 @@ pub enum VcstQuery {
 }
 
 impl VcstQuery {
-    fn dir(&self) -> Option<DirPath> {
+    fn dir(&self) -> Option<QueryDir> {
         self.dir_path().cloned()
     }
 
     // TODO: (rust) way to ask clap to make a global positional arg for all these subcommands, so
     // we can rely on its presence?
-    fn dir_path(&self) -> Option<&DirPath> {
+    fn dir_path(&self) -> Option<&QueryDir> {
         match self {
             VcstQuery::Brand { dir }
             | VcstQuery::Root { dir }

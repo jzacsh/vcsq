@@ -9,6 +9,11 @@ This repo lives at <https://gitlab.com/jzacsh/vcsq>
 
 [![Build Status][gitlab_ci_badge]][gitlab_ci_dash] shows e2e tests' status.
 
+**Status**: While I can already make use of this project for the original goals
+I had, it's still a WIP as I tweak what the "right way" to do some rust/cargo
+things is, and implement some last features and documentatoin (more `TODO`s
+below).
+
 ## Design & Goals
 
 **Goal**: answer _basic_ introspective questions about a repo/directory.

@@ -1,10 +1,12 @@
+//! Provides the traits any driver a particular brand of VCS must implement.
 use crate::cmd::{Utf8CmdOutput, Utf8CmdOutputLossy};
 use std::convert::From;
 use std::path::PathBuf;
 use std::process::Output;
 use thiserror::Error;
 
-pub type DirPath = PathBuf;
+/// The local repository a VCS queyr will center around.
+pub type QueryDir = PathBuf;
 
 pub const ERROR_REPO_NOT_CLEAN: &str = "repo not clean, references not hermetic";
 pub const ERROR_REPO_NOT_DIRTY: &str = "repo not dirty";
@@ -194,7 +196,7 @@ pub type HistoryRefId = String;
 /// VCS repo's human-readable identifier describing a reference-point in its history (eg: branch or
 /// tag in git, bookmark in jj).
 ///
-/// These generally are sparse in a repo's history, unlike `RepoRefId`.
+/// These generally are sparse in a repo's history, unlike `HistoryRefId`.
 pub type HistoryRefName = String;
 
 /// Single point in time in the Repo's history.
@@ -221,7 +223,7 @@ pub struct AncestorRef {
 
 pub type VcsAvailable = Utf8CmdOutputLossy;
 
-/// Operations a VCS driver should be able to answer: is the VCS program even abailel on this
+/// Operations a VCS driver should be able to answer: is the VCS program even available on this
 /// system? Does a directory even look like a valid VCS?.
 pub trait Validator
 where
@@ -235,7 +237,7 @@ where
     /// Returns a [`DriverError`] if either this validator doesn't recognize the directory, as a
     /// VCS or if some critical error happened (like one of the drivers hit an access error to the
     /// directory, or found something silly like the directory is actually a plain file).
-    fn new_driver(&self, dir: DirPath) -> Result<Option<Box<dyn Driver>>, DriverError>;
+    fn new_driver(&self, dir: QueryDir) -> Result<Option<Box<dyn Driver>>, DriverError>;
 
     /// Returns basic info from the underlying VCS, proving its presence on the system, or an error
     /// if the attempt failed.
@@ -243,7 +245,6 @@ where
     /// # Errors
     ///
     /// Returns [`DriverError`] in the event the underlying VCS APIs failed
-    // TODO: (cleanup) move new() impls here, and delete relevant TODO from Driver
     fn check_health(&self) -> Result<VcsAvailable, DriverError>;
 }
 
@@ -270,7 +271,7 @@ where
     ///
     /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
     /// VCS APIs failed.
-    fn root(&self) -> Result<DirPath, DriverError>;
+    fn root(&self) -> Result<QueryDir, DriverError>;
 
     /// Whether repo is in a clean state.
     ///
@@ -292,7 +293,7 @@ where
     /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
     /// VCS APIs failed. Will also return this error if repo wasn't even dirty (unless `clean_ok`
     /// in which case an empty vector will be returned).
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError>;
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<QueryDir>, DriverError>;
 
     /// Lists filepaths tracked by this repo, ignoring the state of the repo (ie: any "staged"
     /// (git) or deleted "working-copy" (jj) edits. The goal of this listing is to show the full
@@ -302,7 +303,7 @@ where
     ///
     /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
     /// VCS APIs failed.
-    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError>;
+    fn tracked_files(&self) -> Result<Vec<QueryDir>, DriverError>;
 
     /// Returns the historical reference of the direct ancestor of the current state.
     ///

@@ -1,5 +1,5 @@
 use crate::repo::{
-    DirPath, Driver, DriverError, HistoryRefId, HistoryRefName, Validator, VcsAvailable,
+    Driver, DriverError, HistoryRefId, HistoryRefName, QueryDir, Validator, VcsAvailable,
     ERROR_REPO_NOT_CLEAN, ERROR_REPO_NOT_DIRTY,
 };
 use std::path::PathBuf;
@@ -7,7 +7,7 @@ use std::process::{Command, Stdio};
 
 #[derive(Debug)]
 pub struct Repo {
-    dir: DirPath,
+    dir: QueryDir,
 }
 
 static VCS_BIN_NAME: &str = "hg";
@@ -26,7 +26,7 @@ where
     Self: Sized;
 
 impl Validator for Loader {
-    fn new_driver(&self, dir: DirPath) -> Result<Option<Box<dyn Driver>>, DriverError> {
+    fn new_driver(&self, dir: QueryDir) -> Result<Option<Box<dyn Driver>>, DriverError> {
         let repo = Repo { dir };
 
         let is_ok = DriverError::unwrap_cmd_lossy(
@@ -102,7 +102,7 @@ impl Repo {
 }
 
 impl Driver for Repo {
-    fn root(&self) -> Result<DirPath, DriverError> {
+    fn root(&self) -> Result<QueryDir, DriverError> {
         let output =
             DriverError::expect_cmd_lossy("hg cli: exec".to_string(), self.hg_root().output())?;
         Ok(PathBuf::from(DriverError::expect_cmd_line(
@@ -110,7 +110,7 @@ impl Driver for Repo {
         )?))
     }
 
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError> {
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<QueryDir>, DriverError> {
         let min_lines = u8::from(!clean_ok);
         let lines = DriverError::expect_cmd_lines(
             self.hg_dirty_files().output(),
@@ -130,7 +130,7 @@ impl Driver for Repo {
         Ok(dirty_files)
     }
 
-    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError> {
+    fn tracked_files(&self) -> Result<Vec<QueryDir>, DriverError> {
         let lines = DriverError::expect_cmd_lines(
             self.hg_tracked_files().output(),
             0, /*min_lines*/

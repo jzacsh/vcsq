@@ -1,5 +1,5 @@
 use crate::repo::{
-    DirPath, Driver, DriverError, HistoryRefId, HistoryRefName, Validator, VcsAvailable,
+    Driver, DriverError, HistoryRefId, HistoryRefName, QueryDir, Validator, VcsAvailable,
     ERROR_REPO_NOT_CLEAN, ERROR_REPO_NOT_DIRTY,
 };
 use const_format::concatcp;
@@ -52,7 +52,7 @@ const GIT_LOG_SCRAPABLE_PRETTY_FLAG: &str =
 
 #[derive(Debug)]
 pub struct Repo {
-    dir: DirPath,
+    dir: QueryDir,
 }
 
 #[derive(Debug)]
@@ -68,7 +68,7 @@ impl Validator for Loader {
     /// ```sh
     /// ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
     /// ```
-    fn new_driver(&self, dir: DirPath) -> Result<Option<Box<dyn Driver>>, DriverError> {
+    fn new_driver(&self, dir: QueryDir) -> Result<Option<Box<dyn Driver>>, DriverError> {
         let repo = Repo { dir };
         let is_ok = DriverError::unwrap_cmd_lossy(
             "git cli".to_string(),
@@ -145,7 +145,7 @@ impl Repo {
 }
 
 impl Driver for Repo {
-    fn root(&self) -> Result<DirPath, DriverError> {
+    fn root(&self) -> Result<QueryDir, DriverError> {
         let output = DriverError::expect_cmd_lossy(
             "git cli".to_string(),
             self.git_show_top_level().output(),
@@ -155,7 +155,7 @@ impl Driver for Repo {
         )?))
     }
 
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError> {
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<QueryDir>, DriverError> {
         let min_lines = u8::from(!clean_ok);
         let lines = DriverError::expect_cmd_lines(
             self.git_dirty_files().output(),
@@ -175,7 +175,7 @@ impl Driver for Repo {
         Ok(files)
     }
 
-    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError> {
+    fn tracked_files(&self) -> Result<Vec<QueryDir>, DriverError> {
         let lines = DriverError::expect_cmd_lines(
             self.git_tracked_files().output(),
             0, /*min_lines*/

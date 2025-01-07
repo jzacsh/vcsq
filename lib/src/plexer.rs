@@ -2,7 +2,7 @@ use crate::adapter::git;
 use crate::adapter::hg;
 use crate::adapter::jj;
 use crate::repo;
-use crate::repo::{AncestorRef, DirPath, Driver, DriverError, Validator, VcsAvailable};
+use crate::repo::{AncestorRef, Driver, DriverError, QueryDir, Validator, VcsAvailable};
 use strum::{AsRefStr, EnumIter, IntoEnumIterator};
 
 /// The particular brands of VCS this library supports.
@@ -30,7 +30,7 @@ impl Repo {
     /// Returns a [`DriverError`] if either no VCS driver is present that recognizes the directory,
     /// or if some critical error happened (like one of the drivers hit an access error to the
     /// directory, or found something silly like the directory is actually a plain file).
-    pub fn new_driver(dir: &DirPath) -> Result<Self, DriverError> {
+    pub fn new_driver(dir: &QueryDir) -> Result<Self, DriverError> {
         // TODO: (feature) generically handle "vcs" being not in $PATH, out here in our plexer; if
         // _none_ of our adapter's underlying CLIs are in our plexer, _then_ translate that to an
         // error.
@@ -63,12 +63,17 @@ impl Repo {
     }
 }
 
+/// Basic report from a given brand of VCS (eg: `--version` output), intended purely to indicate
+/// whether the VCS is in the current process's `$PATH`.
+///
+/// See also [`Validator.check_health`].
 pub struct VcsHealth {
+    /// Which specific brand of VCS we're reporting on.
     pub brand: VcsBrand,
     pub health: Result<VcsAvailable, DriverError>,
 }
 
-/// Returns a single all VCS driver's health reports.
+/// Returns a all VCS drivers' health reports.
 #[must_use]
 pub fn check_health() -> Vec<VcsHealth> {
     VcsBrand::iter()
@@ -91,7 +96,7 @@ pub fn check_health() -> Vec<VcsHealth> {
 }
 
 impl Driver for Repo {
-    fn root(&self) -> Result<DirPath, DriverError> {
+    fn root(&self) -> Result<QueryDir, DriverError> {
         self.adapter.root()
     }
 
@@ -99,11 +104,11 @@ impl Driver for Repo {
         self.adapter.is_clean()
     }
 
-    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<DirPath>, DriverError> {
+    fn dirty_files(&self, clean_ok: bool) -> Result<Vec<QueryDir>, DriverError> {
         self.adapter.dirty_files(clean_ok)
     }
 
-    fn tracked_files(&self) -> Result<Vec<DirPath>, DriverError> {
+    fn tracked_files(&self) -> Result<Vec<QueryDir>, DriverError> {
         self.adapter.tracked_files()
     }
 
