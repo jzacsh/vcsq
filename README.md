@@ -104,58 +104,12 @@ So to see untested lines, just `^F` for " |0" in the output.
   guess separated they have clearer deps-attribution?
 - [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
   have one crate when published).
-- [x] **feature**: add ["list tracked files" concept][vcsListUsecase]
-- [x] install jj VCS to $PATH of gitlab ci/cd
-
-  - [x] copy `git --version && hg --version && jj --version` from ci/cd yml into
-  test harness startup as a sanity-check _anywhere_ the test runs.
-
-- [x] **feature**: run a dump of what VCS we find in path, as part of `--version`
-      output, or some place of the sort.
-- [x] cleanup all the CLI string handling (the `String::from_utf8` and
-      `expect(.*utf8` references) to use `String::from_utf8_lossy`
 - [ ] techdebt/rust-question: cleanup some of the error enums that aren't being
   fully utilized (eg: some that default to map_err() to `Unknown`-fallbackish
   variants). This is because some of the better alternatives were only added
   _later_ (eg: `RepoLoadError::Stderr`) which could fix some
 - [ ] techdbt: make it easier to develop by setting up a nix flake that installs
   all the deps (then cleanup the gitlab CI to use that flow too).
-- [x] before releasing....
-  - [x] flag-guard `todo!()`/`unimplemented!()` blocks for dev/tests only; eg:
-  via `#[cfg(debug_assertions)]`
-  - [x] centralize/codify standards I'm trying to follow, so all "preferences"
-  are automated:
-    - [x] get local test/build/watch command that will error when clippy isn't
-    happy (and document that in the Development instructions above with another
-    `-x ...` on the recommended watch line); ie: something that will _error out_
-    when either vcst/ or lib/ cause any output from `cargo clippy` (and then
-    codify the tip: "maybe just run `cargo clippy --allow-no-vcs --fix`" into readme).
-      - [x] eval options:
-        - `cargo fmt --check` seems to be a thing
-      - [x] ci/cd clippy: get [gitlab ci][rustGitlabCiTempl] to do the above and
-      report on failures.
-    - [x] get local test/build/watch command that will _report_ coverage status
-      - [x] ci/cd: get [gitlab ci][rustGitlabCiTempl] to do the above and report
-      on a health-status on this. find out what the SLA is for this reporting
-      (do you need to save it locally somehwo to have good guarantees? or will
-      it be around for a longtime in the gitlab CI pipeline? are their generic
-      solutions for updating this sort of history directly into the repo
-      periodically?)
-    - [x] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
-    `--no-deps --all-features` for that)
-  - [x] get to clippy:pedantic level:
-    - [x] address clippy::pedantic output `cargo clippy --all -- -W
-    clippy::pedantic`
-      - [x] in `vcst/` dir
-      - [x] in `lib/` dir
-    - [x] roll it into above stages (both doc and [ci/cd][rustGitlabCiTempl])
-      - [x] in `vcst/` dir
-      - [x] in `lib/` dir
-  - [x] reconsider the version number in Cargo.toml's
-
-[vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
-[gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
-[rustGitlabCiTempl]: https://gitlab.com/rust-automation/rust-gitlab-ci/-/tree/master
 
 [^freq]:
     See the three predecessors/mini-libs that inspired this one, at:
@@ -163,6 +117,7 @@ So to see untested lines, just `^F` for " |0" in the output.
     [`vcs.sh` of gitlab.com/jzacsh/yabashlib][yblibVcs] ([ref][yblibVcs_ref]) and
     [gitlab.com/jzacsh/jzach.gitlab.io][wwwVcsts]
 
+[gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
 [yblibVcs]: https://gitlab.com/jzacsh/yabashlib/-/blob/main/src/vcs.sh
 [yblibVcs_ref]: https://gitlab.com/jzacsh/yabashlib/-/blob/dd838fc3b32a66fe2ec95fb85a5e9aa67280fee9/src/vcs.sh
 [dotsVcsq]: https://gitlab.com/jzacsh/dotfiles/-/blob/main/bin/lib/vcsq
