@@ -1,9 +1,9 @@
-# vcst: VCSrusT - Version Control System (VCS) utils in Rust
+# vcsq: VCSquery - Version Control System (VCS) Querying CLI
 
-`vcst` tries to answer a _small set_ of generic questions about "any" type of
+`vcsq` tries to answer a _small set_ of generic questions about "any" type of
 VCS repo, without making you think about the particular flavor of VCS at play.
 
-This repo lives at <https://gitlab.com/jzacsh/vcst>
+This repo lives at <https://gitlab.com/jzacsh/vcsq>
 
 ## Project Status
 
@@ -74,7 +74,7 @@ they covery every API that `lib/` is meant to offer.
 
 Gitlab servers also runs this suite on every merge to main, via `.gitlab-ci.yml`
 instructions. The results can be seen at:
-<https://gitlab.com/jzacsh/vcst/-/jobs>
+<https://gitlab.com/jzacsh/vcsq/-/jobs>
 
 #### Test Coverage
 
@@ -94,6 +94,9 @@ So to see untested lines, just `^F` for " |0" in the output.
 
 ### TODOs
 
+- [ ] cleanup/finish rename of objects to vcsq (from old vcst) (and also just
+  stop prefixing any internal objects with the liberary's name; idk why the heck
+  I did that).
 - [ ] **finish tail-end of feature-set**: see lines in vcst/src/lib.rs disabled
   in release
   - try `cargo build --release` to turn these back off
@@ -125,8 +128,8 @@ So to see untested lines, just `^F` for " |0" in the output.
 [dotsVcsq]: https://gitlab.com/jzacsh/dotfiles/-/blob/main/bin/lib/vcsq
 [dotsVcsq_ref]: https://gitlab.com/jzacsh/dotfiles/-/blob/2543adf4a6d4fcf946d0fda2c70658f72739a250/bin/lib/vcsq
 [wwwVcsts]: https://gitlab.com/jzacsh/jzacsh.gitlab.io/-/blob/fix-jj-usage-vcslib-refactoring/src/bin/vcslib.ts?ref_type=heads
-[gitlab_ci_badge]: https://gitlab.com/jzacsh/vcst/badges/main/pipeline.svg
-[gitlab_ci_dash]: https://gitlab.com/jzacsh/vcst/-/jobs
+[gitlab_ci_badge]: https://gitlab.com/jzacsh/vcsq/badges/main/pipeline.svg
+[gitlab_ci_dash]: https://gitlab.com/jzacsh/vcsq/-/jobs
 [vcprompt]: http://vc.gerg.ca/hg/vcprompt
 
 ## License
