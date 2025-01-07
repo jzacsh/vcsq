@@ -7,23 +7,16 @@ This repo lives at <https://gitlab.com/jzacsh/vcst>
 
 ## Project Status
 
-[![Build Status][gitlab_ci_badge]][gitlab_ci_dash] shows e2e tess' status. I'm
-hoping for near-complete coverage.
-
-_tl;dr_ the effort's 80% done, but the functionality's only 30% through. Some
-early/core functionality (see "goals" section) is already done (and I should
-probably just port my `$PS1` already), an enormous amount of test-infra and
-outlining to enable the rest of the APIs, and now just remains some drudge-work
-to finish the port.
+[![Build Status][gitlab_ci_badge]][gitlab_ci_dash] shows e2e tests' status.
 
 ## Design & Goals
 
-**Goal**: answer 101 introspective questions about a repo/directory.
+**Goal**: answer _basic_ introspective questions about a repo/directory.
 
-This very much inspired by Greg's famous `vcprompt` I'd been using for years,
-but also APIs I've frequently[^freq] wanted for scripting purposes. Each of
-those APIs I wished for is now outlined in this codebase's `VcstQuery` enum of
-in the namesaked reference binary (at `./vcst/src/lib.rs`).
+This very much inspired by Greg's famous `vcprompt` CLI I've been using for
+years via my `$PS1`, but also APIs I've frequently[^freq] wanted for scripting
+purposes. Each of those APIs I wished for is now outlined in this codebase's
+`VcstQuery` enum of in the namesaked reference binary (at `./vcst/src/lib.rs`).
 
 The goal is to have coverage for the popular VCS I personally encounter
 regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
@@ -37,11 +30,11 @@ TODO: (feature) outline installation, and super-basic `$PS1` bash integration.
 
 Ultimately this is just like a shell script: it's relying on the CLI of the VCS
 actually being in your `$PATH`, and interacting with it as such. I think it'd be
-fun to explore calling the VCS's own libraries at some point, and I tried to
-write the library with that in mind from the start. _But_ that's a whole nother
-ball of wax and very unlikely to happen before major TODOs are completed
-(feature completeness, and repo-setup TODOs below, like local/remote ci/cd
-steps).
+_fun_ to explore calling the VCS's own libraries at some point, and I tried to
+write the library with that in mind from the start. _But_ that's probably as or
+less important than tying up some loose ends I stlil have (TODOs below like a
+few more features I wnat, some rust/cargo questions I'm unclear on, and a few
+techdebt TODOs).
 
 ## Development
 
@@ -77,16 +70,9 @@ $ cd vcst && cargo watch \
 e2e tests of the CLI binary, in `vcst/tests/`, are the strategy for the moment;
 they covery every API that `lib/` is meant to offer.
 
-Gitlab servers also run this for us on every merge to main, via `.gitlab-ci.yml`
-instructions. The results can be seen at: <https://gitlab.com/jzacsh/vcst/-/jobs>
-
-TODO: (test infra) consider either/both:
-
-1. starting to teardown the vcst tests temp directory (see
-   `vcst/tests/common/mod.rs` for the tempdir setup funcs that get called for
-    every test in `vcst/tests/integration_test.rs`)
-2. root-less container setup to easily run our e2e tests (so we can contain any
-   potentially buggy teardown(), and not delte our own root directory).
+Gitlab servers also runs this suite on every merge to main, via `.gitlab-ci.yml`
+instructions. The results can be seen at:
+<https://gitlab.com/jzacsh/vcst/-/jobs>
 
 #### Test Coverage
 
@@ -106,12 +92,18 @@ So to see untested lines, just `^F` for " |0" in the output.
 
 ### TODOs
 
-- [ ] **finish initial features**: see lines in vcst/src/lib.rs disabled in release
+- [ ] **finish tail-end of feature-set**: see lines in vcst/src/lib.rs disabled
+  in release
   - try `cargo build --release` to turn these back off
   - in the meantime: dbug build via: `cargo run --` to run, `cargo build`
   - `grep -C 1 -rnE '\b(todo|unimplemented|panic|expect)!' {lib,vcst}/src` to
   hunt down tasks build (because they just `todo!()`, hidden via
   `#[cfg(debug_assertions)]`)
+- [ ] techdebt/rust question: merge the two folders lib/ and vcst/ into root?
+  any downsides one way or the other? maybe one makes crates.io usage harder? I
+  guess separated they have clearer deps-attribution?
+- [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
+  have one crate when published).
 - [x] **feature**: add ["list tracked files" concept][vcsListUsecase]
 - [x] install jj VCS to $PATH of gitlab ci/cd
 
@@ -122,14 +114,15 @@ So to see untested lines, just `^F` for " |0" in the output.
       output, or some place of the sort.
 - [x] cleanup all the CLI string handling (the `String::from_utf8` and
       `expect(.*utf8` references) to use `String::from_utf8_lossy`
-- [ ] cleanup some of the error enums that aren't being fully utilized (eg: some
-  that default to map_err() to `Unknown`-fallbackish variants). This is because
-  some of the better alternatives were only added _later_ (eg:
-  `RepoLoadError::Stderr`) which could fix some
-- [ ] before releasing....
+- [ ] techdebt/rust-question: cleanup some of the error enums that aren't being
+  fully utilized (eg: some that default to map_err() to `Unknown`-fallbackish
+  variants). This is because some of the better alternatives were only added
+  _later_ (eg: `RepoLoadError::Stderr`) which could fix some
+- [ ] techdbt: make it easier to develop by setting up a nix flake that installs
+  all the deps (then cleanup the gitlab CI to use that flow too).
+- [x] before releasing....
   - [x] flag-guard `todo!()`/`unimplemented!()` blocks for dev/tests only; eg:
   via `#[cfg(debug_assertions)]`
-  - [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
   - [x] centralize/codify standards I'm trying to follow, so all "preferences"
   are automated:
     - [x] get local test/build/watch command that will error when clippy isn't
@@ -151,8 +144,6 @@ So to see untested lines, just `^F` for " |0" in the output.
     - [x] run `cargo doc` (in second tty) and ensure it runs on gitlab ci (use
     `--no-deps --all-features` for that)
   - [x] get to clippy:pedantic level:
-    - [ ] merge the two folders lib/ and vcst/ into root (so we can have one
-      crate when published).
     - [x] address clippy::pedantic output `cargo clippy --all -- -W
     clippy::pedantic`
       - [x] in `vcst/` dir
@@ -160,7 +151,7 @@ So to see untested lines, just `^F` for " |0" in the output.
     - [x] roll it into above stages (both doc and [ci/cd][rustGitlabCiTempl])
       - [x] in `vcst/` dir
       - [x] in `lib/` dir
-  - [ ] reconsider the version number in Cargo.toml's
+  - [x] reconsider the version number in Cargo.toml's
 
 [vcsListUsecase]: https://gitlab.com/jzacsh/dotfiles/-/blob/b166218af42ed43e640fd066a7ff9e0d34a7cea5/bin/lib/hacky-java-rename#L147
 [gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
