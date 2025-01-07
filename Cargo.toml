@@ -1,0 +1,11 @@
+[workspace]
+
+resolver = "2"
+members = [
+  "vcsq-lib",
+  "vcsq-cli",
+]
+
+
+[workspace.dependencies]
+thiserror = "2.0.9"

@@ -22,7 +22,7 @@ This very much inspired by the use-case of the popular [`vcprompt`
 CLI][vcprompt] I've been using for years via my `$PS1`, but also by APIs I've
 frequently[^freq] wanted for scripting purposes. Each of those APIs I wished for
 is now outlined in this codebase's `VcstQuery` enum of in the namesaked
-reference binary (at `./vcst/src/lib.rs`).
+reference binary (at `./vcsq-cli/src/lib.rs`).
 
 The goal is to have coverage for the popular VCS I personally encounter
 regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
@@ -45,26 +45,28 @@ techdebt TODOs).
 
 ## Development
 
-The codebase is a library (`./lib/`) and its dependent: a CLI at `./vcst/`.
+The codebase is a library (`./vcsq-lib/`) and its dependent: a CLI at
+`./vcsq-cli/`.
 
-Since logic in `lib/` is designed for its only client (`vcst/`), that client's e2e
-tests are _the_ test coverage for this entire codebase, so local development
-just involves producing a debug binary and making sure you haven't broken tests:
+Since logic in `vcsq-lib/` is designed for its only client (`vcsq-cli/`), that
+client's e2e tests are _the_ test coverage for this entire codebase, so local
+development just involves producing a debug binary and making sure you haven't
+broken tests:
 
 ```sh
-$ cd vcst && cargo watch test  --color=always -- --nocapture
+$ RUST_BACKTRACE=full cargo watch test  --color=always -- --nocapture
 # ...
 ```
 
 In a second terminal I ensure the binary is being continuously rebuilt:
 
 ```sh
-$ cd vcst && cargo watch \
+$ cd vcsq-cli && cargo watch \
   -x build \
   -x 'clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
-  -s 'cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
+  -s 'cd ../vcsq-lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
   -x 'doc --all-features' \
-  -s 'cd ../lib && cargo doc --all-features'
+  -s 'cd ../vcsq-lib && cargo doc --all-features'
 
 # ...
 # can also be tacked onto the previous command via another '-x build' arg at the
@@ -74,8 +76,8 @@ $ cd vcst && cargo watch \
 
 ### Tests
 
-e2e tests of the CLI binary, in `vcst/tests/`, are the strategy for the moment;
-they covery every API that `lib/` is meant to offer.
+e2e tests of the CLI binary, in `vcsq-cli/tests/`, are the strategy for the moment;
+they covery every API that `vcsq-lib/` is meant to offer.
 
 Gitlab servers also runs this suite on every merge to main, via `.gitlab-ci.yml`
 instructions. The results can be seen at:
@@ -100,18 +102,19 @@ So to see untested lines, just `^F` for " |0" in the output.
 ### TODOs
 
 - [ ] cleanup/finish rename of objects to vcsq (from old vcst) (and also just
-  stop prefixing any internal objects with the liberary's name; idk why the heck
+  stop prefixing any internal objects with the library's name; idk why the heck
   I did that).
-- [ ] **finish tail-end of feature-set**: see lines in vcst/src/lib.rs disabled
-  in release
+- [ ] **finish tail-end of feature-set**: see lines in vcsq-cli/src/lib.rs
+  disabled in release
   - try `cargo build --release` to turn these back off
   - in the meantime: dbug build via: `cargo run --` to run, `cargo build`
-  - `grep -C 1 -rnE '\b(todo|unimplemented|panic|expect)!' {lib,vcst}/src` to
+  - `grep -C 1 -rnE '\b(todo|unimplemented|panic|expect)!' vcsq-{lib,cli}/src` to
   hunt down tasks build (because they just `todo!()`, hidden via
   `#[cfg(debug_assertions)]`)
-- [ ] techdebt/rust question: merge the two folders lib/ and vcst/ into root?
-  any downsides one way or the other? maybe one makes crates.io usage harder? I
-  guess separated they have clearer deps-attribution?
+- [x] techdebt/rust question: merge the two folders vcsq-lib/ and vcsq-cli/ into
+  root? any downsides one way or the other? maybe one makes crates.io usage
+  harder? I guess separated they have clearer deps-attribution?
+  - **answer** currently migrating to cargo workspaces feature
 - [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
   have one crate when published).
 - [ ] techdebt/rust-question: cleanup some of the error enums that aren't being

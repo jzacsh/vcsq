@@ -37,7 +37,7 @@ build:cargo:
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
-    - cd vcst && cargo build
+    - RUSTFLAGS='-Ddeprecated -Dwarnings' cargo build --workspace --all-targets
 
 test:e2e:
   stage: test
@@ -51,7 +51,7 @@ test:e2e:
     - cargo install cargo-binstall # dep of jj VCS's isntallation
     - cargo binstall --strategies crate-meta-data jj-cli # install jj VCS
     - git --version && hg --version && jj --version  # vcst/domain-specific debug info
-    - cd vcst && RUSTFLAGS='-D deprecated' cargo test --locked --all-features --all-targets --workspace --verbose -- --nocapture
+    - RUSTFLAGS='-Ddeprecated -Dwarnings' cargo test --locked --all-features --all-targets --workspace --verbose -- --nocapture
 
 test:doc:
   stage: lints
@@ -60,8 +60,7 @@ test:doc:
   script:
     - rustc --version  # Print version info for debugging
     - cargo --version  # Print version info for debugging
-    - cd vcst && RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features
-    - cd ../lib && RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features
+    - RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features --workspace
 
 test:lint:
   stage: lints
@@ -72,8 +71,7 @@ test:lint:
     - cargo --version  # Print version info for debugging
     - rustup component add clippy # install clippy
     - cargo clippy --version  # Print version info for debugging
-    - cd vcst && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
-    - cd ../lib && cargo clippy --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
+    - cargo clippy --workspace --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
 
 test:cov:
   stage: lints
@@ -90,7 +88,7 @@ test:cov:
     - cargo llvm-cov --version  # Print version info for debugging
     - git --version && hg --version && jj --version  # vcst/domain-specific debug info
     # Same as test's steps, but run via code coverage instrumentor:
-    - cd vcst && RUSTFLAGS='-D deprecated' cargo llvm-cov --all-features --workspace --text # --codecov  --output-path codecov.json
+    - RUSTFLAGS='-Ddeprecated -Dwarnings' cargo llvm-cov --workspace --all-features --workspace --text # --codecov  --output-path codecov.json
     # TODO: uncomment below, uncomment --output-path above, delete --text. We
     # can do this once we're public. Until then, this will always fail per
     # https://github.com/codecov/codecov-action/issues/1671#issuecomment-2486953810
