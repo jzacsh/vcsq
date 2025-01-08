@@ -1,4 +1,9 @@
 //! `vcsq` CLI thinly wraps [`vcsq_lib`] to answer version-control questions about any directory.
+//!
+//! Usage: `vcsq SUB_CMD DIR`
+//! Example: `vcsq is-clean .`
+//!
+//! See `--help` for complete doc, and README at <https://gitlab.com/jzacsh/vcsq> for more.
 use clap::{Parser, Subcommand};
 use std::io;
 use thiserror::Error;
