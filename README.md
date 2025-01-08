@@ -11,7 +11,7 @@ This repo lives at <https://gitlab.com/jzacsh/vcsq>
 
 **Status**: While I can already make use of this project for the original goals
 I had, it's still a WIP as I tweak what the "right way" to do some rust/cargo
-things is, and implement some last features and documentatoin (more `TODO`s
+things is, and implement some last features and documentation (more `TODO`s
 below).
 
 ## Design & Goals
@@ -21,13 +21,13 @@ below).
 This very much inspired by the use-case of the popular [`vcprompt`
 CLI][vcprompt] I've been using for years via my `$PS1`, but also by APIs I've
 frequently[^freq] wanted for scripting purposes. Each of those APIs I wished for
-is now outlined in this codebase's `VcstQuery` enum of in the namesaked
-reference binary (at `./vcsq-cli/src/lib.rs`).
+is now outlined in this codebase's `VcstQuery` enum of in the namesake
+reference binary (at `./vcsq_cli/src/lib.rs`).
 
 The goal is to have coverage for the popular VCS I personally encounter
-regulalry, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
+regularly, like `git`, `hg`, `jj`, but I tried to make it as biolerplate-free as
 possible to add new ones. So **contributions of new VCS coverage** is welcome,
-just chat with me about it first to avoid any mis-spent time.
+just chat with me about it first to avoid any miss-spent time.
 
 ### Usage
 
@@ -45,10 +45,10 @@ techdebt TODOs).
 
 ## Development
 
-The codebase is a library (`./vcsq-lib/`) and its dependent: a CLI at
-`./vcsq-cli/`.
+The codebase is a library (`./vcsq_lib/`) and its dependent: a CLI at
+`./vcsq_cli/`.
 
-Since logic in `vcsq-lib/` is designed for its only client (`vcsq-cli/`), that
+Since logic in `vcsq_lib/` is designed for its only client (`vcsq_cli/`), that
 client's e2e tests are _the_ test coverage for this entire codebase, so local
 development just involves producing a debug binary and making sure you haven't
 broken tests:
@@ -74,8 +74,8 @@ $ RUSTFLAGS='-Ddeprecated -Dwarnings' cargo watch \
 
 ### Tests
 
-e2e tests of the CLI binary, in `vcsq-cli/tests/`, are the strategy for the moment;
-they covery every API that `vcsq-lib/` is meant to offer.
+e2e tests of the CLI binary, in `vcsq_cli/tests/`, are the strategy for the moment;
+they covery every API that `vcsq_lib/` is meant to offer.
 
 Gitlab servers also runs this suite on every merge to main, via `.gitlab-ci.yml`
 instructions. The results can be seen at:
@@ -84,7 +84,7 @@ instructions. The results can be seen at:
 #### Test Coverage
 
 `cargo-llvm-cov` is used to instrument the e2e tests, and the results are simply
-dumped as text (for now), which can be read in the ci/cd output. To understand
+dumped as text (for now), which can be read in the CI/CD output. To understand
 the output, according to [llvm-cov][manLlvmCovDesc]:
 
 > The basic content of an .gcov output file is a copy of the source file with an
@@ -102,14 +102,14 @@ So to see untested lines, just `^F` for " |0" in the output.
 - [ ] cleanup/finish rename of objects to vcsq (from old vcst) (and also just
   stop prefixing any internal objects with the library's name; idk why the heck
   I did that).
-- [ ] **finish tail-end of feature-set**: see lines in vcsq-cli/src/lib.rs
+- [ ] **finish tail-end of feature-set**: see lines in vcsq_cli/src/lib.rs
   disabled in release
   - try `cargo build --release` to turn these back off
   - in the meantime: dbug build via: `cargo run --` to run, `cargo build`
-  - `grep -C 1 -rnE '\b(todo|unimplemented|panic|expect)!' vcsq-{lib,cli}/src` to
+  - `grep -C 1 -rnE '\b(todo|unimplemented|panic|expect)!' vcsq_{lib,cli}/src` to
   hunt down tasks build (because they just `todo!()`, hidden via
   `#[cfg(debug_assertions)]`)
-- [x] techdebt/rust question: merge the two folders vcsq-lib/ and vcsq-cli/ into
+- [x] techdebt/rust question: merge the two folders vcsq_lib/ and vcsq_cli/ into
   root? any downsides one way or the other? maybe one makes crates.io usage
   harder? I guess separated they have clearer deps-attribution?
   - **answer** currently migrating to cargo workspaces feature
