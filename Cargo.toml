@@ -14,7 +14,6 @@ description = "vcsq (vcsQuery): Version Control System (VCS) Querying CLI"
 license = "Apache-2.0"
 repository = "https://gitlab.com/jzacsh/vcsq"
 readme = "README.md"
-documentation = "https://gitlab.com/jzacsh/vcsq"
 keywords = ["vcs", "scm"]
 categories = ["command-line-utilities", "development-tools"]
 
