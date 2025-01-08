@@ -27,16 +27,15 @@ fn git() {
     let mut untracked_file = test_dir.clone();
     untracked_file.push("git-unclean.md");
     make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
-    vcs_test_setup::run_cli_from_tempdir("git", vec!["add", "."].as_ref(), &test_dir).unwrap();
+    vcs_test_setup::run_cli_from_tempdir("git", &["add", "."], &test_dir).unwrap();
     vcs_test_setup::run_cli_from_tempdir(
         "git",
-        vec![
+        &[
             "commit",
             "--no-verify",
             "--message",
             "test arrange phase: ensuring git history",
-        ]
-        .as_ref(),
+        ],
         &test_dir,
     )
     .unwrap();
@@ -77,15 +76,14 @@ fn hg() {
     let mut untracked_file = test_dir.clone();
     untracked_file.push("mercurial-unclean.md");
     make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
-    vcs_test_setup::run_cli_from_tempdir("hg", vec!["add", "."].as_ref(), &test_dir).unwrap();
+    vcs_test_setup::run_cli_from_tempdir("hg", &["add", "."], &test_dir).unwrap();
     vcs_test_setup::run_cli_from_tempdir(
         "hg",
-        vec![
+        &[
             "commit",
             "--message",
             "test arrange phase: ensuring hg history",
-        ]
-        .as_ref(),
+        ],
         &test_dir,
     )
     .unwrap();
@@ -128,12 +126,11 @@ fn jj() {
     make_test_temp::touch(&untracked_file).expect("test arrange: touch failed");
     vcs_test_setup::run_cli_from_tempdir(
         "jj",
-        vec![
+        &[
             "commit",
             "--message",
             "test arrange phase: ensuring jj history",
-        ]
-        .as_ref(),
+        ],
         &test_dir,
     )
     .unwrap();

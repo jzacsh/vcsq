@@ -27,10 +27,10 @@ fn git() {
         touched_file.push(basename);
         make_test_temp::touch(touched_file.as_ref()).unwrap();
     }
-    vcs_test_setup::run_cli_from_tempdir("git", vec!["add", "."].as_ref(), &test_dir).unwrap();
+    vcs_test_setup::run_cli_from_tempdir("git", &["add", "."], &test_dir).unwrap();
     vcs_test_setup::run_cli_from_tempdir(
         "git",
-        vec![
+        &[
             "commit",
             "--no-verify",
             "--message",
@@ -74,15 +74,14 @@ fn hg() {
         touched_file.push(basename);
         make_test_temp::touch(touched_file.as_ref()).unwrap();
     }
-    vcs_test_setup::run_cli_from_tempdir("hg", vec!["add", "."].as_ref(), &test_dir).unwrap();
+    vcs_test_setup::run_cli_from_tempdir("hg", &["add", "."], &test_dir).unwrap();
     vcs_test_setup::run_cli_from_tempdir(
         "hg",
-        vec![
+        &[
             "commit",
             "--message",
             "test arrange phase: ensuring hg history",
-        ]
-        .as_ref(),
+        ],
         &test_dir,
     )
     .unwrap();
@@ -122,12 +121,11 @@ fn jj() {
     }
     vcs_test_setup::run_cli_from_tempdir(
         "jj",
-        vec![
+        &[
             "commit",
             "--message",
             "test arrange phase: ensuring jj history",
-        ]
-        .as_ref(),
+        ],
         &test_dir,
     )
     .unwrap();
