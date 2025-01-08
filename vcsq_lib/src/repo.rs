@@ -221,7 +221,7 @@ pub struct AncestorRef {
     pub distance: u64,
 }
 
-// Proof of underlying VCS's existence on the current system (typically --version output).
+/// Proof of underlying VCS's existence on the current system (typically --version output).
 pub type VcsAvailable = Utf8CmdOutputLossy;
 
 /// Generic questions a VCS driver should be able to answer: is the VCS program even available on
