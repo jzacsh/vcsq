@@ -46,7 +46,8 @@ techdebt TODOs).
 ## Development
 
 The codebase is a library (`./vcsq-lib/`) and its dependent: a CLI at
-`./vcsq-cli/`.
+`./vcsq-cli/`. Directly point the CLI to the local lib, to continue lib
+development (ie: locally undo `ef5ffbc6`).
 
 Since logic in `vcsq-lib/` is designed for its only client (`vcsq-cli/`), that
 client's e2e tests are _the_ test coverage for this entire codebase, so local
