@@ -16,6 +16,7 @@ repository = "https://gitlab.com/jzacsh/vcsq"
 readme = "README.md"
 documentation = "https://gitlab.com/jzacsh/vcsq"
 keywords = ["vcs", "scm"]
+categories = ["command-line-utilities", "development-tools"]
 
 [workspace.dependencies]
 thiserror = "2.0.9"
