@@ -122,6 +122,13 @@ So to see untested lines, just `^F` for " |0" in the output.
 - [ ] techdbt: make it easier to develop by setting up a nix flake that installs
   all the deps (then cleanup the gitlab CI to use that flow too).
 
+## v1.0.0 Blockers
+
+- [ ] the TODOs section above.
+- [ ] pull `adapters` mod out of `vcs_lib` so they can have higher churn. but
+  not _before_ 1.0, because that just wlil make it more difficult to develop the
+  two in tandem.
+
 [^freq]:
     See the three predecessors/mini-libs that inspired this one, at:
     [`vcsq` of gitlab.com/jzacsh/dotfiles][dotsVcsq] ([ref][dotsVcsq_ref]) and at

@@ -223,8 +223,8 @@ pub struct AncestorRef {
 
 pub type VcsAvailable = Utf8CmdOutputLossy;
 
-/// Operations a VCS driver should be able to answer: is the VCS program even available on this
-/// system? Does a directory even look like a valid VCS?.
+/// Generic questions a VCS driver should be able to answer: is the VCS program even available on
+/// this system? Does a directory even look like a valid VCS?.
 pub trait Validator
 where
     Self: std::fmt::Debug,
@@ -248,8 +248,7 @@ where
     fn check_health(&self) -> Result<VcsAvailable, DriverError>;
 }
 
-/// Operations any VCS should be able to answer about a repo, so any proprietary/brand-specific
-/// implementations must implement this driver.
+/// Repo-specific questions any VCS should be able to answer.
 ///
 /// Implementations of this trait can be expected from the factory `new_driver` of `Validator`
 /// trait.
