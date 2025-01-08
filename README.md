@@ -109,6 +109,10 @@ So to see untested lines, just `^F` for " |0" in the output.
   - `grep -C 1 -rnE '\b(todo|unimplemented|panic|expect)!' vcsq_{lib,cli}/src` to
   hunt down tasks build (because they just `todo!()`, hidden via
   `#[cfg(debug_assertions)]`)
+- [ ] **feature**: my own `vcs o` use-case, more fully-realized (might require a
+  good number of flags).
+- [ ] **feature/ui**: clean up subcmds (and awkard second --dir). maybe add
+  aliases for terser interactions
 - [x] techdebt/rust question: merge the two folders vcsq_lib/ and vcsq_cli/ into
   root? any downsides one way or the other? maybe one makes crates.io usage
   harder? I guess separated they have clearer deps-attribution?
