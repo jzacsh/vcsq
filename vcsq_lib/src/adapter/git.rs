@@ -23,17 +23,17 @@ static VCS_BIN_NAME: &str = "git";
 const GIT_ERROR_NO_LOG_YET: &str = "fatal: ambiguous argument 'HEAD': unknown revision";
 const GIT_SYNTHETIC_FIRST_COMMIT_ID: &str = "00000000000000000000000000000000000000000000000000";
 
-const VCST_FIRST_COMMIT_ID: &str = "0ff8325e7d74a838d39cdffff9cddcecdce30f10";
-const VCST_UNIQUE_PREFIX: &str = concatcp!("VCST_SCRAPING_", VCST_FIRST_COMMIT_ID, "_");
+const VCSQ_FIRST_COMMIT_ID: &str = "0ff8325e7d74a838d39cdffff9cddcecdce30f10";
+const VCSQ_UNIQUE_PREFIX: &str = concatcp!("VCSQ_SCRAPING_", VCSQ_FIRST_COMMIT_ID, "_");
 const GIT_LOG_SCRAPABLE_PRETTY_DECOR_PREFIX: &str =
-    concatcp!("prefix=", VCST_UNIQUE_PREFIX, "prefix");
+    concatcp!("prefix=", VCSQ_UNIQUE_PREFIX, "prefix");
 const GIT_LOG_SCRAPABLE_PRETTY_DECOR_POINTER: &str =
-    concatcp!("pointer=", VCST_UNIQUE_PREFIX, "pointer");
+    concatcp!("pointer=", VCSQ_UNIQUE_PREFIX, "pointer");
 const GIT_LOG_SCRAPABLE_PRETTY_DECOR_SUFFIX: &str =
-    concatcp!("suffix=", VCST_UNIQUE_PREFIX, "suffix");
-const GIT_LOG_SCRAPABLE_PRETTY_DECOR_TAG: &str = concatcp!("tag=", VCST_UNIQUE_PREFIX, "tag");
+    concatcp!("suffix=", VCSQ_UNIQUE_PREFIX, "suffix");
+const GIT_LOG_SCRAPABLE_PRETTY_DECOR_TAG: &str = concatcp!("tag=", VCSQ_UNIQUE_PREFIX, "tag");
 const GIT_LOG_SCRAPABLE_PRETTY_DECOR_SEP: &str =
-    concatcp!("separator=", VCST_UNIQUE_PREFIX, "separator");
+    concatcp!("separator=", VCSQ_UNIQUE_PREFIX, "separator");
 
 const GIT_LOG_SCRAPABLE_PRETTY_FMT: &str = concatcp!(
     GIT_LOG_SCRAPABLE_PRETTY_DECOR_PREFIX,
