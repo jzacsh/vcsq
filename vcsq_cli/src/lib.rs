@@ -5,6 +5,7 @@ use thiserror::Error;
 use vcsq_lib::plexer;
 use vcsq_lib::repo::{Driver, DriverError, QueryDir};
 
+/// Top-Level instructions into which we parse the resluts of CLI args.
 #[derive(Parser, Debug)]
 #[command(
     name = "vcsq",
@@ -55,6 +56,7 @@ impl VcstArgs {
     }
 }
 
+/// Sub-commands of the CLI that map to a single VCS query.
 // TODO: (clap, rust) figure out how to shorten the names of these subcommands so they rust-lang
 // naming doesn't turn into annoyingly-long (and hyphenated) names.
 //
