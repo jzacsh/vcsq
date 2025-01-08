@@ -284,7 +284,11 @@ impl<'a> PlexerQuery<'a> {
 ///
 /// # Panics
 /// Should only panic if stderr or stdout writes fail.
-pub fn vcst_query(args: &VcstArgs, stdout: &mut dyn io::Write, stderr: &mut dyn io::Write) -> u8 {
+pub fn main_vcsquery(
+    args: &VcstArgs,
+    stdout: &mut dyn io::Write,
+    stderr: &mut dyn io::Write,
+) -> u8 {
     let plexerq = match PlexerQuery::new(args, stdout) {
         Ok(pq) => pq,
         Err(e) => {
