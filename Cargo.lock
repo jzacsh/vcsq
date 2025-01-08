@@ -543,12 +543,14 @@ dependencies = [
  "predicates",
  "thiserror",
  "uuid",
- "vcsq_lib 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "vcsq_lib 0.4.0",
 ]
 
 [[package]]
 name = "vcsq_lib"
 version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6064f4f25d39b8d7c6f715e64340acc73bed2afc135bcdbdd8c86cb7176b8bb6"
 dependencies = [
  "const_format",
  "strum",
@@ -557,9 +559,7 @@ dependencies = [
 
 [[package]]
 name = "vcsq_lib"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6064f4f25d39b8d7c6f715e64340acc73bed2afc135bcdbdd8c86cb7176b8bb6"
+version = "0.4.1"
 dependencies = [
  "const_format",
  "strum",
