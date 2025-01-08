@@ -146,5 +146,5 @@ impl Driver for Repo {
     }
 }
 
-// NOTE: lack of unit tests here is purely because of the coverage via e2e tests via ../vcsq_cli/
+// NOTE: lack of unit tests here is purely because of the coverage via e2e tests via ../vcsq-cli/
 // binary target. That doesn't mean unit tests won't be appropriate in this file in the future.

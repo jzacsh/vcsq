@@ -3,7 +3,7 @@
 //! Couple wrapping traits to encompass simple questions you might ask of any common VCS,
 //! regardless of its branding. Also some default implementations are exposed in this crate. The
 //! intention is to make it easier to build tools that need to answer the simple questions about a
-//! Version Control System (VCS) repository. For example, see `vcsq_cli`.
+//! Version Control System (VCS) repository. For example, see `vcsq-cli` crate.
 //!
 //! Jargon used in this library:
 //! - "brand" of VCS is some concrete repo format (eg: "Git" or "Mercurial" are brands).

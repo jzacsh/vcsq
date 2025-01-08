@@ -2,8 +2,8 @@
 
 resolver = "2"
 members = [
-  "vcsq_lib",
-  "vcsq_cli",
+  "vcsq-lib",
+  "vcsq-cli",
 ]
 
 [workspace.package]

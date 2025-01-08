@@ -13,7 +13,7 @@ keywords.workspace = true
 [dependencies]
 thiserror.workspace = true
 clap = { version = "4.5.23", features = ["derive"] }
-vcsq_lib = { path = "../vcsq_lib", version = "0.4.0" }
+vcsq_lib = { path = "../vcsq-lib", version = "0.4.0" }
 
 [dev-dependencies]
 assert_cmd = "2.0.16"
