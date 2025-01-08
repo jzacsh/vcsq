@@ -24,7 +24,7 @@ pub struct MainArgs {
 }
 
 #[derive(Error, Debug)]
-enum VcstError {
+enum CliError {
     #[error("usage error: {0}")]
     Usage(String),
 
@@ -40,14 +40,14 @@ impl MainArgs {
     ///
     // TODO: (feature,clap) fix this clunkiness: somehow allow lone positional arg of a
     // directory for the case that no subcommand is passed. IDK how to do that in clap.
-    pub(self) fn reduce(&self) -> Result<QueryCmd, VcstError> {
+    pub(self) fn reduce(&self) -> Result<QueryCmd, CliError> {
         if let Some(q) = &self.query {
             Ok(q.clone())
         } else {
             let dir = self
                 .dir
                 .clone()
-                .ok_or(VcstError::Usage(
+                .ok_or(CliError::Usage(
                     "require either subcmd with a query or a direct --dir".into(),
                 ))?
                 .clone();
@@ -191,13 +191,13 @@ impl<'a> PlexerQuery<'a> {
     fn new(
         args: &'a MainArgs,
         stdout: &'a mut dyn io::Write,
-    ) -> Result<Option<PlexerQuery<'a>>, VcstError> {
+    ) -> Result<Option<PlexerQuery<'a>>, CliError> {
         let query = args.reduce()?;
         let Some(dir) = query.dir() else {
             return Ok(None);
         };
         if !dir.is_dir() {
-            return Err(VcstError::Usage(
+            return Err(CliError::Usage(
                 "dir must be a readable directory".to_string(),
             ));
         }
@@ -209,7 +209,7 @@ impl<'a> PlexerQuery<'a> {
         }))
     }
 
-    pub fn handle_query(&mut self) -> Result<u8, VcstError> {
+    pub fn handle_query(&mut self) -> Result<u8, CliError> {
         match self.cli {
             QueryCmd::Brand { dir: _ } => {
                 writeln!(self.stdout, "{:?}", self.plexer.brand)
@@ -218,13 +218,13 @@ impl<'a> PlexerQuery<'a> {
             QueryCmd::Root { dir: _ } => {
                 let root_path = self.plexer.root()?;
                 let dir_path = root_path.as_path().to_str().ok_or_else(|| {
-                    VcstError::Unknown(format!("vcs generated invalid unicode: {root_path:?}"))
+                    CliError::Unknown(format!("vcs generated invalid unicode: {root_path:?}"))
                 })?;
                 writeln!(self.stdout, "{dir_path}")
                     .unwrap_or_else(|_| panic!("failed stdout write of: {dir_path}"));
             }
             QueryCmd::IsClean { dir: _ } => {
-                let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
+                let is_clean = self.plexer.is_clean().map_err(CliError::Plexing)?;
                 return Ok(u8::from(!is_clean));
             }
             QueryCmd::CheckHealth => panic!("bug: PlexerQuery() should not be constructed for the generalized CheckHealth query"),
@@ -252,7 +252,7 @@ impl<'a> PlexerQuery<'a> {
                 let files = self
                     .plexer
                     .dirty_files(clean_ok)
-                    .map_err(VcstError::Plexing)?;
+                    .map_err(CliError::Plexing)?;
                 for file in files {
                     writeln!(self.stdout, "{}", file.display()).unwrap_or_else(|_| {
                         panic!("failed stdout write of: {}", file.display())
@@ -263,7 +263,7 @@ impl<'a> PlexerQuery<'a> {
                 let files = self
                     .plexer
                     .tracked_files()
-                    .map_err(VcstError::Plexing)?;
+                    .map_err(CliError::Plexing)?;
                 for file in files {
                     writeln!(self.stdout, "{}", file.display()).unwrap_or_else(|_| {
                         panic!("failed stdout write of: {}", file.display())
