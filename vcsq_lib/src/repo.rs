@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::process::Output;
 use thiserror::Error;
 
-/// The local repository a VCS queyr will center around.
+/// The local repository a VCS query will center around.
 pub type QueryDir = PathBuf;
 
 pub const ERROR_REPO_NOT_CLEAN: &str = "repo not clean, references not hermetic";
@@ -19,7 +19,7 @@ pub enum DriverError {
     #[error("directory access issue: {0}")]
     Directory(String),
 
-    /// An error ocurred trying to call out to the VCS binary
+    /// An error occurred trying to call out to the VCS binary
     #[error("vcs call failed: {:?}: {:?}", .context, .source)]
     Command {
         context: String,
@@ -30,20 +30,20 @@ pub enum DriverError {
     #[error("vcs stderr: {:?}: {:?}", .context, .stderr)]
     Stderr { context: String, stderr: String },
 
-    /// An error ocurred reading the directory name
+    /// An error occurred reading the directory name
     #[error("vcs returned a problematic root name")]
     RootName(#[from] std::string::FromUtf8Error),
 
-    /// An unknown error ocurred
+    /// An unknown error occurred
     #[error("{0}")]
     Unknown(String),
 }
 
 impl DriverError {
     /// Low-level unwrapping of a command that's strict about its expectations that the
-    /// underlying CLI produces valid utf8 cntent.
+    /// underlying CLI produces valid utf8 content.
     ///
-    /// For a lossy versin of this function see `unwrap_cmd_lossy(...)`.
+    /// For a lossy version of this function see `unwrap_cmd_lossy(...)`.
     ///
     /// # Errors
     ///
@@ -65,7 +65,7 @@ impl DriverError {
     ///
     /// # Errors
     ///
-    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the the
+    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the
     /// stderr of `cmd_output` if the command actually exited non-zero.
     pub fn expect_cmd(
         context: String,
@@ -86,16 +86,16 @@ impl DriverError {
         Ok(utf8_output)
     }
 
-    /// Assumes `cmd_output` is an interaction with a textual CLI and does a dirty (lossy) conersion
-    /// of its stdout/stderr outputs.
+    /// Assumes `cmd_output` is an interaction with a textual CLI and does a dirty (lossy)
+    /// conversion of its stdout/stderr outputs.
     ///
-    /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
+    /// For a strict conversion (where you want to handle bad UTF-8-behaviors) see
     /// `unwrap_cmd(...)`.
     ///
     /// # Errors
     ///
     /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`]. Does not check
-    /// error state of the command thoguh (ese `expect_` variatns of this API for that)..
+    /// error state of the command though (see `expect_` variants of this API for that).
     pub fn unwrap_cmd_lossy(
         context: String,
         cmd_output: std::io::Result<Output>,
@@ -107,12 +107,12 @@ impl DriverError {
     /// Like `unwrap_cmd_lossy(...)` but additionally expects the command to have succeeded,
     /// otherwise unpacks the stderr into an `Err()` case for you.
     ///
-    /// For a strict conversion (where you want to handle bad UTF8-behaviors) see
+    /// For a strict conversion (where you want to handle bad UTF-8-behaviors) see
     /// `expect_cmd(...)`.
     ///
     /// # Errors
     ///
-    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the the
+    /// Returns [`DriverError`] in the event of an underlying [`std::io::Error`], or simply the
     /// stderr of `cmd_output` if the command actually exited non-zero.
     // TODO: rename 'expect' to either 'to'  or 'unwrap_ok_cmd_lossy'
     pub fn expect_cmd_lossy(
@@ -156,13 +156,13 @@ impl DriverError {
             .to_string())
     }
 
-    /// Like `expect_cmd_line(...)`  but might expect lines depeneding on `min_lines`, and doesn't
+    /// Like `expect_cmd_line(...)`  but might expect lines depending on `min_lines`, and doesn't
     /// care about the command's exit status.
     ///
     /// # Errors
     ///
     /// Returns [`DriverError`] if `output` had less than `min_lines` to stdout.
-    // TODO: (rust) idiomatic api is probably Iter<> of String, not Vec? try to fix that here
+    // TODO: (rust) idiomatic API is probably Iter<> of String, not Vec? Try to fix that here
     pub fn expect_cmd_lines(
         output: std::io::Result<Output>,
         min_lines: u8,
@@ -257,14 +257,6 @@ pub trait Driver
 where
     Self: std::fmt::Debug,
 {
-    // TODO: is returning boolean/Option<> the right design here? wrt:
-    //   ```rust
-    //   fn new(dir) -> Result<Option<Repo>, ...> { ... }
-    //   ```
-    // that is: how can we handle the case that JJ repo is a JJ repo, or maybe a JJ-colocated-git repo,
-    // or JJ-colocated-p4 repo, or JJ-wrapping-git repo? Just true for all of those? Or some generic
-    // type we can define that would let JJ pack the answer here?
-
     /// Prints the root dir of the repo.
     ///
     /// # Errors
@@ -295,8 +287,8 @@ where
     /// in which case an empty vector will be returned).
     fn dirty_files(&self, clean_ok: bool) -> Result<Vec<QueryDir>, DriverError>;
 
-    /// Lists filepaths tracked by this repo, ignoring the state of the repo (ie: any "staged"
-    /// (git) or deleted "working-copy" (jj) edits. The goal of this listing is to show the full
+    /// Lists filepaths tracked by this repo, ignoring the state of the repo edits (ie: any
+    /// "staged" in git or deleted "working-copy" jj). The goal of this listing is to show the full
     /// listing of the repository's contents, as of the time of the current commit.
     ///
     /// # Errors

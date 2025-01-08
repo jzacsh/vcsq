@@ -1,3 +1,4 @@
+//! Internal library for the `vcsq` CLI, itself a thin wrapper for [`vcsq_lib`].
 use clap::{Parser, Subcommand};
 use std::io;
 use thiserror::Error;
@@ -148,8 +149,8 @@ pub enum VcstQuery {
         // with IsClean)
     },
 
-    /// Prints any system/$PATH info that mgiht be useful for debugging issues this binary might
-    /// have onyour system.
+    /// Prints any system/$PATH info that might be useful for debugging issues this binary might
+    /// have on your system.
     CheckHealth,
 }
 

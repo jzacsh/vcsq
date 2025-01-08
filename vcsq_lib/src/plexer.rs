@@ -13,7 +13,7 @@ pub enum VcsBrand {
     Jujutsu,
 }
 
-/// Multiplexes all available VCS adapters into one interface so you don't have to figure out which
+/// Demultiplexes all available VCS adapters into one interface so you don't have to figure out which
 /// VCS you're interacting with in order to start asking `repo::Repo` questions.
 #[derive(Debug)]
 pub struct Repo {
@@ -73,7 +73,7 @@ pub struct VcsHealth {
     pub health: Result<VcsAvailable, DriverError>,
 }
 
-/// Returns a all VCS drivers' health reports.
+/// Returns all VCS drivers' health reports.
 #[must_use]
 pub fn check_health() -> Vec<VcsHealth> {
     VcsBrand::iter()
@@ -146,5 +146,5 @@ impl Driver for Repo {
     }
 }
 
-// NOTE: lack of unit tests here, is purely because of the coverage via e2e tests via ../vcst
+// NOTE: lack of unit tests here is purely because of the coverage via e2e tests via ../vcsq_cli/
 // binary target. That doesn't mean unit tests won't be appropriate in this file in the future.

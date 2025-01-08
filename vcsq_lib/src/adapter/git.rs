@@ -8,8 +8,8 @@ use std::process::{Command, Stdio};
 
 static VCS_BIN_NAME: &str = "git";
 
-/// Error string intendd to match the case when git prints that "HEAD" is an unknown versiion
-/// becaus ethere's not yet any logs in the repo.
+/// Error string intended to match the case when git prints that "HEAD" is an unknown version
+/// because there's not yet any logs in the repo.
 ///
 /// ## Example
 ///

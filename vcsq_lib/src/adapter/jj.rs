@@ -67,8 +67,8 @@ impl Repo {
 
     fn jj_tracked_files(&self) -> Command {
         let mut cmd = self.start_shellout();
-        // TODO: unclear @- is always the right bet. _Sometimes_ you can put yourself into a weird
-        // state where your '@' is actually not just an ephemeral copy, as you've re-attached
+        // TODO: unclear @- is always the right API here. _Sometimes_ you can put yourself into a
+        // weird state where your '@' is actually not just an ephemeral copy, as you've re-attached
         // yourself to it.
         cmd.arg("file").arg("list").arg("-r").arg("@-");
         cmd
@@ -130,8 +130,8 @@ impl Driver for Repo {
 
     /// Returns the current bookmark if there one.
     // TODO: (feature) when jj is more stable, do more advanced things: determine if we're
-    // git-backed, and then translate our answers into the answe ra user would expect if this
-    // iwasn't jj-on-git but just git. For now we just keep it sipmle (and less featureful) then
+    // git-backed, and then translate our answers into the answer a user would expect if this
+    // wasn't jj-on-git but just git. For now we just keep it simple (and less feature-full) then
     // our git counterpart driver.
     fn current_ref_name(&self, _dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
         todo!(); // TODO: (feature) implement

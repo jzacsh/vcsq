@@ -137,7 +137,7 @@ impl Driver for Repo {
             "hg cli: exec",
             None,
         )?;
-        // first 2 chars ar the files status codes, of which the one we car eabout from the
+        // First 2 chars are the files status codes, of which the one we care about from the
         // docs is: "C = clean". We look for those lines, then strip that status information.
         let files = lines
             .into_iter()
@@ -168,7 +168,7 @@ impl Driver for Repo {
             .to_string())
     }
 
-    /// Returns the current mercurial tag if available.
+    /// Returns the current Mercurial tag if available.
     fn current_ref_name(&self, dirty_ok: bool) -> Result<Option<HistoryRefName>, DriverError> {
         if !dirty_ok && !self.is_clean()? {
             return Err(ERROR_REPO_NOT_CLEAN.to_string().into());

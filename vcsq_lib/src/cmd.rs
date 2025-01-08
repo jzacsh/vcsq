@@ -1,12 +1,15 @@
+//! When interacting with text-only CLI APIs, this makes [`std::process::Output`] simpler to
+//! interact with, as it encodes your assumption that said APIs aren't going to output non-UTF-8
+//! content (eg: like a binary stream).
 use std::process::ExitStatus;
 use std::process::Output;
 use std::string::FromUtf8Error;
 
 /// Provides a lossy wrapper for `std::process:Output` useful for CLIs you're only ever expecting
-/// utf8-text output from.
+/// UTF-8 text output from.
 ///
-/// Only useful if the comamnd's utf8-failure modes are not critical to your applciation, otherwise
-/// use `Utf8CmdOutput`.
+/// Only useful if the comamnd's UTF-8 failure modes are not critical to your application,
+/// otherwise use `Utf8CmdOutput`.
 #[derive(Debug)]
 pub struct Utf8CmdOutputLossy {
     pub status: ExitStatus,
@@ -37,8 +40,8 @@ impl Utf8CmdOutputLossy {
     }
 }
 
-/// Provides a wrapper for `std::process:Output` useful for CLIs you're only ever expecting
-/// utf8-text output from.
+/// Provides a wrapper for `std::process:Output` useful for CLIs you're only ever expecting UTF-8
+/// text output from.
 ///
 /// Only useful if you want to be defensive (say `expect()` on any conversion errors), otherwise
 /// use `Utf8CmdOutputLossy`.
