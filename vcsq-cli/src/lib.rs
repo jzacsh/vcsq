@@ -1,4 +1,4 @@
-//! Internal library for the `vcsq` CLI, itself a thin wrapper for [`vcsq_lib`].
+//! `vcsq` CLI thinly wraps [`vcsq_lib`] to answer version-control questions about any directory.
 use clap::{Parser, Subcommand};
 use std::io;
 use thiserror::Error;
