@@ -543,11 +543,11 @@ dependencies = [
  "predicates",
  "thiserror",
  "uuid",
- "vcsq-lib",
+ "vcsq_lib",
 ]
 
 [[package]]
-name = "vcsq-lib"
+name = "vcsq_lib"
 version = "0.4.0"
 dependencies = [
  "const_format",
