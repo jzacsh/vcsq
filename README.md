@@ -21,7 +21,7 @@ below).
 This very much inspired by the use-case of the popular [`vcprompt`
 CLI][vcprompt] I've been using for years via my `$PS1`, but also by APIs I've
 frequently[^freq] wanted for scripting purposes. Each of those APIs I wished for
-is now outlined in this codebase's `VcstQuery` enum of in the namesake
+is now outlined in this codebase's `QueryCmd` enum of in the namesake
 reference binary (at `./vcsq_cli/src/lib.rs`).
 
 The goal is to have coverage for the popular VCS I personally encounter
@@ -99,7 +99,7 @@ So to see untested lines, just `^F` for " |0" in the output.
 
 ### TODOs
 
-- [ ] cleanup/finish rename of objects to vcsq (from old vcst) (and also just
+- [x] cleanup/finish rename of objects to vcsq (from old vcst) (and also just
   stop prefixing any internal objects with the library's name; idk why the heck
   I did that).
 - [ ] **finish tail-end of feature-set**: see lines in vcsq_cli/src/lib.rs
