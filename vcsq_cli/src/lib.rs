@@ -20,7 +20,7 @@ pub struct MainArgs {
     pub dir: Option<QueryDir>,
 
     #[command(subcommand)]
-    pub query: Option<VcstQuery>,
+    pub query: Option<QueryCmd>,
 }
 
 #[derive(Error, Debug)]
@@ -40,7 +40,7 @@ impl MainArgs {
     ///
     // TODO: (feature,clap) fix this clunkiness: somehow allow lone positional arg of a
     // directory for the case that no subcommand is passed. IDK how to do that in clap.
-    pub(self) fn reduce(&self) -> Result<VcstQuery, VcstError> {
+    pub(self) fn reduce(&self) -> Result<QueryCmd, VcstError> {
         if let Some(q) = &self.query {
             Ok(q.clone())
         } else {
@@ -51,7 +51,7 @@ impl MainArgs {
                     "require either subcmd with a query or a direct --dir".into(),
                 ))?
                 .clone();
-            Ok(VcstQuery::Brand { dir })
+            Ok(QueryCmd::Brand { dir })
         }
     }
 }
@@ -62,7 +62,7 @@ impl MainArgs {
 //
 // TODO: (feature) impl a subcommand that lets you know which $PATH dependencies are found.
 #[derive(Debug, Subcommand, Clone)]
-pub enum VcstQuery {
+pub enum QueryCmd {
     /// Prints the brand of the VCS repo, or exits non-zero if it's not a known VCS repo.
     #[command(arg_required_else_help = true)]
     Brand { dir: QueryDir },
@@ -156,7 +156,7 @@ pub enum VcstQuery {
     CheckHealth,
 }
 
-impl VcstQuery {
+impl QueryCmd {
     fn dir(&self) -> Option<QueryDir> {
         self.dir_path().cloned()
     }
@@ -165,25 +165,25 @@ impl VcstQuery {
     // we can rely on its presence?
     fn dir_path(&self) -> Option<&QueryDir> {
         match self {
-            VcstQuery::Brand { dir }
-            | VcstQuery::Root { dir }
-            | VcstQuery::IsClean { dir }
-            | VcstQuery::DirtyFiles { dir, clean_ok: _ }
-            | VcstQuery::TrackedFiles { dir }
-            | VcstQuery::CurrentId { dir, dirty_ok: _ } => Some(dir),
-            VcstQuery::CheckHealth => None,
+            QueryCmd::Brand { dir }
+            | QueryCmd::Root { dir }
+            | QueryCmd::IsClean { dir }
+            | QueryCmd::DirtyFiles { dir, clean_ok: _ }
+            | QueryCmd::TrackedFiles { dir }
+            | QueryCmd::CurrentId { dir, dirty_ok: _ } => Some(dir),
+            QueryCmd::CheckHealth => None,
             #[cfg(debug_assertions)]
-            VcstQuery::CurrentName { dir, dirty_ok: _ }
-            | VcstQuery::ParentId { dir }
-            | VcstQuery::ParentName { dir, max: _ }
-            | VcstQuery::CurrentFiles { dir, dirty_ok: _ } => Some(dir),
+            QueryCmd::CurrentName { dir, dirty_ok: _ }
+            | QueryCmd::ParentId { dir }
+            | QueryCmd::ParentName { dir, max: _ }
+            | QueryCmd::CurrentFiles { dir, dirty_ok: _ } => Some(dir),
         }
     }
 }
 
 struct PlexerQuery<'a> {
     plexer: plexer::Repo,
-    cli: VcstQuery,
+    cli: QueryCmd,
     stdout: &'a mut dyn io::Write,
 }
 
@@ -211,11 +211,11 @@ impl<'a> PlexerQuery<'a> {
 
     pub fn handle_query(&mut self) -> Result<u8, VcstError> {
         match self.cli {
-            VcstQuery::Brand { dir: _ } => {
+            QueryCmd::Brand { dir: _ } => {
                 writeln!(self.stdout, "{:?}", self.plexer.brand)
                     .unwrap_or_else(|_| panic!("failed stdout write of: {:?}", self.plexer.brand));
             }
-            VcstQuery::Root { dir: _ } => {
+            QueryCmd::Root { dir: _ } => {
                 let root_path = self.plexer.root()?;
                 let dir_path = root_path.as_path().to_str().ok_or_else(|| {
                     VcstError::Unknown(format!("vcs generated invalid unicode: {root_path:?}"))
@@ -223,12 +223,12 @@ impl<'a> PlexerQuery<'a> {
                 writeln!(self.stdout, "{dir_path}")
                     .unwrap_or_else(|_| panic!("failed stdout write of: {dir_path}"));
             }
-            VcstQuery::IsClean { dir: _ } => {
+            QueryCmd::IsClean { dir: _ } => {
                 let is_clean = self.plexer.is_clean().map_err(VcstError::Plexing)?;
                 return Ok(u8::from(!is_clean));
             }
-            VcstQuery::CheckHealth => panic!("bug: PlexerQuery() should not be constructed for the generalized CheckHealth query"),
-            VcstQuery::CurrentId {
+            QueryCmd::CheckHealth => panic!("bug: PlexerQuery() should not be constructed for the generalized CheckHealth query"),
+            QueryCmd::CurrentId {
                 dir: _,
                 dirty_ok,
             } => {
@@ -238,17 +238,17 @@ impl<'a> PlexerQuery<'a> {
                 });
             },
             #[cfg(debug_assertions)]
-            VcstQuery::CurrentName {
+            QueryCmd::CurrentName {
                 dir: _,
                 dirty_ok: _,
             }
-            | VcstQuery::ParentId { dir: _ }
-            | VcstQuery::ParentName { dir: _, max: _ }
-            | VcstQuery::CurrentFiles {
+            | QueryCmd::ParentId { dir: _ }
+            | QueryCmd::ParentName { dir: _, max: _ }
+            | QueryCmd::CurrentFiles {
                 dir: _,
                 dirty_ok: _,
             } => todo!(),
-            VcstQuery::DirtyFiles { dir: _, clean_ok } => {
+            QueryCmd::DirtyFiles { dir: _, clean_ok } => {
                 let files = self
                     .plexer
                     .dirty_files(clean_ok)
@@ -259,7 +259,7 @@ impl<'a> PlexerQuery<'a> {
                     });
                 }
             }
-            VcstQuery::TrackedFiles { dir: _ } => {
+            QueryCmd::TrackedFiles { dir: _ } => {
                 let files = self
                     .plexer
                     .tracked_files()
