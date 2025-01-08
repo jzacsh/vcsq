@@ -14,7 +14,7 @@ use vcsq_lib::repo::{Driver, DriverError, QueryDir};
     long_about = "vcsq is a rust CLI providing Version Control System (VCS) inspection, without you
 needing to know each VCS's proprietary incantations."
 )]
-pub struct VcstArgs {
+pub struct MainArgs {
     /// Directory for which you'd like to ask VCS questions.
     #[arg(short, long)]
     pub dir: Option<QueryDir>,
@@ -35,7 +35,7 @@ enum VcstError {
     Unknown(String),
 }
 
-impl VcstArgs {
+impl MainArgs {
     /// Alternative to clap's parse, just so we can handle defaults
     ///
     // TODO: (feature,clap) fix this clunkiness: somehow allow lone positional arg of a
@@ -189,7 +189,7 @@ struct PlexerQuery<'a> {
 
 impl<'a> PlexerQuery<'a> {
     fn new(
-        args: &'a VcstArgs,
+        args: &'a MainArgs,
         stdout: &'a mut dyn io::Write,
     ) -> Result<Option<PlexerQuery<'a>>, VcstError> {
         let query = args.reduce()?;
@@ -285,7 +285,7 @@ impl<'a> PlexerQuery<'a> {
 /// # Panics
 /// Should only panic if stderr or stdout writes fail.
 pub fn main_vcsquery(
-    args: &VcstArgs,
+    args: &MainArgs,
     stdout: &mut dyn io::Write,
     stderr: &mut dyn io::Write,
 ) -> u8 {
