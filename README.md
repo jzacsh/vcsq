@@ -75,7 +75,7 @@ $ RUSTFLAGS='-Ddeprecated -Dwarnings' cargo watch \
 ### Tests
 
 e2e tests of the CLI binary, in `vcsq_cli/tests/`, are the strategy for the moment;
-they covery every API that `vcsq_lib/` is meant to offer.
+they cover every API that `vcsq_lib/` is meant to offer.
 
 Gitlab servers also runs this suite on every merge to main, via `.gitlab-ci.yml`
 instructions. The results can be seen at:
