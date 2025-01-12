@@ -1,0 +1,113 @@
+name: Build, Docs, Lint, & e2e-Test
+
+on:
+  push:
+  pull_request:
+
+env: 
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_cargo:
+    name: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: rustc --version  # Print version info for debugging
+      - run: cargo --version  # Print version info for debugging
+      - run: RUSTFLAGS='-Ddeprecated -Dwarnings' cargo build --workspace --all-targets
+
+  test_e2e:
+    name: test e2e
+    needs: build_cargo
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: rustc --version  # Print version info for debugging
+      - run: cargo --version  # Print version info for debugging
+      # install jj VCS, per 20241231 instructions at
+      # https://jj-vcs.github.io/jj/latest/install-and-setup/#cargo-binstall
+      - run: cargo install cargo-binstall # dep of jj VCS's isntallation
+      - run: cargo binstall --strategies crate-meta-data jj-cli # install jj VCS
+      - run: git --version && hg --version && jj --version  # vcst/domain-specific debug info
+      - run: RUSTFLAGS='-Ddeprecated -Dwarnings' cargo test --locked --all-features --all-targets --workspace --verbose -- --nocapture
+
+  test_doc:
+    name: rustdoc
+    needs: test_e2e
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: rustc --version  # Print version info for debugging
+      - run: cargo --version  # Print version info for debugging
+      - run: RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --all-features --workspace
+
+  test_lint:
+    name: lint
+    needs: test_e2e
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: rustc --version  # Print version info for debugging
+      - run: cargo --version  # Print version info for debugging
+      - run: rustup component add clippy # install clippy
+      - run: cargo clippy --version  # Print version info for debugging
+      - run: cargo clippy --workspace --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
+
+  test_cov:
+    name: test code-coverage
+    needs: test_e2e
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: rustc --version  # Print version info for debugging
+      - run: cargo --version  # Print version info for debugging
+      # install jj VCS, per 20241231 instructions at
+      # https://jj-vcs.github.io/jj/latest/install-and-setup/#cargo-binstall
+      - run: cargo install cargo-binstall # dep of jj VCS's isntallation
+      - run: cargo binstall --strategies crate-meta-data jj-cli # install jj VCS
+      - run: cargo binstall --strategies crate-meta-data cargo-llvm-cov # install jj VCS
+      - run: cargo llvm-cov --version  # Print version info for debugging
+      - run: git --version && hg --version && jj --version  # vcst/domain-specific debug info
+      # Same as test's steps, but run via code coverage instrumentor:
+      - run: RUSTFLAGS='-Ddeprecated -Dwarnings' cargo llvm-cov --workspace --all-features --workspace --text # --codecov  --output-path codecov.json
+      # TODO: uncomment below, uncomment --output-path above, delete --text. We
+      # can do this once we're public. Until then, this will always fail per
+      # https://github.com/codecov/codecov-action/issues/1671#issuecomment-2486953810
+      # (and I don't feel like messing with tokens just for the interim).
+      # - bash <(curl -s https://codecov.io/bash)

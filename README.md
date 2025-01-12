@@ -7,7 +7,10 @@ This repo lives at <https://gitlab.com/jzacsh/vcsq>
 
 ## Project Status
 
-[![Build Status][gitlab_ci_badge]][gitlab_ci_dash] shows e2e tests' status.
+ [![Github build Status][github_ci_badge]][github_ci_dash] Shows full-ish test
+ coverage via one large e2e test suite of the CLI. Unfortunately gitlab is out
+ of free compute ([![Gitlab build Status][gitlab_ci_badge]][gitlab_ci_dash]), so
+ using Github free CI t in the meantime.
 
 **Status**: While I can already make use of this project for the original goals
 I had, it's still a WIP as I tweak what the "right way" to do some rust/cargo
@@ -148,6 +151,8 @@ So to see untested lines, just `^F` for " |0" in the output.
 [wwwVcsts]: https://gitlab.com/jzacsh/jzacsh.gitlab.io/-/blob/fix-jj-usage-vcslib-refactoring/src/bin/vcslib.ts?ref_type=heads
 [gitlab_ci_badge]: https://gitlab.com/jzacsh/vcsq/badges/main/pipeline.svg
 [gitlab_ci_dash]: https://gitlab.com/jzacsh/vcsq/-/jobs
+[github_ci_badge]: https://github.com/jzacsh/vcsq/actions/workflows/ci.yml/badge.svg
+[github_ci_dash]: https://github.com/jzacsh/vcsq/actions
 [vcprompt]: http://vc.gerg.ca/hg/vcprompt
 
 ## License
