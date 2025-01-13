@@ -76,6 +76,10 @@ $ RUSTFLAGS='-Ddeprecated -Dwarnings' cargo watch \
 # there's compiler errors you're trying to read.
 ```
 
+NOTE: running `nix-shell` at the root of this repo will enter you in to you
+subshell with all the necessary dev tools (see `./shell.nix`). This will let you
+easily run anything you find in the ci/cd yaml scripts (`./.gitlab-ci.yml`).
+
 ### Tests
 
 e2e tests of the CLI binary, in `vcsq-cli/tests/`, are the strategy for the moment;
