@@ -121,8 +121,6 @@ So to see untested lines, just `^F` for " |0" in the output.
   root? any downsides one way or the other? maybe one makes crates.io usage
   harder? I guess separated they have clearer deps-attribution?
   - **answer** currently migrating to cargo workspaces feature
-- [ ] setup a Github mirror [via gitlab's mechanism][gLabToGhubMirror]
-  have one crate when published).
 - [ ] techdebt/rust-question: cleanup some of the error enums that aren't being
   fully utilized (eg: some that default to map_err() to `Unknown`-fallbackish
   variants). This is because some of the better alternatives were only added
@@ -143,7 +141,6 @@ So to see untested lines, just `^F` for " |0" in the output.
     [`vcs.sh` of gitlab.com/jzacsh/yabashlib][yblibVcs] ([ref][yblibVcs_ref]) and
     [gitlab.com/jzacsh/jzach.gitlab.io][wwwVcsts]
 
-[gLabToGhubMirror]: https://docs.gitlab.com/ee/user/project/repository/mirror/push.html#set-up-a-push-mirror-from-gitlab-to-github
 [yblibVcs]: https://gitlab.com/jzacsh/yabashlib/-/blob/main/src/vcs.sh
 [yblibVcs_ref]: https://gitlab.com/jzacsh/yabashlib/-/blob/dd838fc3b32a66fe2ec95fb85a5e9aa67280fee9/src/vcs.sh
 [dotsVcsq]: https://gitlab.com/jzacsh/dotfiles/-/blob/main/bin/lib/vcsq
