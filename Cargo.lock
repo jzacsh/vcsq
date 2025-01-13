@@ -539,7 +539,6 @@ dependencies = [
  "assert_cmd",
  "chrono",
  "clap",
- "log",
  "predicates",
  "thiserror",
  "uuid",
