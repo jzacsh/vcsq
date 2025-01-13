@@ -103,9 +103,6 @@ So to see untested lines, just `^F` for " |0" in the output.
 
 ### TODOs
 
-- [x] cleanup/finish rename of objects to vcsq (from old vcst) (and also just
-  stop prefixing any internal objects with the library's name; idk why the heck
-  I did that).
 - [ ] **finish tail-end of feature-set**: see lines in vcsq-cli/src/lib.rs
   disabled in release
   - try `cargo build --release` to turn these back off
