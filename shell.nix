@@ -1,3 +1,4 @@
+# adapted from https://wiki.nixos.org/wiki/Rust#Installation_via_rustup
 {
     pkgs ? import <nixpkgs> { },
 }:
@@ -10,29 +11,21 @@ pkgs.callPackage (
     mkShell,
     rustup,
     rustPlatform,
-
-
-    #
-    # Packages specific to vcsq
-    #
-
-    #
-    # Packages specific to vcsq's domain
-    #
-    git,
-    mercurial,
-    jujutsu,
-
-    #
-    # Packages specific to vcsq's ci/cd tasks
-    #
-    cargo-llvm-cov, # for test coverage
   }:
   mkShell {
     strictDeps = true;
     nativeBuildInputs = [
       rustup
       rustPlatform.bindgenHook
+
+      #
+      # Packages specific to vcsq
+      #
+      pkgs.git
+      pkgs.mercurial
+      pkgs.jujutsu
+      pkgs.cargo-llvm-cov # for test coverage
+      pkgs.grcov # for test coverage
     ];
     # libraries here
     buildInputs = [
@@ -42,6 +35,8 @@ pkgs.callPackage (
     shellHook = ''
       export PATH="''${CARGO_HOME:-~/.cargo}/bin":"$PATH"
       export PATH="''${RUSTUP_HOME:-~/.rustup}/toolchains/$RUSTC_VERSION-${stdenv.hostPlatform.rust.rustcTarget}/bin":"$PATH"
+
+      export RUSTFLAGS="''${RUSTFLAGS:+$RUSTFLAGS }-Cinstrument-coverage -Ddeprecated -Dwarnings "
     '';
   }
 ) { }
