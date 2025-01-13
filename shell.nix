@@ -27,7 +27,6 @@ pkgs.callPackage (
     # Packages specific to vcsq's ci/cd tasks
     #
     cargo-llvm-cov, # for test coverage
-    cargo-binutils,
   }:
   mkShell {
     strictDeps = true;
