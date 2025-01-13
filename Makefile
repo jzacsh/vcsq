@@ -1,0 +1,68 @@
+# Recipes written down in one place for both CI/CD, and basic
+# documentatoin/portable usage (we can expect everyone has make instaled).
+
+dev: build test lint 
+
+watch_test:
+	cargo watch test --workspace --color=always -- --nocapture
+
+watch_build:
+	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo watch \
+		-s 'make build' \
+		-s 'make lint' \
+		-s 'make doc'
+
+all: build test doc lint 
+
+clean:
+	cargo clean
+
+clean_all: clean
+	$(RM) *.profraw
+	$(RM) vcsq-lib/*.profraw
+	$(RM) vcsq-cli/*.profraw
+
+# everything above this line is meant for local development usage (ci/cd runs
+# things more carefully, in interdependent stages)
+##############################################################################
+
+build:
+	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo build --workspace --all-targets
+
+test:
+	RUST_BACKTRACE=full RUSTFLAGS='-Ddeprecated -Dwarnings' cargo test --workspace --locked --all-features --all-targets --verbose -- --nocapture
+
+doc: 
+	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo doc --workspace --all-features
+
+lint:
+	cargo clippy --workspace --all -- -W clippy::pedantic -Dwarnings -Ddeprecated
+
+# TODO: uncomment --output-path below, delete --text. We
+# can do this once we're public. Until then, this will always fail per
+# https://github.com/codecov/codecov-action/issues/1671#issuecomment-2486953810
+# (and I don't feel like messing with tokens just for the interim).
+# - bash <(curl -s https://codecov.io/bash)
+# TODO: once coverage is working for me locally, maybe:
+# LLVM_PROFILE_FILE="target/coverage/prof/%p-%m.profraw"
+cov:
+	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo llvm-cov --all-features --workspace --text # --codecov  --output-path codecov.json
+
+have_vcs_deps: have_vcs_git have_vcs_hg have_vcs_jj
+
+have_vcs_git:
+	$(shell which git)
+	$(shell git --version)
+
+have_vcs_hg:
+	$(shell which hg)
+	$(shell hg --version)
+
+have_vcs_jj:
+	$(shell which jj)
+	$(shell jj --version)
+
+# Yes, we're calling build phony because we using this as a sort of portable
+# script, _not_ trying to rely on Make's needs-rebuild heuristics. (for that we
+# should use a different tool if we really want one; eg: ).
+.PHONY: dev watch_build watch_test all clean clean_all build doc lint test cov have_vcs_deps have_vcs_git have_vcs_hg have_vcs_jj

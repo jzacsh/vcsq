@@ -58,17 +58,14 @@ development just involves producing a debug binary and making sure you haven't
 broken tests:
 
 ```sh
-$ RUST_BACKTRACE=full cargo watch test --workspace --color=always -- --nocapture
-# ...
+$ make watch_test
+# ... snipped
 ```
 
 In a second terminal I ensure the binary is being continuously rebuilt:
 
 ```sh
-$ RUSTFLAGS='-Ddeprecated -Dwarnings' cargo watch \
-  -x build \
-  -x 'clippy --workspace --all -- -W clippy::pedantic -Dwarnings -Ddeprecated' \
-  -x 'doc --workspace --all-features'
+$ make watch_build
 
 # ...
 # can also be tacked onto the previous command via another '-x build' arg at the
