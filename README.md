@@ -128,6 +128,8 @@ So to see untested lines, just `^F` for " |0" in the output.
   _later_ (eg: `RepoLoadError::Stderr`) which could fix some
 - [ ] techdbt: make it easier to develop by setting up a nix flake that installs
   all the deps (then cleanup the gitlab CI to use that flow too).
+  - [x] setup shell.nix
+  - [ ] DRY: make ci/cd use nix for steup instead of their custom commands.
 
 ## v1.0.0 Blockers
 
