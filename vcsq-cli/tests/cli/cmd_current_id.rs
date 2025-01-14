@@ -31,6 +31,10 @@ fn git() {
     vcs_test_setup::run_cli_from_tempdir(
         "git",
         &[
+            "-c",
+            "user.name='e2etests Vcsq'",
+            "-c",
+            "user.email=e2e-tests@vcsq.codebase",
             "commit",
             "--no-verify",
             "--message",
