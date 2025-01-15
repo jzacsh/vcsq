@@ -48,6 +48,9 @@ techdebt TODOs).
 
 ## Development
 
+**tl;dr** `make all` to locally check what ci/cd pipelines will (consider
+`nix-shell` if you're missing deps)
+
 The codebase is a library (`./vcsq-lib/`) and its dependent: a CLI at
 `./vcsq-cli/`. Directly point the CLI to the local lib, to continue lib
 development (ie: locally undo `ef5ffbc6`).
