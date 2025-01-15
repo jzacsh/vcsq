@@ -29,7 +29,7 @@ clean_all: clean
 build:
 	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo build --workspace --all-targets
 
-test:
+test: e2e_test_deps
 	RUST_BACKTRACE=full RUSTFLAGS='-Ddeprecated -Dwarnings' cargo test --workspace --locked --all-features --all-targets --verbose -- --nocapture
 
 doc: 
@@ -45,24 +45,28 @@ lint:
 # - bash <(curl -s https://codecov.io/bash)
 # TODO: once coverage is working for me locally, maybe:
 # LLVM_PROFILE_FILE="target/coverage/prof/%p-%m.profraw"
-cov:
+#
+# Same as test's steps, but run via code coverage instrumentor:
+cov: e2e_test_deps
 	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo llvm-cov --all-features --workspace --text # --codecov  --output-path codecov.json
+
+e2e_test_deps: have_vcs_deps
 
 have_vcs_deps: have_vcs_git have_vcs_hg have_vcs_jj
 
 have_vcs_git:
-	$(shell which git)
-	$(shell git --version)
+	which git
+	git --version
 
 have_vcs_hg:
-	$(shell which hg)
-	$(shell hg --version)
+	which hg
+	hg --version
 
 have_vcs_jj:
-	$(shell which jj)
-	$(shell jj --version)
+	which jj
+	jj --version
 
 # Yes, we're calling build phony because we using this as a sort of portable
 # script, _not_ trying to rely on Make's needs-rebuild heuristics. (for that we
 # should use a different tool if we really want one; eg: ).
-.PHONY: dev watch_build watch_test all clean clean_all build doc lint test cov have_vcs_deps have_vcs_git have_vcs_hg have_vcs_jj
+.PHONY: dev watch_build watch_test all clean clean_all build doc lint test cov e2e_test_deps have_vcs_deps have_vcs_git have_vcs_hg have_vcs_jj
