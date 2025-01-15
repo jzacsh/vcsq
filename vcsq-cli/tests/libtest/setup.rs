@@ -19,14 +19,20 @@ static TESTDIR_TMPDIR_ROOT: &str = "vcsq-e2e-testdirs";
 
 /// config flags that should be passed before the verb of a git command (eg: before `commit`
 /// subcommand) to avoid errors about global config (say in a ci/cd).
-// TODO: (cleanup) &[].iter().chain() with this within tests, so this is harder to forget when
-// copy/pasting patterns in tests.
-pub static FAKE_GIT_CONFIG_FLAGS: &[&str; 4] = &[
+static FAKE_GIT_CONFIG_FLAGS: &'static [&'static str; 4] = &[
     "-c",
     "user.name='e2etests Vcsq'",
     "-c",
     "user.email=e2e-tests@vcsq.codebase",
 ];
+
+pub fn git_cmd_args<'a>(args: &'a [&'a str]) -> Vec<&'a str> {
+    FAKE_GIT_CONFIG_FLAGS
+        .iter()
+        .cloned()
+        .chain(args.iter().cloned())
+        .collect()
+}
 
 // TODO: (rust) how much of this file do the following two crates make obsolete/deletable?
 // - https://docs.rs/assert_cmd/latest/assert_cmd

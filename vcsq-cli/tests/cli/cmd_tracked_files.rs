@@ -1,5 +1,5 @@
 use crate::libtest::consts::{ERROR_NOT_VALID_DIR, ERROR_NO_KNOWN_VCS};
-use crate::libtest::setup::{make_test_temp, vcs_test_setup, TestDirs, TestScope};
+use crate::libtest::setup::{git_cmd_args, make_test_temp, vcs_test_setup, TestDirs, TestScope};
 use assert_cmd::Command;
 use predicates::prelude::*;
 
@@ -30,17 +30,13 @@ fn git() {
     vcs_test_setup::run_cli_from_tempdir("git", &["add", "."], &test_dir).unwrap();
     vcs_test_setup::run_cli_from_tempdir(
         "git",
-        &[
-            "-c",
-            "user.name='e2etests Vcsq'",
-            "-c",
-            "user.email=e2e-tests@vcsq.codebase",
+        git_cmd_args(&[
             "commit",
             "--no-verify",
             "--message",
             "test arrange phase: ensuring git history",
-        ]
-        .as_ref(),
+        ])
+        .as_slice(),
         &test_dir,
     )
     .unwrap();
