@@ -43,12 +43,35 @@ lint:
 # https://github.com/codecov/codecov-action/issues/1671#issuecomment-2486953810
 # (and I don't feel like messing with tokens just for the interim).
 # - bash <(curl -s https://codecov.io/bash)
+#
 # TODO: once coverage is working for me locally, maybe:
 # LLVM_PROFILE_FILE="target/coverage/prof/%p-%m.profraw"
 #
+# TODO: figure out what's wrong with coverage; current status:
+# - expecting: >70% coverage at _least_
+# - seeing: <30% coverage, and the missed lines are _definitely_ executed as
+#   part of e2e suite.
+# - ways I've tried to run analysis:
+#
+#   - <19% line-coverage from:
+#
+#   ```sh
+#   $ cargo tarpaulin --release --bins --engine llvm --follow-exec
+#   ```
+#   - <32% line-coverage from:
+#
+#   ```sh
+#   $ cargo tarpaulin --command test --workspace --release --engine llvm --follow-exec
+#   ```
+#   - <21% line-coverage from:
+#
+#   ```sh
+#   $ RUSTFLAGS='-Ddeprecated -Dwarnings' cargo llvm-cov --all-features --workspace --summary-only
+#   ```
+#
 # Same as test's steps, but run via code coverage instrumentor:
 cov: e2e_test_deps
-	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo llvm-cov --all-features --workspace --text # --codecov  --output-path codecov.json
+	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo llvm-cov --all-features --workspace --summary-only # --text # --codecov  --output-path codecov.json
 
 e2e_test_deps: have_vcs_deps
 
