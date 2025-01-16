@@ -208,7 +208,8 @@ impl TestDirs {
         use std::process::exit;
 
         test_scope.setup_idempotence.call_once(|| {
-            let tmpdir_root = mktemp(TESTDIR_TMPDIR_ROOT, test_scope).expect("setting up test dir");
+            let tmpdir_root = mktemp(TESTDIR_TMPDIR_ROOT, test_scope)
+                .expect(&format!("setting up test dir: {}", test_scope.test_name));
             eprintln!("SETUP: {:?}", tmpdir_root.clone());
             match TestDirs::create(&tmpdir_root) {
                 Ok(()) => {}
