@@ -26,6 +26,7 @@ pkgs.callPackage (
       pkgs.jujutsu
       pkgs.cargo-llvm-cov # for test coverage
       pkgs.grcov # for test coverage
+      pkgs.cargo-tarpaulin # for test coverage
     ];
     # libraries here
     buildInputs = [
