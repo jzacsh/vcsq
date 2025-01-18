@@ -4,10 +4,13 @@
 dev: build test lint 
 
 watch_test:
-	cargo watch test --workspace --color=always -- --nocapture
+	cargo watch \
+		--ignore='.jj/' \
+		-s 'make test'
 
 watch_build:
-	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo watch \
+	cargo watch \
+		--ignore='.jj/' \
 		-s 'make build' \
 		-s 'make lint' \
 		-s 'make doc'
