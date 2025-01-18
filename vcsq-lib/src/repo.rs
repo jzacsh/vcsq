@@ -1,6 +1,7 @@
 //! Provides the traits any driver a particular brand of VCS must implement.
 use crate::cmd::{Utf8CmdOutput, Utf8CmdOutputLossy};
 use std::convert::From;
+use std::num::NonZero;
 use std::path::PathBuf;
 use std::process::Output;
 use thiserror::Error;
@@ -217,8 +218,7 @@ pub struct AncestorRef {
     pub name: HistoryRefName,
 
     /// How far back of an ancestor is this (will always be 1 or more).
-    // TODO: (rust) there's a type-way to express positive natural numbers, yeah?
-    pub distance: u64,
+    pub distance: NonZero<u64>,
 }
 
 /// Proof of underlying VCS's existence on the current system (typically --version output).
@@ -335,10 +335,9 @@ where
     ///
     /// Returns [`DriverError`] if (eg) there was a problem accessing the repo, or the underlying
     /// VCS APIs failed.
-    // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
     fn first_ancestor_ref_name(
         &self,
-        _limit: Option<u64>,
+        _limit: Option<NonZero<u64>>,
     ) -> Result<Option<AncestorRef>, DriverError> {
         todo!(); // TODO: (feature) delete and implement in adaapters
     }

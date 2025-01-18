@@ -3,6 +3,7 @@ use crate::adapter::hg;
 use crate::adapter::jj;
 use crate::repo;
 use crate::repo::{AncestorRef, Driver, DriverError, QueryDir, Validator, VcsAvailable};
+use std::num::NonZero;
 use strum::{AsRefStr, EnumIter, IntoEnumIterator};
 
 /// The particular brands of VCS this library supports.
@@ -124,10 +125,9 @@ impl Driver for Repo {
         self.adapter.parent_ref_name()
     }
 
-    // TODO: (rust) wrt `limit`: there's a type-way to express positive natural numbers, yeah?
     fn first_ancestor_ref_name(
         &self,
-        limit: Option<u64>,
+        limit: Option<NonZero<u64>>,
     ) -> Result<Option<AncestorRef>, DriverError> {
         self.adapter.first_ancestor_ref_name(limit)
     }
