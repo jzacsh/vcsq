@@ -107,6 +107,8 @@ So to see untested lines, just `^F` for " |0" in the output.
 
 ### TODOs
 
+- [ ] crates source info: [include sources][psa_cargoCratesIncludeSrc]
+  (test publish dryrun from a clean repo to double-check this works).
 - [ ] **finish tail-end of feature-set**: see lines in vcsq-cli/src/lib.rs
   disabled in release
   - try `cargo build --release` to turn these back off
@@ -144,6 +146,7 @@ So to see untested lines, just `^F` for " |0" in the output.
     [`vcs.sh` of gitlab.com/jzacsh/yabashlib][yblibVcs] ([ref][yblibVcs_ref]) and
     [gitlab.com/jzacsh/jzach.gitlab.io][wwwVcsts]
 
+[psa_cargoCratesIncludeSrc]: https://users.rust-lang.org/t/psa-check-if-your-cargo-crates-are-clean-and-tagged/109264#use-include-in-cargotoml-1
 [yblibVcs]: https://gitlab.com/jzacsh/yabashlib/-/blob/main/src/vcs.sh
 [yblibVcs_ref]: https://gitlab.com/jzacsh/yabashlib/-/blob/dd838fc3b32a66fe2ec95fb85a5e9aa67280fee9/src/vcs.sh
 [dotsVcsq]: https://gitlab.com/jzacsh/dotfiles/-/blob/main/bin/lib/vcsq
