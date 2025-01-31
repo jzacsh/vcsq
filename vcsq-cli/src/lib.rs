@@ -6,6 +6,7 @@
 //! See `--help` for complete doc, and README at <https://gitlab.com/jzacsh/vcsq> for more.
 use clap::{Parser, Subcommand};
 use std::io;
+use std::num::NonZero;
 use thiserror::Error;
 use vcsq_lib::plexer;
 use vcsq_lib::repo::{Driver, DriverError, QueryDir};
@@ -120,8 +121,7 @@ pub enum QueryCmd {
         dir: QueryDir,
 
         /// Max number of parents back to walk when seeking a parent with a hand-written ref name.
-        // TODO: (rust) there's a type-way to express positive natural numbers, yeah?
-        max: u64,
+        max: NonZero<u64>,
     },
 
     /// Lists filepaths tracked by this repo, ignoring the state of the repo (ie: any "staged"
