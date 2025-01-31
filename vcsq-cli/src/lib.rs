@@ -148,6 +148,7 @@ pub enum QueryCmd {
         dir: QueryDir,
 
         /// Whether to be silent about any answers being flawed, in the event `IsClean` is false.
+        #[arg(long, default_value_t = false)]
         dirty_ok: bool,
         // TODO: (feature) allow an optional Id or Name  (ref or bookmark) of which to compare
         // (instead of just the default which is "parent commit").
