@@ -124,6 +124,22 @@ pub enum QueryCmd {
         max: NonZero<u64>,
     },
 
+    /// Print the VCS repo's descendent revision IDs, if any exit.
+    #[command(arg_required_else_help = true)]
+    #[cfg(debug_assertions)]
+    ChildIds {
+        dir: QueryDir,
+
+        /// Max number of children to list, or zero to indicate no max.
+        #[arg(long, default_value_t = 0)]
+        max: u64,
+    },
+
+    /// Print the VCS repo's descendent revision ID, or error if more than one exists.
+    #[command(arg_required_else_help = true)]
+    #[cfg(debug_assertions)]
+    ChildId { dir: QueryDir },
+
     /// Lists filepaths tracked by this repo, ignoring the state of the repo (ie: any "staged"
     /// (git) or deleted "working-copy" (jj) edits. The goal of this listing is to show the full
     /// listing of the repository's contents, as of the time of the current commit.
@@ -182,6 +198,8 @@ impl QueryCmd {
             QueryCmd::CurrentName { dir, dirty_ok: _ }
             | QueryCmd::ParentId { dir }
             | QueryCmd::ParentName { dir, max: _ }
+            | QueryCmd::ChildIds { dir, max: _ }
+            | QueryCmd::ChildId { dir }
             | QueryCmd::CurrentFiles { dir, dirty_ok: _ } => Some(dir),
         }
     }
@@ -250,6 +268,8 @@ impl<'a> PlexerQuery<'a> {
             }
             | QueryCmd::ParentId { dir: _ }
             | QueryCmd::ParentName { dir: _, max: _ }
+            | QueryCmd::ChildIds { dir: _, max: _ }
+            | QueryCmd::ChildId { dir: _ }
             | QueryCmd::CurrentFiles {
                 dir: _,
                 dirty_ok: _,
