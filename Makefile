@@ -34,7 +34,11 @@ clean_all: clean
 build:
 	RUSTFLAGS='-Ddeprecated -Dwarnings' cargo build --workspace --all-targets
 
-test: e2e_test_deps
+# TODO: is 'build' _really_ a pre-req here? for some reason fresh installs
+# sometimes fail `watch_test` and I've not had the patience to figure out
+# what's happening there, but _appears_ fixed by building first manually like
+# this
+test: build e2e_test_deps
 	RUST_BACKTRACE=full RUSTFLAGS='-Ddeprecated -Dwarnings' cargo test --workspace --locked --all-features --all-targets --verbose -- --nocapture
 
 doc: 
