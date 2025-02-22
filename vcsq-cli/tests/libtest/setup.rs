@@ -11,7 +11,7 @@ pub static TEST_SUBDIR_NAME_SUFFIX: &str = "testscope";
 
 /// environment variable to optionally override the root (standard `$TMPDIR` or /tmp/) under which
 /// the tests' temp directory tree is created/destroyed.
-static ENVVAR_OVERRIDE_TESTDIR_ROOT: &str = "VCST_TESTDIR";
+static ENVVAR_OVERRIDE_TESTDIR_ROOT: &str = "VCSQ_TESTDIR";
 
 /// Directory under which all files are managed. This directory may itself be sub-contained (say in
 /// /tmp/foo, depending on `ENVVAR_OVERRIDE_TESTDIR_ROOT` being present).
