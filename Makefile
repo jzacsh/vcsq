@@ -5,11 +5,13 @@ dev: build test lint
 
 watch_test:
 	cargo watch \
+		--ignore='.vcsq-*/target/' \
 		--ignore='.jj/' \
 		-s 'make test'
 
 watch_build:
 	cargo watch \
+		--ignore='.vcsq-*/target/' \
 		--ignore='.jj/' \
 		-s 'make build' \
 		-s 'make lint' \
